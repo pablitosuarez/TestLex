@@ -1,0 +1,189 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('Sorteo','read')}">
+		<ui:param name="icon" value="turno" />    
+		<ui:param name="title" value="#{messages['turnosSorteo.gestionTurnos']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(sorteoList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{sorteoList}"/>
+
+			<s:decorate id="codigoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteo.codigo']}</ui:define>
+	                <h:inputText id="codigoFilter" 
+	                           size="10"
+	                          value="#{sorteoSearch.codigo}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="descripcionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteo.descripcion']}</ui:define>
+	                <h:inputText id="descripcionFilter" 
+	                           size="98"
+	                          value="#{sorteoSearch.descripcion}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="camaraFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{empty sessionState.globalCamara}">
+			    <ui:define name="label">#{messages['sorteo.camara']}</ui:define>
+	
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0" summary="#{messages['lookup.summary']}">	                
+		            	<h:panelGroup>
+		            	</h:panelGroup>
+
+		       	    	<h:commandLink style="margin-right:5px"
+			    	    	    action="#{sorteoHome.lookupSearchCamara('/web/camara/camaraList.xhtml', '/webCustom/mesaEntrada/turnos/turnoSorteoList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+		       	    	</h:commandLink>
+		            	<h:panelGroup id="camaraDescription" style="margin-right:5px">
+							<h:outputText value="#{messages['sorteo.camara.lookup_select']}" 
+						    	rendered="#{sorteoSearch.camara == null}"/>
+						    <s:fragment rendered="#{sorteoSearch.camara != null}">
+				            	#{sorteoSearch.camara.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px"
+							action="#{sorteoSearch.clearCamara}"
+						  reRender="camaraFilterDecoration" 
+						  rendered="#{sorteoSearch.camara != null}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['sorteo.conTurno.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty sorteoList.conTurnoResultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="sorteoList">
+			    <rich:dataTable id="sorteoTable" 
+			                var="item"
+			              value="#{sorteoList.conTurnoResultList}" 
+                       rendered="#{not empty sorteoList.conTurnoResultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('Sorteo','update') or sorteoSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoList.getOrderStyle('codigo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteo.codigo.shortLabel']}">
+				                    <f:param name="sorteoOrder" value="#{sorteoList.getOrderParam('codigo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoList.getOrderStyle('descripcion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteo.descripcion.shortLabel']}">
+				                    <f:param name="sorteoOrder" value="#{sorteoList.getOrderParam('descripcion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoList.getOrderStyle('conTurno', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteo.conTurno.shortLabel']}">
+				                    <f:param name="sorteoOrder" value="#{sorteoList.getOrderParam('conTurno')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" rendered="#{empty sessionState.globalOficina}" >
+								#{messages['sorteo.camara.shortLabel']}
+							</rich:column>
+
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('Sorteo','update') or sorteoSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{sorteoList.doSelection(item, '/webCustom/mesaEntrada/turnos/turnosSorteoEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!sorteoSearch.inSelectionMultiple and turnoSorteoEnumeration.isConTurnoManual(item.conTurno)}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			            <h:commandLink action="#{sorteoList.doSelection(item, '/webCustom/mesaEntrada/turnos/turnosSorteoAnualEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!sorteoSearch.inSelectionMultiple and turnoSorteoEnumeration.isConTurnoAnual(item.conTurno)}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.codigo}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.descripcion}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{turnoSorteoEnumeration.getLabel(item.conTurno)}"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn" rendered="#{empty sessionState.globalOficina}" >
+						<s:fragment rendered="#{item.camara != null}">
+
+			            #{item.camara.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{sorteoList.getPaginator(sorteoList)}"/>
+	  			<ui:param name="componentName" value="sorteo"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{sorteoSearch.hasReturnPage()}" 
+		        			  view="#{sorteoSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['sorteo.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/sorteo/sorteoList.jrxml" />
+		<ui:param name="reportList" value="#{sorteoList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

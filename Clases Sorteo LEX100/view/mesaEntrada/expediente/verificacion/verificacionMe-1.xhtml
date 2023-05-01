@@ -1,0 +1,159 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="verificacionExpediente" />    
+		<ui:param name="title" value="#{messages['expedienteMeVerificacion.tittle']}"/>
+	<br/>
+
+	<!-- Expediente  -->
+	<s:fragment id="expediente">
+	<s:decorate id="expedienteDecoration" template="/layout/edit.xhtml" >
+		    <ui:define name="label">#{messages['expedienteMeVerificacion.expedienteNumAnio']}</ui:define>
+		    <ui:param name="required" value="true"/>
+     		<h:panelGrid id="numeroSearch" columns="6" style="color:#000;" cellpadding="0" cellspacing="0">
+                <h:inputText id="numeroFilter" class="numeroExpediente" 
+                			readonly="#{false and not empty expedienteMeVerificacion.expediente}"
+						   size="10"
+						   maxlength="9"
+                          value="#{expedienteMeVerificacion.numeroExpediente}">
+                </h:inputText>
+                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+	     			<h:outputLabel value="/" />
+                </h:panelGroup>
+                <h:inputText id="anioFilter" class="anioExpediente"
+                		  style="margin-right:5px"
+                	   readonly="#{false and not empty expedienteMeVerificacion.expediente}"
+                		   size="5"
+					  maxlength="4"
+                          value="#{expedienteMeVerificacion.anioExpediente}">
+                </h:inputText>
+                <s:span rendered="#{not empty expedienteMeVerificacion.codigoSubexpediente}">
+	                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+		     			<h:outputLabel value="/" />
+	                </h:panelGroup>
+	                <h:inputText id="codigoSubexpedienteFilter"
+	                 			style="margin-right:5px"
+	                			readonly="true"
+	                			disabled="true"
+							   size="4"
+	                          value="#{expedienteMeVerificacion.codigoSubexpediente}">
+	                </h:inputText>
+				</s:span>                
+				<h:commandLink style="margin-right:5px" inmediate="true"  eventsQueue="editProperty" ajaxSingle="true"
+    	    	    action="#{expedienteMeVerificacion.doSave1()}" title="#{messages['expediente.title.validar']}">
+       	    	    <h:graphicImage value="/img/icon/check.png" style="vertical-align:top"/>
+      	    	</h:commandLink>
+				<h:commandLink inmediate="true" style="margin-right:5px"
+					title="#{messages['expediente.title.buscar']}"
+					action="#{expedienteMeVerificacion.lookupExpediente('/web/expediente/expedienteSelectionList.xhtml', siteController.currentPage.target)}">
+					<h:graphicImage value="/img/icon/lookup-button.gif"/>
+					<s:conversationPropagation type="join" />
+				</h:commandLink>
+            </h:panelGrid>
+	</s:decorate>
+	
+	
+
+	<s:div id="familiaExpedientes">
+	<s:fragment rendered="#{empty expedienteMeVerificacion.expediente and not empty expedienteMeVerificacion.familiaExpedientes and expedienteMeVerificacion.familiaExpedientes.size() > 1}">
+		<s:decorate id="expedientesFamiliaDecoration" template="/layout/edit.xhtml" >
+			<ui:define name="label">#{messages['expedienteMeReasignacion.seleccioneExpediente']}</ui:define>
+		    <ui:param name="required" value="true"/>
+	    	<div style="font-size:1.2em;font-weight:bold">
+			<ui:repeat var="expedienteFamilia" value="#{expedienteMeVerificacion.familiaExpedientes}">
+				<h:commandLink value="#{expedienteManager.getIdxAnaliticoFirst(expedienteFamilia)} #{expedienteManager.getCaratulaResumida(expedienteFamilia.caratula, 120)}" 
+								action="#{expedienteMeVerificacion.doSelectExpediente(expedienteFamilia)}"
+							   title="#{expedienteManager.getIdxAnaliticoFirst(expedienteFamilia)}"
+ 							   /> 
+				<br/>
+			</ui:repeat>
+			</div>
+	    </s:decorate>
+	</s:fragment>
+	</s:div>
+
+	<s:div id="divCaratula">
+	<s:div styleClass="rounded bigShadow caratula" rendered="#{not empty expedienteMeVerificacion.expediente}">
+		#{expedienteMeVerificacion.expediente.caratula}
+	</s:div>
+	<br/>
+	</s:div>
+	</s:fragment>
+  	<!-- end group Expediente  -->
+	
+	
+	
+	
+	
+	<!-- 
+	<s:div id="datos">
+	<s:fragment rendered="#{not empty expedienteMeVerificacion.expediente}">
+		<s:decorate id="oficinasRadicacionDecoration" template="/layout/edit.xhtml" rendered="#{not empty expedienteMeVerificacion.radicacionesActuales}">
+			<ui:define name="label">#{messages['expedienteMeVerificacion.oficinasRadicacion']}</ui:define>
+			<div style="font-size:1.5em;font-weight:bold">
+			<ui:repeat var="oficinaAsignacion" value="#{expedienteMeVerificacion.radicacionesActuales}">
+				#{tipoRadicacionEnumeration.getLabel(oficinaAsignacion.tipoRadicacion)} -
+				#{expedienteMeVerificacion.getDescripcionRadicacion(oficinaAsignacion)}
+				<br/>
+			</ui:repeat>
+			</div>
+	    </s:decorate>
+	</s:fragment>
+
+
+	
+	<s:div id="radicacionesFamilia">
+	<s:fragment rendered="#{expedienteMeVerificacion.isBuscaConexidadFamilia() and expedienteMeVerificacion.puedeSortearExpediente}" >
+	<ui:include src="#{'/webCustom/mesaEntrada/expediente/include/radicacionesFamilia-inc.xhtml'}">
+		<ui:param name="controller" value="#{expedienteMeVerificacion}"/>
+	</ui:include>
+	</s:fragment>	
+	</s:div>
+	</s:div>
+	 -->
+	
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+ 
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+		            <h:commandButton id="button-save" style="Xdisplay:none" styleClass="button main-button"
+		            	onclick="Richfaces.showModalPanel('waitDialog');"
+						value="#{messages['expediente.modificarDatos']}" 
+						action="#{expedienteMeVerificacion.doSave1}">
+						<s:defaultAction/>
+					</h:commandButton>
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

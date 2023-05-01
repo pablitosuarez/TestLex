@@ -1,0 +1,144 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="rubro" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{rubroHome.managed ? messages['rubro.edit'] : messages['rubro.add']}" />    
+		<ui:param name="description" value="#{messages['rubro.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="codigoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['rubro.codigo']}</ui:define>
+	                <h:inputText id="codigo" 
+	                       required="true"
+					       disabled="#{!rubroHome.hasEditPermission('Rubro','add','update')}"
+	                           size="10"
+	                      maxlength="10"
+	                          value="#{rubroHome.instance.codigo}">
+	                    <a4j:support event="onblur" reRender="codigoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="descripcionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['rubro.descripcion']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputTextarea id="descripcion"
+	                               cols="98"
+	                               rows="2"
+					       	 disabled="#{!rubroHome.hasEditPermission('Rubro','add','update')}"
+	                       required="true"
+	                              value="#{rubroHome.instance.descripcion}">
+	                    <a4j:support event="onblur" reRender="descripcionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputTextarea>
+	                </div>
+                              
+            </s:decorate>
+
+			<s:decorate id="materiaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['rubro.materia']}</ui:define>
+					<h:selectOneMenu id="materia"
+							  rendered="#{rubroHome.hasEditPermission('Rubro','add','update')}"
+								 value="#{rubroHome.instance.materia}">
+						<s:selectItems var="lookupItem"
+									 label="#{materiaEnumeration.labelFor(lookupItem)}"
+									 value="#{materiaEnumeration.items}"
+							noSelectionLabel="#{messages['rubro.materia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="materiaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{materiaEnumeration.labelFor(rubroHome.instance.materia)}"
+						   rendered="#{!rubroHome.hasEditPermission('Rubro','add','update')}" />
+ 
+			</s:decorate>
+
+			<s:decorate id="tipoInstanciaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['rubro.tipoInstancia']}</ui:define>
+					<h:selectOneMenu id="tipoInstancia"
+							  rendered="#{rubroHome.hasEditPermission('Rubro','add','update')}"
+								 value="#{rubroHome.instance.tipoInstancia}">
+						<s:selectItems var="lookupItem"
+									 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+									 value="#{tipoInstanciaEnumeration.items}"
+							noSelectionLabel="#{messages['rubro.tipoInstancia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="tipoInstanciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{tipoInstanciaEnumeration.labelFor(rubroHome.instance.tipoInstancia)}"
+						   rendered="#{!rubroHome.hasEditPermission('Rubro','add','update')}" />
+ 
+			</s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{rubroHome.doCancel}"
+						view="#{rubroSearch.getReturnPage('/web/rubro/rubroList.xhtml')}"
+						rendered="#{rubroHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{rubroHome.doAdd(rubroSearch.getReturnPage('/web/rubro/rubroList.xhtml'))}"
+					rendered="#{!rubroHome.managed and s:hasPermission('Rubro','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{rubroHome.doUpdate(rubroSearch.getReturnPage('/web/rubro/rubroList.xhtml'))}"
+						rendered="#{rubroHome.managed and s:hasPermission('Rubro','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{rubroHome.doCancel}"
+						view="#{rubroSearch.getReturnPage('/web/rubro/rubroList.xhtml')}"
+						rendered="#{!rubroHome.managed}"/>
+					<rich:spacer width="15" rendered="#{rubroHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{rubroHome.doDelete(rubroSearch.getReturnPage('/web/rubro/rubroList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{rubroHome.managed and s:hasPermission('Rubro','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

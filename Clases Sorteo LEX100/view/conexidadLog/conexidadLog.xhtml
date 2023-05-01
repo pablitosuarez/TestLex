@@ -1,0 +1,113 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+    
+	<h:form>
+	<ui:decorate id="form" template="/layout/form.xhtml">
+		<ui:param name="icon" value="conexidad" />    
+		<ui:param name="title" value="#{messages['conexidadLog']}" />    
+		<ui:param name="description" value="#{messages['conexidadLog.comment']}" />
+
+		<!-- group default -->
+        <ui:decorate template="/layout/group/groupAuto.xhtml">
+		<ui:param name="id" value="default"/>
+
+			<s:decorate id="camara" template="/layout/display.xhtml" >
+				<ui:define name="label">#{messages['conexidadLog.camara']}</ui:define>
+				<h:outputText value="#{messages['conexidadLog.camara.lookup_none']}" 
+		    		rendered="#{conexidadLogHome.instance.camara == null}"/>
+						<s:fragment rendered="#{conexidadLogHome.instance.camara != null}">
+
+			            #{conexidadLogHome.instance.camara.descripcion}
+						</s:fragment>
+			</s:decorate>
+
+			<s:decorate id="expediente" template="/layout/display.xhtml" >
+				<ui:define name="label">#{messages['conexidadLog.expediente']}</ui:define>
+				<h:outputText value="#{messages['conexidadLog.expediente.lookup_none']}" 
+		    		rendered="#{conexidadLogHome.instance.expediente == null}"/>
+						<s:fragment rendered="#{conexidadLogHome.instance.expediente != null}">
+
+			            #{conexidadLogHome.instance.expediente.descriptionExpression}
+						</s:fragment>
+			</s:decorate>
+
+    	    <s:decorate id="tipoRadicacion" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['conexidadLog.tipoRadicacion']}</ui:define>
+			            <h:outputText value="#{tipoRadicacionEnumeration.getLabel(conexidadLogHome.instance.tipoRadicacion)}"/>
+	        </s:decorate>
+
+    	    <s:decorate id="fechaComienzo" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['conexidadLog.fechaComienzo']}</ui:define>
+			            <h:outputText value="#{conexidadLogHome.instance.fechaComienzo}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm:ss"/>
+			            </h:outputText>
+	        </s:decorate>
+    	    <s:decorate id="fechaFin" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['conexidadLog.fechaFin']}</ui:define>
+			            <h:outputText value="#{conexidadLogHome.instance.fechaFin}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm:ss"/>
+			            </h:outputText>
+	        </s:decorate>
+    	    <s:decorate id="intervaloSeg" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['conexidadLog.intervaloSeg']}</ui:define>
+			            #{conexidadLogHome.instance.intervaloSeg}
+	        </s:decorate>
+
+		<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['conexidadLog.informacionConexidad']}"/>
+		<ui:param name="id" value="informacionConexidadGroup"/>
+		<ui:param name="initialState" value="closed"/>
+           	<pre><br/>
+           	<h:outputText value="#{conexidadLogHome.instance.informacionConexidad}"/>
+           	</pre>
+		</ui:decorate>
+		<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['conexidadLog.resultado']}"/>
+		<ui:param name="id" value="resultadoGroup"/>
+		<ui:param name="initialState" value="closed"/>
+           	<pre><br/>
+           	<h:outputText value="#{conexidadLogHome.instance.resultado}"/>
+           	</pre>
+		</ui:decorate>
+
+		</ui:decorate>
+		
+		<!-- end group default -->		
+
+    	<ui:define name="collections">
+		</ui:define>
+	
+        <div style="clear:both"/>
+
+    	<ui:define name="buttons">
+	    	<div class="actionButtons">      
+	    	    <s:button styleClass="button done main-button " 
+	    	    	  action="#{conexidadLogSearch.done()}"
+						view="#{conexidadLogSearch.getReturnPage('/web/conexidadLog/conexidadLogList.xhtml')}"
+					   value="#{messages['button_done']}"/>
+					<rich:spacer width="15"/>	
+
+		    </div>
+		</ui:define>
+
+	</ui:decorate>
+
+	</h:form>
+
+	<div class="indent_lines">
+	</div>
+	   
+</ui:define>
+
+</ui:composition>

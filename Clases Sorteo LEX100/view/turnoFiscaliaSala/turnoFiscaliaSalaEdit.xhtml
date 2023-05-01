@@ -1,0 +1,142 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="turnoFiscaliaSala" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{turnoFiscaliaSalaHome.managed ? messages['turnoFiscaliaSala.edit'] : messages['turnoFiscaliaSala.add']}" />    
+		<ui:param name="description" value="#{messages['turnoFiscaliaSala.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="fechaDesdeDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoFiscaliaSala.fechaDesde']}</ui:define>
+					<rich:calendar id="fechaDesde" 
+					 enableManualInput="true"					
+								 value="#{turnoFiscaliaSalaHome.instance.fechaDesde}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="fechaDesdeDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="fechaDesdeDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+            <s:decorate id="codFiscaliaPrimeraDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoFiscaliaSala.codFiscaliaPrimera']}</ui:define>
+	                <h:inputText id="codFiscaliaPrimera"
+	                       required="true"
+	                          value="#{turnoFiscaliaSalaHome.instance.codFiscaliaPrimera}">
+	                    <a4j:support event="onblur" reRender="codFiscaliaPrimeraDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="codFiscaliaSegundaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoFiscaliaSala.codFiscaliaSegunda']}</ui:define>
+	                <h:inputText id="codFiscaliaSegunda"
+	                       required="true"
+	                          value="#{turnoFiscaliaSalaHome.instance.codFiscaliaSegunda}">
+	                    <a4j:support event="onblur" reRender="codFiscaliaSegundaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+
+			<s:decorate id="competenciaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['turnoFiscaliaSala.competencia']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="competencia"
+							  required="true"
+								 value="#{turnoFiscaliaSalaHome.instance.competencia}">
+						<s:selectItems var="lookupItem"
+									 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+									 value="#{competenciaEnumeration.items}"
+							noSelectionLabel="#{messages['turnoFiscaliaSala.competencia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="competenciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+ 
+			</s:decorate>
+
+			<s:decorate id="camaraDecoration" template="/layout/edit.xhtml" rendered="#{empty sessionState.globalCamara}">
+					<ui:define name="label">#{messages['turnoFiscaliaSala.camara']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="camara"
+							  required="true"
+								 value="#{turnoFiscaliaSalaHome.instance.camara}">
+						<s:selectItems var="lookupItem"
+									 label="#{camaraEnumeration.labelFor(lookupItem)}"
+									 value="#{camaraEnumeration.items}"
+							noSelectionLabel="#{messages['turnoFiscaliaSala.camara.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="camaraDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+ 
+			</s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{turnoFiscaliaSalaHome.doCancel}"
+						view="#{turnoFiscaliaSalaSearch.getReturnPage('/web/turnoFiscaliaSala/turnoFiscaliaSalaList.xhtml')}"
+						rendered="#{turnoFiscaliaSalaHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{turnoFiscaliaSalaHome.doAdd(turnoFiscaliaSalaSearch.getReturnPage('/web/turnoFiscaliaSala/turnoFiscaliaSalaList.xhtml'))}"
+					rendered="#{!turnoFiscaliaSalaHome.managed}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{turnoFiscaliaSalaHome.doUpdate(turnoFiscaliaSalaSearch.getReturnPage('/web/turnoFiscaliaSala/turnoFiscaliaSalaList.xhtml'))}"
+						rendered="#{turnoFiscaliaSalaHome.managed}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{turnoFiscaliaSalaHome.doCancel}"
+						view="#{turnoFiscaliaSalaSearch.getReturnPage('/web/turnoFiscaliaSala/turnoFiscaliaSalaList.xhtml')}"
+						rendered="#{!turnoFiscaliaSalaHome.managed}"/>
+					<rich:spacer width="15" rendered="#{turnoFiscaliaSalaHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{turnoFiscaliaSalaHome.doDelete(turnoFiscaliaSalaSearch.getReturnPage('/web/turnoFiscaliaSala/turnoFiscaliaSalaList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{turnoFiscaliaSalaHome.managed}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

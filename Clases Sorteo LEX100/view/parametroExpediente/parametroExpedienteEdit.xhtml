@@ -1,0 +1,150 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="parametroExpediente" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{parametroExpedienteHome.managed ? messages['parametroExpediente.edit'] : messages['parametroExpediente.add']}" />    
+		<ui:param name="description" value="#{messages['parametroExpediente.comment']}" />
+
+   		<ui:define name="formHeader">
+	        <div class="formHeader">
+
+			<s:decorate id="expedienteIngreso" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['parametroExpediente.expedienteIngreso']}</ui:define>
+				<h:outputText value="#{messages['parametroExpediente.expedienteIngreso.lookup_none']}" 
+		    		rendered="#{parametroExpedienteHome.instance.expedienteIngreso == null}"/>
+						<s:fragment rendered="#{parametroExpedienteHome.instance.expedienteIngreso != null}">
+			            #{parametroExpedienteHome.instance.expedienteIngreso.id}
+						</s:fragment>
+			</s:decorate>
+			</div>
+		</ui:define>	<!--  end formHeader -->
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+
+			<s:decorate id="parametroDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['parametroExpediente.parametro']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" rendered="#{parametroExpedienteHome.hasEditPermission('ParametroExpediente','add','update')}">
+                		<h:inputText id="parametro"
+                				  value="#{parametroExpedienteHome.instance.parametro}" 
+							   required="true"
+							  converter="parametroEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+                			onclick="#{rich:component('parametroSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="400" width="400" id="parametroSuggestion" for="parametro" suggestionAction="#{parametroEnumeration.autocomplete}" 
+						var="parametro">
+						<h:column>
+							<h:outputText value="#{parametroEnumeration.labelFor(parametro)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="parametroDecoration" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{parametro}" target="#{parametroEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{parametro}" target="#{parametroExpedienteHome.instance.parametro}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+					<h:outputText value="#{parametroEnumeration.labelFor(parametroExpedienteHome.instance.parametro)}"
+						   rendered="#{!parametroExpedienteHome.hasEditPermission('ParametroExpediente','add','update')}" />
+ 
+			</s:decorate>
+            <s:decorate id="indiceDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametroExpediente.indice']}</ui:define>
+	                <h:inputText id="indice"
+	                       required="true"
+					       disabled="#{!parametroExpedienteHome.hasEditPermission('ParametroExpediente','add','update')}"
+	                          value="#{parametroExpedienteHome.instance.indice}">
+	                    <a4j:support event="onblur" reRender="indiceDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="valorDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametroExpediente.valor']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputTextarea id="valor"
+	                               cols="98"
+	                               rows="2"
+					       	 disabled="#{!parametroExpedienteHome.hasEditPermission('ParametroExpediente','add','update')}"
+	                              value="#{parametroExpedienteHome.instance.valor}">
+	                    <a4j:support event="onblur" reRender="valorDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputTextarea>
+	                </div>
+                              
+            </s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{parametroExpedienteHome.doCancel}"
+						view="#{parametroExpedienteSearch.getReturnPage('/web/parametroExpediente/parametroExpedienteList.xhtml')}"
+						rendered="#{parametroExpedienteHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{parametroExpedienteHome.doAdd(parametroExpedienteSearch.getReturnPage('/web/parametroExpediente/parametroExpedienteList.xhtml'))}"
+					rendered="#{!parametroExpedienteHome.managed and s:hasPermission('ParametroExpediente','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{parametroExpedienteHome.doUpdate(parametroExpedienteSearch.getReturnPage('/web/parametroExpediente/parametroExpedienteList.xhtml'))}"
+						rendered="#{parametroExpedienteHome.managed and s:hasPermission('ParametroExpediente','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{parametroExpedienteHome.doCancel}"
+						view="#{parametroExpedienteSearch.getReturnPage('/web/parametroExpediente/parametroExpedienteList.xhtml')}"
+						rendered="#{!parametroExpedienteHome.managed}"/>
+					<rich:spacer width="15" rendered="#{parametroExpedienteHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{parametroExpedienteHome.doDelete(parametroExpedienteSearch.getReturnPage('/web/parametroExpediente/parametroExpedienteList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{parametroExpedienteHome.managed and s:hasPermission('ParametroExpediente','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

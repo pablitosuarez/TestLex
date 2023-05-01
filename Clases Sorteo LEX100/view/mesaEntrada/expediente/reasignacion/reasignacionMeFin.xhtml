@@ -1,0 +1,314 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+
+    <h:form id="causa" enctype="multipart/form-data">
+    
+    <s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+	<ui:decorate id="form" template="/layout/editFormExpediente.xhtml">
+		<ui:param name="icon" value="edit" /> 
+  		<ui:param name="buttonCaratula" value="expediente:generarCaratulaButton" />
+		<ui:define name="title">
+		
+		<span class="titleExpediente">
+			#{expedienteManager.getTitleExpediente(expedienteMeReasignacion.reasignacionEdit.expediente)}
+		</span>
+		<rich:toolTip for="titleExpediente" style="color:#333" >
+		<pre>#{expedienteManager.getToolTipExpediente()}</pre>
+		</rich:toolTip>
+		
+
+		</ui:define>    
+	<br/>
+	<!-- group sorteo -->
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="Datos del Expediente"/>
+		<ui:param name="id" value="sorteoGroup"/>
+
+         <s:decorate id="numeroExpedienteDecoration" template="/layout/edit.xhtml" >
+             	<ui:define name="label">Número de Expediente</ui:define>
+             	<span style="font-size:1.5em;font-weight:bold">
+             	#{expedienteManager.getIdxAnaliticoFirst(expedienteMeReasignacion.reasignacionEdit.expediente)}
+             	</span>
+         </s:decorate>
+         <s:decorate id="tipoCausaExpedienteDecoration" rendered="#{expedienteMeReasignacion.tipoSorteoCambioTipoCausa}" template="/layout/edit.xhtml" >
+             	<ui:define name="label">Tipo de Causa</ui:define>
+             	<div style="font-size:1.5em;font-weight:bold">
+             		#{expedienteMeReasignacion.descripcionTipoCausaActual}
+             	</div>
+         </s:decorate>
+         <s:decorate id="oficinaAnteriorExpedienteDecoration" rendered="#{not expedienteMeReasignacion.destinoSecretariaEspecial and not expedienteMeReasignacion.tipoSorteoCambioTipoCausa}" template="/layout/edit.xhtml" >
+             	<ui:define name="label">#{expedienteMeReasignacion.labelOficinaAnteriorRadicacion}</ui:define>
+             	<div style="font-size:1.5em;font-weight:bold">
+             		#{expedienteMeReasignacion.descripcionOficinaAnteriorRadicacion}
+             	</div>
+         </s:decorate>
+         <s:decorate id="oficinaExpedienteDecoration" 
+         	rendered="#{not expedienteMeReasignacion.destinoSecretariaEspecial and not expedienteMeReasignacion.tipoSorteoDesafectacionSalaEstudio and not expedienteMeReasignacion.tipoSorteoFinJuzgadoSentencia and not expedienteMeReasignacion.tipoSorteoCambioTipoCausa}" 
+         	template="/layout/edit.xhtml" >
+             	<ui:define name="label">#{expedienteMeReasignacion.labelOficinaActualRadicacion}</ui:define>
+
+				<s:fragment rendered="#{expedienteMeReasignacion.sorteadoOkExpediente or not expedienteMeReasignacion.reasignacionEdit.necesitaSorteo}">
+					<div style="font-size: 1.5em; font-weight: bold">
+						#{expedienteMeReasignacion.descripcionOficinaActualRadicacion}
+					</div>
+				</s:fragment>
+				<s:fragment rendered="#{expedienteMeReasignacion.sorteadoErrorExpediente and expedienteMeReasignacion.reasignacionEdit.necesitaSorteo}">
+					<div style="font-size: 1.5em; font-weight: bold">No ha sido
+						posible sortear el expediente. El servicio de sorteo no esta
+						activo o no hay disponibles oficinas de turno para este
+						expediente.</div>
+				</s:fragment>
+				<s:fragment rendered="#{expedienteMeReasignacion.sorteadoErrorExpediente and not expedienteMeReasignacion.reasignacionEdit.necesitaSorteo}">
+					<div style="font-size: 1.5em; font-weight: bold">No ha sido
+						posible compensar las oficinas.</div>
+				</s:fragment>
+
+				<s:fragment rendered="#{expedienteMeReasignacion.sorteandoExpediente}">
+					<a4j:poll id="poll" interval="2000" enabled="true" ajaxSingle="true" 
+						reRender="caratulaExpedienteSpan, sorteoGroup, conexidadExpGroup, buttonsGroup" actionListener="#{expedienteMeReasignacion.refreshExpediente()}"/> 
+					<s:div>
+						<h:graphicImage value="/lex100pjn/img/other/sorteando.gif" />
+					</s:div>
+				</s:fragment>
+         </s:decorate>
+         <s:decorate id="salaOrigenDecoration" rendered="#{expedienteMeReasignacion.tipoSorteoDesafectacionSalaEstudio}" template="/layout/edit.xhtml" >
+             	<ui:define name="label">Sala Origen</ui:define>
+				<s:fragment rendered="#{expedienteMeReasignacion.sorteadoOkExpediente or not expedienteMeReasignacion.reasignacionEdit.necesitaSorteo}">
+					<div style="font-size: 1.5em; font-weight: bold">
+						#{expedienteMeReasignacion.descripcionOficinaDestino}
+					</div>
+				</s:fragment>
+             	
+				<a4j:poll id="poll" interval="2000" enabled="true" ajaxSingle="true" 
+					rendered="#{expedienteMeReasignacion.reasignacionEdit.expediente.statusSorteo == 1}"
+					reRender="sorteoGroup, conexidadExpGroup, buttonsGroup" actionListener="#{expedienteMeReasignacion.refreshExpediente()}"/> 
+				<s:div rendered="#{expedienteMeReasignacion.reasignacionEdit.expediente.statusSorteo == 1}">
+					<h:graphicImage value="/lex100pjn/img/other/sorteando.gif" />
+				</s:div>
+         </s:decorate>
+         <s:decorate id="juzgadoOrigenDecoration" rendered="#{expedienteMeReasignacion.tipoSorteoFinJuzgadoSentencia}" template="/layout/edit.xhtml" >
+             	<ui:define name="label">Juzgado Origen</ui:define>
+				<s:fragment rendered="#{expedienteMeReasignacion.sorteadoOkExpediente or not expedienteMeReasignacion.reasignacionEdit.necesitaSorteo}">
+					<div style="font-size: 1.5em; font-weight: bold">
+						#{expedienteMeReasignacion.descripcionOficinaDestino}
+					</div>
+				</s:fragment>
+             	
+				<a4j:poll id="poll" interval="2000" enabled="true" ajaxSingle="true" 
+					rendered="#{expedienteMeReasignacion.reasignacionEdit.expediente.statusSorteo == 1}"
+					reRender="sorteoGroup, conexidadExpGroup, buttonsGroup" actionListener="#{expedienteMeReasignacion.refreshExpediente()}"/> 
+				<s:div rendered="#{expedienteMeReasignacion.reasignacionEdit.expediente.statusSorteo == 1}">
+					<h:graphicImage value="/lex100pjn/img/other/sorteando.gif" />
+				</s:div>
+         </s:decorate>
+	</ui:decorate>
+	<!-- end group sorteo -->
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <s:div id="buttonsGroup" styleClass="actionButtons">
+						
+ 				<h:commandButton styleClass="button main-button"
+						value="Mostrar Expediente"
+						disabled="#{expedienteMeReasignacion.sorteandoExpediente}"
+						actionListener="#{expedienteMeReasignacion.refreshSelectExpediente()}"
+						action="/web/expediente/expedienteCompleto.xhtml"/>
+						
+				<h:commandButton styleClass="button" 
+						value="Imprimir Caratula"
+						disabled="#{expedienteMeReasignacion.sorteandoExpediente}" 
+						actionListener="#{expedienteMeReasignacion.refreshSelectExpediente()}"
+						action="#{caratulaReportManager.downloadCaratula(expedienteMeReasignacion.reasignacionEdit.expediente)}" />
+
+				<h:commandButton styleClass="button" 
+						value="Imprimir Constancia Sorteo" 
+						disabled="#{expedienteMeReasignacion.sorteandoExpediente}"
+						actionListener="#{expedienteMeReasignacion.refreshSelectExpediente()}"
+						action="#{constanciaSorteoReportManager.downloadConstanciaSorteoVocales('constanciaSorteoVocales.jrxml', expedienteMeReasignacion)}" />
+				
+				<h:commandButton  value="#{messages['constanciaSorteoSala']}"
+						styleClass="button main-button" 
+						rendered="#{expedienteMeReasignacion.sorteoSala and s:hasPermission('Expediente','verConstanciaSorteoSala')}"
+						actionListener="#{constanciaSorteoReportManager.downloadConstancia('constanciaSorteoSala.jrxml', expedienteMeReasignacion.reasignacionEdit.expediente)}" />
+				<h:commandButton  value="#{messages['recursoExp.reciboSorteoSala.button']}"
+					styleClass="button main-button" 
+					rendered="#{impresionManager.isHasColaImpresionCaratulas(sessionState.globalOficina) and (expedienteMeReasignacion.sorteoSala) and s:hasPermission('Expediente','verConstanciaSorteoSala') and expedienteMeAdd.isReciboSorteoSala(expedienteMeReasignacion.reasignacionEdit.expediente)}"
+					actionListener="#{recursoReportManager.imprimirReciboSorteoSalaCiv(expedienteMeReasignacion.reasignacionEdit.expediente)}" />
+
+				<h:commandButton  value="#{messages['recursoExp.reciboSorteoSala.button']}"
+					styleClass="button main-button" 
+					rendered="#{!impresionManager.isHasColaImpresionCaratulas(sessionState.globalOficina) and (expedienteMeReasignacion.sorteoSala) and s:hasPermission('Expediente','verConstanciaSorteoSala') and expedienteMeAdd.isReciboSorteoSala(expedienteMeReasignacion.reasignacionEdit.expediente)}"
+					actionListener="#{recursoReportManager.downloadReciboSorteoSalaCiv(expedienteMeReasignacion.reasignacionEdit.expediente, expedienteMeReasignacion.recursoEdit.recursoSorteo)}" />
+			</s:div>
+		</ui:define>
+	</ui:decorate>
+
+	<!-- Batch task list -->
+	<a4j:poll id="pollTaskList" interval="10000" reRender="batchTaskList" ajaxSingle="true" />
+	
+	<s:div styleClass="results" id="batchTaskList">
+	    <div>
+	    	<h1>Procesos en segundo plano</h1>
+	    </div>
+	    <h:outputText 
+			value="No hay procesos en segundo plano pendientes de procesar"
+			styleClass="emptyMessage"
+			rendered="#{empty userTaskManager.taskList}" />
+		
+	    <rich:dataTable id="batchTaskTable" 
+	                var="item"
+	              value="#{userTaskManager.taskList}" 
+                     rendered="#{not empty userTaskManager.taskList}">
+			<f:facet name="header">
+				<rich:columnGroup>
+					<rich:column styleClass="toolbaritem">
+	            		<span/>
+					</rich:column>
+					<rich:column styleClass="toolbaritem">
+						#{messages['userTaskManager.title.status']}
+					</rich:column>
+					<rich:column styleClass="toolbaritem">
+						#{messages['userTaskManager.title.horario']}
+					</rich:column>
+					<rich:column styleClass="toolbaritem">
+						#{messages['userTaskManager.title']}
+					</rich:column>
+					<rich:column styleClass="toolbaritem">
+						#{messages['userTaskManager.title.info']}
+					</rich:column>
+				</rich:columnGroup>
+			</f:facet>
+	        <rich:column styleClass="rowColumn align-center"  >
+	            <h:graphicImage value="/lex100pjn/img/ajax-loader-minibar.gif" rendered="#{item.running}"/>
+	            <h:graphicImage value="/img/icon/check2.gif" rendered="#{!item.running and item.status != 'Finalizada con Error'}"/>
+	            <h:graphicImage value="/img/icon/error.gif" rendered="#{!item.running and item.status == 'Finalizada con Error'}"/>
+				<br/>
+	        </rich:column>
+	        <rich:column styleClass="rowColumn" >
+	            #{item.status}
+				<br/>
+	        </rich:column>
+	        <rich:column styleClass="rowColumn"  >
+	            #{adminAction.timeInfo(item)}
+				<br/>
+	        </rich:column>
+	        <rich:column styleClass="rowColumn"  >
+	           #{item.description}
+				<br/>
+	        </rich:column>
+	        <rich:column styleClass="rowColumn"  >
+	            #{item.info}
+				<br/>
+	        </rich:column>
+		</rich:dataTable>
+	</s:div>
+	<!-- End batch task list -->
+	
+	<br />
+	<s:div id="conexidadExpGroup" styleClass="indent_lines">
+		<!-- group conexidadExpGroup -->
+		<s:decorate id="conexidadListLines"
+			template="/layout/lines/lines.xhtml"
+			rendered="#{expedienteMeReasignacion.buscaConexidad and not empty expedienteMeReasignacion.reasignacionEdit.expediente and (expedienteMeReasignacion.sorteadoOkExpediente or not expedienteMeReasignacion.reasignacionEdit.necesitaSorteo)}">
+			<ui:param name="label"
+				value="#{messages['expediente.conexidadInformativa']}" />
+			<ui:param name="icon" value="conexidad" />
+			<ui:param name="initialState"
+				value="#{empty conexidadList.byExpedienteReasignacionResultList? 'closed':'open'}" />
+
+			<div class="association" id="conexidadListChildren">
+				<ui:define name="emptyMessage">
+					<h:outputText 
+						value="#{messages['expediente.conexidadInformativa.list_none']}"
+						styleClass="emptyMessage"
+						rendered="#{empty conexidadList.byExpedienteReasignacionResultList}" />
+				</ui:define>
+				<rich:dataTable
+					value="#{conexidadList.byExpedienteReasignacionResultList}"
+					var="conexidad"
+					rendered="#{not empty conexidadList.byExpedienteReasignacionResultList}"
+					rowClasses="rvgRowOne,rvgRowTwo" id="conexidadListTable">
+					<rich:column styleClass="rowColumn align-right">
+						<f:facet name="header">
+						#{messages['conexidad.orden.shortLabel']}
+					</f:facet>
+		            #{conexidad.orden}
+					<br />
+					</rich:column>
+					<rich:column styleClass="rowColumn">
+						<f:facet name="header">
+						#{messages['conexidad.expedienteRelacionado.shortLabel']}
+					</f:facet>
+						<s:fragment rendered="#{conexidad.expedienteRelacionado != null}">
+			            #{expedienteManager.getNumeroExpedienteAbreviado(conexidad.expedienteRelacionado, true)}
+					</s:fragment>
+						<br />
+					</rich:column>
+					<rich:column styleClass="rowColumn">
+						<f:facet name="header">
+						#{messages['expediente.caratula']}
+					</f:facet>
+						<s:fragment rendered="#{conexidad.expedienteRelacionado != null}">
+			            #{conexidad.expedienteRelacionado.caratula}
+					</s:fragment>
+						<br />
+					</rich:column>
+					<rich:column styleClass="rowColumn">
+						<f:facet name="header">
+                            #{messages['oficina']}
+					</f:facet>
+						<s:fragment rendered="#{conexidad.expedienteRelacionado != null}">
+
+		            #{expedienteManager.getDescripcionOficinaByRadicacion(conexidad.expedienteRelacionado, expedienteMeReAsignacion.tipoRadicacionValue)}
+					</s:fragment>
+						<br />
+					</rich:column>
+					<rich:column styleClass="rowColumn">
+						<f:facet name="header">
+						#{messages['conexidad.criterios']}
+					</f:facet>
+		            #{conexidad.criteriosName}
+					<br />
+					</rich:column>
+			        <rich:column styleClass="rowColumn">
+						<f:facet name="header">
+                             #{messages['conexidad.coincidencias.shortLabel']}
+						</f:facet>
+		            #{conexidad.coincidencias}
+					<br/>
+			        </rich:column>
+				</rich:dataTable>
+			</div>
+		    <ui:define name="paginator">
+				<s:decorate template="/layout/listPaginator.xhtml">
+		  			<ui:param name="paginator" value="#{conexidadList.getPaginator(conexidadList)}"/>
+		  			<ui:param name="componentName" value="conexidad"/>
+		  		</s:decorate>
+			</ui:define>
+		</s:decorate>
+		<!-- end group conexidadExpGroup -->
+	</s:div>
+
+    </s:fragment>
+    </h:form>
+
+</ui:define>
+
+
+</ui:composition>

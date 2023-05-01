@@ -1,0 +1,431 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{empty expedienteMeAdd.expedienteEspecialEdit.tipoCausa ? expedienteMeAdd.normalTitle : interpolator.interpolate(expedienteMeAdd.title, expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion)}"/>
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+	<br/>
+
+	<!-- Expediente Principal -->
+	<s:fragment id="expedientePrincipal" rendered="#{false and expedienteMeAdd.isVinculado()}">
+		<ui:include src="/webCustom/mesaEntrada/expediente/add/include/expedientePrincipal.xhtml"/>
+	</s:fragment>
+  	<!-- end group Expediente Principal -->
+
+	<!-- group tipoProcesoGroup -->
+	<s:div id="tiposProceso">
+		<s:fragment rendered="#{expedienteMeAdd.showTipoProceso()}">
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/tipoProceso-inc.xhtml'}"/>
+		</s:fragment>
+	</s:div>
+	<!-- end group tipoProcesoGroup -->
+
+	<s:fragment rendered="#{expedienteMeAdd.showFiltroMateriaObjetoJuicio() and not empty expedienteMeAdd.filtroMateriaObjetoJuicio and expedienteMeAdd.filtroMateriaObjetoJuicio.abreviatura != 'SU' and not expedienteMeAdd.editMode}">
+			<s:decorate template="/layout/editQueryShort2.xhtml" >
+					<ui:define name="label">#{messages['tipoCausa.materia']}</ui:define>
+					#{materiaEnumeration.labelFor(expedienteMeAdd.filtroMateriaObjetoJuicio)}
+			</s:decorate>
+	</s:fragment> 
+	<s:fragment rendered="#{expedienteMeAdd.showFiltroMateriaObjetoJuicio() and (empty expedienteMeAdd.filtroMateriaObjetoJuicio or expedienteMeAdd.editMode) }">
+			<s:decorate id="materiaDecoration" template="/layout/editQueryShort2.xhtml" >
+					<ui:define name="label">#{messages['tipoCausa.materia']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="materia"
+							  required="#{!oficinaManager.isCorteSuprema(oficinaManager.oficinaActual)}"
+								 value="#{expedienteMeAdd.filtroMateriaObjetoJuicio}"
+				   valueChangeListener="#{expedienteMeAdd.onChangeFiltroMateriaObjetoJuicio}">
+						<s:selectItems var="lookupItem"
+									 label="#{materiaEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeAdd.materiasNoPenal}"
+							noSelectionLabel="#{messages['tipoCausa.materia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+					<a4j:support event="onchange" reRender="temaDecoration, objetosIntervinientes" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+ 
+			</s:decorate>
+            <h:commandButton styleClass="button main-button" rendered="#{not expedienteMeAdd.editMode}"
+				value="#{messages['button_next']}" />
+				
+	</s:fragment>
+	<s:fragment rendered="#{not expedienteMeAdd.showFiltroMateriaObjetoJuicio() or not empty expedienteMeAdd.filtroMateriaObjetoJuicio}">
+	<!-- Seleccion Submateria  -->
+	<s:div id="temaDecoration" >
+		<s:decorate template="/layout/editQueryShort2.xhtml" rendered="#{not expedienteMeAdd.showTema()}">
+			 	 <s:fragment rendered="#{expedienteMeAdd.showMedidasCautelares()}">
+			        <h:selectBooleanCheckbox id="medidasCautelares" value="#{expedienteMeAdd.medidasCautelares}" /> #{messages['expediente.medidasCautelares']}
+			 	 	<rich:spacer width="10px"></rich:spacer>
+				 </s:fragment>	
+			 	 <s:fragment rendered="#{expedienteMeAdd.showRelajarValidacion()}">
+			        <h:selectBooleanCheckbox id="relajarValidacion" value="#{expedienteMeAdd.relajarValidacion}" > 
+						<a4j:support event="onclick" ajaxSingle="true" />
+			        </h:selectBooleanCheckbox>
+			        #{messages['expediente.relajarValidacion']}
+			 	 	<rich:spacer width="10px"></rich:spacer>
+				 </s:fragment>	
+			 	 <s:fragment rendered="#{expedienteMeAdd.showEstadoEsParte()}">
+			        <h:selectBooleanCheckbox id="estadoEsParte" value="#{expedienteMeAdd.estadoEsParte}" /> #{messages['expediente.estadoEsParte']}
+			 	 	<rich:spacer width="10px"></rich:spacer>
+				 </s:fragment>	
+		</s:decorate>
+		<s:decorate template="/layout/editQueryShort2.xhtml" rendered="#{expedienteMeAdd.showTema()}">
+				<ui:define name="label">#{messages['objetoJuicio.tema']}</ui:define>
+				
+				<s:fragment rendered="#{not expedienteMeAdd.isShowTemaRadioButtonSelector()}">
+				<div style="float:left;">
+				<h:selectOneMenu id="tema"
+							 disabled="#{not s:hasPermission('Expediente','cambioObjetoJuicio') and expedienteMeAdd.editMode}"
+							 value="#{expedienteMeAdd.tema}">
+					<s:selectItems var="lookupItem"
+								 label="#{temaEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeAdd.temas}"
+						noSelectionLabel="#{messages['expediente.materia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="temaDecoration, objetosIntervinientes" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneMenu>	
+				</div>	
+				</s:fragment>		
+				
+				<s:fragment rendered="#{expedienteMeAdd.isShowTemaRadioButtonSelector()}">
+				<div style="float:left;">
+				<h:selectOneRadio id="temaCivil"
+							 disabled="#{not s:hasPermission('Expediente','cambioObjetoJuicio') and expedienteMeAdd.editMode}"
+							 value="#{expedienteMeAdd.tema}">
+					<s:selectItems var="lookupItem"
+								 label="#{temaEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeAdd.temas}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="temaDecoration, objetosIntervinientes" ajaxSingle="true" eventsQueue="editProperty"/>							 
+				</h:selectOneRadio>
+				</div>
+				</s:fragment>
+				
+					
+			 	 <s:fragment rendered="#{expedienteMeAdd.showMedidasCautelares()}">
+			 	 	<rich:spacer width="10px"></rich:spacer>
+			        <h:selectBooleanCheckbox id="medidasCautelares" value="#{expedienteMeAdd.medidasCautelares}" /> #{messages['expediente.medidasCautelares']}
+			 	 	<rich:spacer width="10px"></rich:spacer>
+				 </s:fragment>	
+			 	 <s:fragment rendered="#{expedienteMeAdd.showRelajarValidacion()}">
+			        <h:selectBooleanCheckbox id="relajarValidacion" value="#{expedienteMeAdd.relajarValidacion}" > 
+						<a4j:support event="onclick" ajaxSingle="true" />
+			        </h:selectBooleanCheckbox>
+			        #{messages['expediente.relajarValidacion']}
+			 	 	<rich:spacer width="10px"></rich:spacer>
+				 </s:fragment>	
+			 	 <s:fragment rendered="#{expedienteMeAdd.showEstadoEsParte()}">
+			        <h:selectBooleanCheckbox id="estadoEsParte" value="#{expedienteMeAdd.estadoEsParte}" /> #{messages['expediente.estadoEsParte']}
+			 	 	<rich:spacer width="10px"></rich:spacer>
+				 </s:fragment>	
+			</s:decorate> 
+	</s:div>
+
+	<s:div id="objetosIntervinientes">
+
+	
+	<!-- group objeto de juicio  -->
+	<s:fragment rendered="#{expedienteMeAdd.showObjetoJuicio() and (expedienteMeAdd.puedeCambiarObjetoJuicio() or not expedienteMeAdd.editMode )}">
+		<s:fragment rendered="#{not expedienteMeAdd.mediacion}">
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/objetoJuicio-inc.xhtml'}"/>
+		</s:fragment>
+		<s:fragment rendered="#{expedienteMeAdd.mediacion}">
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/objetoJuicioMultiple-inc.xhtml'}"/>
+		</s:fragment>
+	</s:fragment>	
+ 	 <!--  end group objeto de juicio  -->
+ 	 
+	<!-- group abogadosGroup -->
+	<s:div id="objetosAbogados">
+		<s:fragment rendered="#{expedienteMeAdd.showIntervinientes() and expedienteMeAdd.showLetrados()}">
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/letrado-inc.xhtml'}"/>
+		</s:fragment>
+	</s:div>
+	<!-- end group abogadosGroup -->
+	
+	<!-- check lesahumanidad ** esta por parametro de configuracion, no se si solo deberia ser para corte -->
+	<s:div rendered="#{expedienteMeAdd.showDerechosHumanos()}">
+        <h:selectBooleanCheckbox id="derechosHumanos" value="#{expedienteMeAdd.derechosHumanos}" /> 
+        <h:outputText style="font-size:12px;font-weight:bold" value="#{messages['expediente.derechosHumanos']}" /> 
+ 	 	<rich:spacer width="10px"></rich:spacer>
+	</s:div>
+	
+	<!-- group interviniente -->
+	<s:fragment rendered="#{expedienteMeAdd.showIntervinientes()}">
+		<s:fragment rendered="#{not expedienteMeAdd.modoRapido}">
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/interviniente-inc.xhtml'}">
+	      	<ui:param name="label" value="#{messages['expedienteMe.intervinienteList']}"/>
+			<ui:param name="icon" value="interviniente"/>
+			<ui:param name="id" value="int"/>
+			<ui:param name="editList" value="#{expedienteMeAdd.intervinienteEditList}"/>
+		</ui:include>
+		</s:fragment>	
+		<s:fragment rendered="#{expedienteMeAdd.modoRapido}">
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/interviniente-inc-mr.xhtml'}">
+	      	<ui:param name="label" value="#{messages['expedienteMe.intervinienteList']}"/>
+			<ui:param name="icon" value="interviniente"/>
+			<ui:param name="id" value="int"/>
+			<ui:param name="editList" value="#{expedienteMeAdd.intervinienteEditList}"/>
+		</ui:include>	
+		</s:fragment>	
+	</s:fragment>	
+	<!-- end group interviniente --> 
+
+
+	</s:div>
+	</s:fragment>
+	
+
+   	
+   		<ui:define name="collections">
+		</ui:define>
+ 
+   		<ui:define name="buttons">     
+	        <s:div id="actionButtons" rendered="#{not expedienteMeAdd.showFiltroMateriaObjetoJuicio() or not empty expedienteMeAdd.filtroMateriaObjetoJuicio}">
+  			<s:fragment rendered="#{!expedienteMeAdd.editMode}">
+  			
+  			<s:fragment rendered="#{not expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}">
+		 		<ui:include src="/web/remesaExpediente/include/selecccionRemesasPorUsuarioInc.xhtml" />
+			</s:fragment>
+
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button" rendered="#{expedienteMeAdd.isEspecial() and !expedienteMeAdd.hasPageEspecial0()}"
+						value="#{messages['button_previous']}"
+						view="#{expedienteMeAdd.ingresoAnteriorSistema ? '/webCustom/mesaEntrada/expediente/add/ingresoAnteriorSistema-Menu-Especial.xhtml' : '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Menu-Especial.xhtml'}">
+						<s:conversationPropagation type="none"/>
+					</s:button>
+	            <s:button styleClass="button done main-button" rendered="#{expedienteMeAdd.isEspecial() and expedienteMeAdd.hasPageEspecial0()}"
+						value="#{messages['button_previous']}"
+						view="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial-0.xhtml">
+				</s:button>
+				<rich:spacer width="15"/>	
+	            <h:commandButton id="button-save" styleClass="button main-button"
+					value="#{messages['expediente.title.validar']}" 
+					action="#{expedienteMeAdd.doSave1}">
+					<s:defaultAction/>
+				</h:commandButton>
+				<!-- Modo rapido/normal -->
+	            <h:commandButton styleClass="button main-button"
+						value="#{messages['expedienteMe.modo_rapido']}" rendered="#{not expedienteMeAdd.modoRapido}"
+						actionListener="#{expedienteMeAdd.cambiarModoRapido(true)}"/>
+						
+	            <h:commandButton styleClass="button main-button"
+						value="#{messages['expedienteMe.modo_normal']}" rendered="#{expedienteMeAdd.modoRapido}"
+						actionListener="#{expedienteMeAdd.cambiarModoRapido(false)}"/>
+				
+				<!-- Next Button -->
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_next']}" 
+					action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial.xhtml')}"/>
+
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_next']}" 
+					action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-2.xhtml')}"/>
+
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.asignaPorSorteo and not expedienteMeAdd.ingresoAnteriorSistema and not expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_asignar']}" 
+					onclick="Richfaces.showModalPanel('waitDialog');"
+					action="#{expedienteMeAdd.doSaveFin(1,'/webCustom/mesaEntrada/expediente/add/expedienteMeAddFin.xhtml')}"/>
+						
+				<s:div style="float:right" rendered="#{configuracionMateriaManager.isCamaraUsaPoderes(sessionState.globalCamara)}">
+				<h:commandButton value="#{messages['expediente.action.addPoder.label']}"
+						styleClass="button main-button"
+                		action="#{expedienteMeAdd.onAddPoder()}"
+						rendered="#{configuracionMateriaManager.isCamaraUsaPoderes(sessionState.globalCamara)}"/>
+				</s:div>		
+						
+				<s:div style="float:right" rendered="#{s:hasPermission('MesaEntrada','ingresoDiferido') or expedienteMeAdd.ingresoAnteriorSistema}">
+		            <h:commandButton styleClass="button main-button" rendered="#{not expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+						value="#{expedienteMeAdd.ingresoAnteriorSistema ? messages['expedienteMe.ingresoAnteriorSistema.button'] : messages['expedienteMe.ingresoDiferido.button']}"
+						actionListener="#{expedienteMeAdd.onShowIngresoDiferido('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}" 
+						action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/expedienteMeIngresoDiferido.xhtml')}"/>
+				</s:div>		
+				<s:div style="float:right" rendered="#{s:hasPermission('MesaEntrada','ingresoRadicacionPrevia') and not expedienteMeAdd.ingresoAnteriorSistema}">
+		            <h:commandButton styleClass="button main-button" rendered="#{not expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+						value="#{expedienteMeAdd.ingresoACorteSuprema ?  messages['expedienteMe.ingresoCorteSuprema.button'] : messages['expedienteMe.ingresoRadicacionPrevia.button']}"
+						actionListener="#{expedienteMeAdd.onShowIngresoRadicacionPrevia('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}" 
+						action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/expedienteMeingresoRadicacionPrevia.xhtml')}"/>
+				</s:div>		
+			</div>
+			</s:fragment>
+   			<s:fragment rendered="#{expedienteMeAdd.editMode}"> 
+  			<h:selectBooleanCheckbox id="omitirBusquedaConexidad" value="#{expedienteMeAdd.omitirBusquedaConexidad}" rendered="#{expedienteMeAdd.editMode}"/> #{messages['expedienteMeAdd.omitirBusquedaConexidad']}
+   			<br />
+	        <div class="actionButtons">
+				<s:button styleClass="button done main-button"
+					value="#{messages['button_done']}"
+					rendered="#{!expedienteMeAdd.verifyMode}"
+					view="/web/expediente/expedienteCompleto.xhtml">
+				</s:button>
+				
+				<!-- Verificacion -->	
+				<s:button styleClass="button done main-button"
+					value="#{messages['button_done']}"
+					rendered="#{expedienteMeAdd.verifyMode}"
+					view="/webCustom/mesaEntrada/expediente/verificacion/verificacionExpediente.xhtml" propagation="none">
+				</s:button>
+
+				<rich:spacer width="15"/>	
+   			       
+	            <h:commandButton id="button-update" styleClass="button main-button"
+	            	style="display:none;"
+					value="#{messages['button_masDatos']}" 
+					action="#{expedienteMeAdd.doSave1}">
+					<s:defaultAction/>
+				</h:commandButton>
+				<!-- Next Button -->
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPageEspecial()}"
+						value="#{messages['button_next']}"
+						action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial.xhtml')}"/>
+	            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_next']}" rendered="#{expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+						action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-2.xhtml')}"/>
+						
+				<h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						rendered="#{!expedienteMeAdd.verifyMode}"
+					  onclick="Richfaces.showModalPanel('waitDialog');"
+						action="#{expedienteMeAdd.doSaveAll(1,'/web/expediente/expedienteCompleto.xhtml')}"/>
+				
+				<s:div style="float:right" rendered="#{!expedienteMeAdd.verifyMode and configuracionMateriaManager.isCamaraUsaPoderes(sessionState.globalCamara)}">
+				<h:commandButton value="#{messages['expediente.action.addPoder.label']}"
+						styleClass="button main-button"
+                		action="#{expedienteMeAdd.onAddPoder()}"
+						rendered="#{!expedienteMeAdd.verifyMode and configuracionMateriaManager.isCamaraUsaPoderes(sessionState.globalCamara)}"/>
+				</s:div>		
+						
+				<!-- Verificacion -->		
+				<h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						rendered="#{expedienteMeAdd.verifyMode}"
+					  onclick="Richfaces.showModalPanel('waitDialog');"
+						  actionListener="#{expedienteMeVerificacion.init()}"
+						  action="#{expedienteMeAdd.doSaveAll(1,'/webCustom/mesaEntrada/expediente/verificacion/verificacionExpediente.xhtml')}">
+				</h:commandButton>
+				
+				<s:button styleClass="button main-button" style="float:right"
+					value="#{messages['expedienteMeAdd.button.mostrarExpediente']}"
+					rendered="#{expedienteMeAdd.verifyMode}"
+					view="/web/expediente/expedienteCompleto.xhtml">
+				</s:button>
+
+			</div>
+			</s:fragment>
+			</s:div>
+		</ui:define>
+
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+
+	<ui:decorate template="/layout/group/groupModalDialog400.xhtml">
+		<ui:param name="dialogName" value="sigla" />
+		<ui:param name="headerTitle" value="#{messages['actorDemandado.sigla.shortLabel']}" />
+		<ui:param name="entityHome" value="#{expedienteHome}" />
+		<ui:param name="renderedExpression" value="#{expedienteMeAdd.intervinienteEditList.showSiglaDialog}" />
+		<h:form id="siglaSelection" enctype="multipart/form-data">
+		
+		<!-- group editSituacion -->
+		<ui:decorate template="/layout/group/editGroupAuto.xhtml">
+				<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0">
+               		<h:inputText id="siglaMasiva" styleClass="siglaMasivaClass"
+	                           size="75"
+               				  value="#{expedienteMeAdd.intervinienteEditList.siglaMasiva}" 
+						  converter="siglaEnumerationConverter">
+               		</h:inputText>
+               		<h:graphicImage value="/img/icon/combo_arrow.png" 
+               			onclick="#{rich:component('siglaSuggestionMasivo')}.callSuggestion(true)"
+                   		alt="" />
+           		</h:panelGrid>				    
+				<rich:suggestionbox height="400" width="400" id="siglaSuggestionMasivo" for="siglaMasiva" suggestionAction="#{siglaEnumeration.autocomplete}"
+					var="sigla">
+					<h:column>
+						<h:outputText value="#{siglaEnumeration.labelFor(sigla)}"/>
+					</h:column>
+	                    <a4j:support event="onselect" ajaxSingle="true">
+	                    	<f:setPropertyActionListener value="#{sigla}" target="#{siglaEnumeration.selected}" >
+	                    		<s:convertEntity/>
+	                    	</f:setPropertyActionListener>
+	                    	<f:setPropertyActionListener value="#{sigla}" target="#{expedienteMeAdd.intervinienteEditList.siglaMasiva}" >
+	                    		<s:convertEntity/>
+	                    	</f:setPropertyActionListener>
+	                    </a4j:support>
+				</rich:suggestionbox>
+
+			<s:div style="text-align:center;">
+				<h:panelGroup>
+					<h:commandButton value="#{messages['button_accept']}"
+						styleClass="button" 
+						actionListener="#{expedienteMeAdd.intervinienteEditList.doAceptarSigla()}"/>
+					<a4j:commandButton value="#{messages['button_cancel']}"
+						actionListener="#{expedienteMeAdd.intervinienteEditList.doCancelarSigla()}"
+						styleClass="button" 
+						ajaxSingle="true"
+						reRender="siglaDialog"/>
+				</h:panelGroup>
+			</s:div>
+		</ui:decorate>
+		</h:form>
+		<s:fragment rendered="#{expedienteMeAdd.intervinienteEditList.showSiglaDialog}">
+		<script>
+			jQuery(document).ready(function() {
+				jQuery('.siglaMasivaClass').focus();
+			});
+		</script>
+		</s:fragment>
+	</ui:decorate>	
+
+	<s:div id="warningDiv">
+		<rich:modalPanel id="warningModalPanel" rendered="#{expedienteMeAdd.showWarningModalPanel}" autosized="true" width="400" showWhenRendered="true">
+			<f:facet name="header">#{messages['warning.title']}</f:facet>
+			<h:form>
+				<h:panelGrid columns="2">
+					<h:graphicImage value="/img/icon48/but_help_48.gif" />
+					<h:outputText value="#{expedienteMeAdd.warning}" />
+				</h:panelGrid>
+		
+				<div style="text-align: center">
+					<h:commandButton value="#{messages['expedienteMeAdd.button.continuar']}"
+						styleClass="button main-button"
+						actionListener="#{expedienteMeAdd.hideWarningModalPanel()}"
+						action="#{expedienteMeAdd.getWarningModalPage()}"  
+						/>
+					<a4j:commandButton value="#{messages['button_cancel']}" 
+						styleClass="button main-button"
+						reRender="warningDiv"
+						onclick="#{rich:component('warningModalPanel')}.hide()"
+						actionListener="#{expedienteMeAdd.hideWarningModalPanel()}"
+						/>
+				</div>
+			</h:form>
+		</rich:modalPanel>
+	</s:div>
+
+	<s:fragment rendered="#{configuracionMateriaManager.isCamaraUsaPoderes(sessionState.globalCamara)}">
+	<ui:include src="/webCustom/mesaEntrada/expediente/add/include/expedientePoderAddDialog.xhtml" />
+	</s:fragment>
+
+
+</ui:define>
+
+</ui:composition>

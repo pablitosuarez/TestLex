@@ -1,0 +1,54 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+	<s:fragment rendered="#{controller.expediente != null  and controller.puedeSeleccionarRadicacionesFamiliaPrevia}">
+	<s:decorate id="radicacionesFamiliaPreviaDecorate" template="/layout/edit.xhtml" 
+			style="padding:4px;margin:-5px;background-color:#F0F8FF;border:1px solid #BBBBBB" >
+    	<ui:define name="label">#{camaraManager.isCamaraCivilNacional() ? messages['radicacionesDeFamiliaCivil'] : messages['radicacionesDeFamilia']}</ui:define>
+    	<s:div rendered="#{controller.hasDiversidadOficina()}">
+			<h:graphicImage value="/img/icon/warning.gif" style="vertical-align:text-top;"/>
+			<h:outputText value="#{controller.labelDiversidadOficina()}"  />
+		</s:div>    	
+		<rich:dataTable var="radicacionesFamiliaPreviaInfo" value="#{controller.radicacionesFamiliaPreviaInfoList}" style="border:0px; background-color:transparent">
+	    	<rich:column  width="1" style="border:0px">
+				<s:fragment rendered="#{radicacionesFamiliaPreviaInfo eq controller.radicacionFamiliaPreviaInfoSelected}">
+	        		<div class="line_selected"/>
+	        	</s:fragment>
+	        	<s:fragment rendered="#{not(radicacionesFamiliaPreviaInfo eq controller.radicacionFamiliaPreviaInfoSelected)}">
+	        		<h:commandButton style="border:0px;" styleClass="line_unselected" rendered="#{controller.seleccionarRadicacionFamilia and not radicacionesFamiliaPreviaInfo.excluida}" 
+	        				actionListener="#{controller.selectRadicacionFamiliaPrevia(radicacionesFamiliaPreviaInfo)}">
+		            </h:commandButton >
+					<s:fragment rendered="#{not controller.seleccionarRadicacionFamilia or radicacionesFamiliaPreviaInfo.excluida}">
+						<div class="line_unselectable"/>
+					</s:fragment>	
+		         </s:fragment>
+	    	</rich:column>
+	    	<rich:column style="border-width:0 0 1px 0; border-color #aaa;" styleClass="#{radicacionesFamiliaPreviaInfo.excluida ? 'excluded' : ''}">
+	    		<s:fragment rendered="#{empty radicacionesFamiliaPreviaInfo.oficinaAsignacionExp}">
+	    			<div style="padding:5px 0px">
+	    			#{messages['expedienteMeReasignacion.sortear']}
+	    			</div>
+	    		</s:fragment> 
+	    		<s:fragment rendered="#{not empty radicacionesFamiliaPreviaInfo.oficinaAsignacionExp}">
+		    		<h:outputText value="#{radicacionesFamiliaPreviaInfo.fecha}" >
+		    			<s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy"/>
+		    		</h:outputText> - 
+		    		#{radicacionesFamiliaPreviaInfo.descripcionRadicacion}
+		    		<br/>
+		    		#{expedienteManager.getIdxAnaliticoFirst(radicacionesFamiliaPreviaInfo.oficinaAsignacionExp.expediente)} -
+		    		#{radicacionesFamiliaPreviaInfo.caratula}
+	    		</s:fragment>
+	    		
+	    	</rich:column>
+    	</rich:dataTable>
+	</s:decorate>
+	<br/>
+	</s:fragment>
+	
+
+</ui:composition>

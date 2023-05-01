@@ -1,0 +1,38 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<!-- fecha inicio dialog -->
+	<s:div id="addPoderDialogDiv">
+	<ui:decorate template="/layout/group/groupModalDialog500.xhtml">
+		<ui:param name="dialogName" value="addPoder" />
+		<ui:param name="headerTitle" value="#{messages['expedienteMeAdd.dialog.addPoder.title']}" />
+		<ui:param name="entityHome" value="#{expedienteHome}" />
+		<ui:param name="renderedExpression" value="#{expedienteMeAdd.isVisibleAddPoderDialog()}" />
+		<h:form id="addPoderForm" enctype="multipart/form-data">
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/expedientePoderSelector.xhtml'}"/>
+			<s:div style="text-align:center;">
+			<h:panelGroup>
+				<h:commandButton value="#{messages['button_accept']}"
+					styleClass="button" 
+					action="#{expedienteMeAdd.addPoder}"
+					onclick="#{rich:component('waitDialog')}.show();"/>
+				<a4j:commandButton value="#{messages['button_cancel']}"
+					actionListener="#{expedienteMeAdd.setVisibleAddPoderDialog(false)}"
+					styleClass="button" 
+					ajaxSingle="true"
+					reRender="addPoderDialogDiv"/>
+			</h:panelGroup>
+			</s:div>
+		</h:form>
+	</ui:decorate>
+	</s:div>
+
+</ui:composition>

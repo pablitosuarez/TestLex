@@ -1,0 +1,105 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<p:document xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://jboss.com/products/seam/pdf" pageSize="A4"
+	orientation="landscape" type="pdf">
+
+	<f:facet name="header">
+		<p:font size="10" style="BOLD">
+            <p:footer borderWidthTop="2" borderColorTop="#C0C0C0" borderWidthBottom="0" alignment="right">
+                <p:pageNumber/>
+            </p:footer>
+		</p:font>
+	</f:facet>
+
+
+	<p:table columns="8" headerRows="4" widths="6 2 6 4 2 8 8 2" widthPercentage="100">
+
+		<p:cell backgroundColor="#FFFFFF" borderWidthLeft="2" borderWidthRight="2"
+		 borderColor="#FFFFFF" colspan="8" fixedHeight="50" horizontalAlignment="right">
+	 		<p:image value="#{branding.getPropertyAsURL('reportLogo')}"/>
+		</p:cell>
+		<p:cell backgroundColor="#FFFFFF" borderWidthLeft="2" borderWidthRight="2"
+		 borderColor="#FFFFFF" colspan="8" paddingBottom="25">
+		 	<p:paragraph spacingAfter="25" alignment="center">
+				<p:font size="20">#{branding.getProperty('title')}</p:font>
+			</p:paragraph>
+		</p:cell>
+		<p:cell backgroundColor="#FFFFFF" borderWidthLeft="2" borderWidthRight="2"
+		 borderColor="#FFFFFF" colspan="8" paddingBottom="20">
+		 	<p:paragraph spacingAfter="25" alignment="center">
+		 		<p:font size="12" style="underline">#{messages['sorteoLog.list']}</p:font>
+		 	</p:paragraph>
+		</p:cell>
+
+		<f:facet name="defaultCell">
+			<p:cell horizontalAlignment="center" verticalAlignment="middle" borderWidthTop="0" borderWidthBottom="0"
+			borderWidthLeft="0" borderWidthRight="0" paddingBottom="8" paddingTop="-5"/>
+		</f:facet>
+
+		<p:font size="9" fontFamily="Arial" style="bold" color="#FFFFFF">
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.codigoSorteo.shortLabel']}"/>
+		</p:cell>
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.rubro.shortLabel']}"/>
+		</p:cell>
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.fechaSorteo.shortLabel']}"/>
+		</p:cell>
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.usuario.shortLabel']}"/>
+		</p:cell>
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.codigoTipoCambioAsignacion.shortLabel']}"/>
+		</p:cell>
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.expediente.shortLabel']}"/>
+		</p:cell>
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.oficina.shortLabel']}"/>
+		</p:cell>
+		<p:cell backgroundColor="#C0C0C0" borderWidthLeft="2" borderWidthRight="2" borderColor="#FFFFFF" paddingTop="1" paddingBottom="5" paddingLeft="5" paddingRight="5">
+			<p:text value="#{messages['sorteoLog.cargaTrabajo.shortLabel']}"/>
+		</p:cell>
+		</p:font>
+		<p:font size="8" fontFamily="Arial Narrow" backgroundColor="#FFFFFF">
+		<ui:repeat var="sorteoLog" value="#{sorteoLogList.allResults}">
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5"
+					borderWidthLeft="2" borderColorLeft="#FFFFFF" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.codigoSorteo}&#160;"/>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.rubro}&#160;"/>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.fechaSorteo}&#160;">
+					<f:convertDateTime type="both" pattern="dd/MM/yyyy HH:mm:ss.SSS"/>
+				</p:text>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.usuario}&#160;"/>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5"
+					borderWidthRight="2" borderColorRight="#FFFFFF" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.codigoTipoCambioAsignacion}&#160;"/>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{expedienteManager.getIdxAnalitico(sorteoLog.expediente)}&#160;"/>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.oficina.descripcion}&#160;"/>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" paddingTop="1" paddingBottom="5" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.cargaTrabajo}&#160;"/>
+			</p:cell>
+			<p:cell borderWidthBottom="1" borderColorBottom="#C0C0C0" colspan="8" paddingTop="1" paddingBottom="5" verticalAlignment="middle" paddingLeft="5" paddingRight="5">
+				<p:text value="#{sorteoLog.informacionSorteo}&#160;"/>
+			</p:cell>
+			
+		</ui:repeat>
+		</p:font>
+	</p:table>
+</p:document>

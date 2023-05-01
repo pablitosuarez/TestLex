@@ -1,0 +1,120 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<script type='text/javascript' src="#{facesContext.externalContext.requestContextPath}/js/codigoExpediente.js"/>
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{empty expedienteMeAdd.expedienteEspecialEdit.tipoCausa ? expedienteMeAdd.normalTitle : interpolator.interpolate((expedienteMeAdd.ingresoACorteSuprema ? expedienteMeAdd.title : expedienteMeAdd.ingresoDiferidoTitle), expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion)}"/>
+		<ui:param name="description" value="#{expedienteMeAdd.ingresoACorteSuprema ?  '': messages['expedienteMe.ingresoRadicacionPrevia.comment']}" />
+		<br/>
+
+		<s:decorate id="oficinaDestinoDecoration" template="/layout/edit.xhtml" >
+		    <ui:define name="label">#{messages['expedienteMe.ingresoRadicacionPrevia.oficinaDestino']}</ui:define>
+			    <ui:param name="required" value="true"/>
+				<h:selectOneMenu id="oficinaDestino"
+							 value="#{expedienteMeAdd.radicacionPreviaEdit.oficinaDestino}">
+					<s:selectItems var="lookupItem"
+								 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeAdd.oficinasDestinoRadicacionPrevia}"
+						noSelectionLabel="#{messages['expedienteMeAdd.ingresoRadicacionPrevia.oficinaDestino.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+				<s:fragment rendered="#{expedienteMeAdd.showVerTodasOficinasDestino()}">
+					<rich:spacer width="10px"></rich:spacer>
+					<h:selectBooleanCheckbox id="verTodasOficinas" value="#{expedienteMeAdd.verTodasOficinasDestino}">
+						<a4j:support event="onclick" reRender="oficinaDestinoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectBooleanCheckbox>
+					#{messages['expedienteMe.ingresoRadicacionPrevia.verTodas']}
+				</s:fragment>
+		</s:decorate>
+		
+		
+		
+		<s:decorate id="mediadorDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.mediacion}">
+					<ui:define name="label">#{messages['expedienteMe.ingresoRadicacionPrevia.mediador']}</ui:define>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" >
+                		<h:inputText id="mediador"
+                				size="60"
+                				  value="#{expedienteMeAdd.radicacionPreviaEdit.mediador}" 
+							  converter="mediadorEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+                			onclick="#{rich:component('mediadorSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="400" width="400" id="mediadorSuggestion" for="mediador" suggestionAction="#{mediadorEnumeration.autocomplete}" 
+						var="mediador">
+						<h:column>
+							<h:outputText value="#{mediadorEnumeration.labelFor(mediador)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="mediadorDecoration" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{mediador}" target="#{mediadorEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{mediador}" target="#{expedienteMeAdd.radicacionPreviaEdit.mediador}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+ 
+			</s:decorate>
+		
+		
+		
+		
+		<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+		</div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+ 
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+			
+		            <h:commandButton id="button_previous" styleClass="button main-button"
+						value="#{messages['button_previous']}" 
+						action="#{expedienteMeAdd.doCancelIngresoRadicacionPrevia()}">
+					</h:commandButton>
+
+		            <h:commandButton id="button-save" styleClass="button main-button"
+						value="#{messages['expediente.title.validar']}" 
+						action="#{expedienteMeAdd.doSaveRadicacionPrevia()}">
+						<s:defaultAction/>
+					</h:commandButton>
+
+					<h:commandButton styleClass="button main-button"
+						value="#{messages['button_finalizar']}" 
+						onclick="Richfaces.showModalPanel('waitDialog');"
+						action="#{expedienteMeAdd.doSaveFin(5,'/webCustom/mesaEntrada/expediente/add/expedienteMeAddFin.xhtml')}"/>
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>
+		

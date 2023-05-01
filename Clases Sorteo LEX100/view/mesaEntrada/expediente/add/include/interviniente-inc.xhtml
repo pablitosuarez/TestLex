@@ -1,0 +1,728 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+		<s:decorate id="#{id}Lines" template="/layout/lines/lines.xhtml">		
+			<ui:param name="label" value="#{label}" />    
+			<ui:param name="icon" value="#{icon}" />
+
+	        <div class="association" id="#{id}ListChildren">
+				<a4j:region>
+				<rich:dataTable value="#{editList.list}" 
+	                           var="item" 
+	                      rendered="#{not empty editList.list}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="#{id}ListTable">
+					<f:facet name="header">
+						<rich:columnGroup  rowClasses="rich-table-subheader" style="background-image:none">
+							<rich:column styleClass="toolbaritem" style="padding:0px" width="1">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+			                <rich:column styleClass="toolbaritem">
+			                    #{messages['actorDemandado.tipoInterviniente.shortLabel']}
+			                </rich:column>
+							<rich:column width="500px" styleClass="toolbaritem" >
+								#{messages['actorDemandado.nombreYDomicilio.shortLabel']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['actorDemandado.documento.shortLabel']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['actorDemandado.sexo.shortLabel']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" width="20">
+			            		<span/>
+							</rich:column>
+							<rich:column styleClass="toolbaritem" width="1">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+					           
+				<rich:subTable  id="editRow" var="instance" value="#{editList.tmpInstance}" rendered="#{editList.isEditing(item)}">
+			        <rich:column width="1" styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" >
+			            <a4j:commandLink actionListener="#{editList.doSaveLine}" eventsQueue="editLine"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="#{id}ListTable">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <br/>
+			            <a4j:commandLink  style="padding-top:5px"
+			            				actionListener="#{editList.doSaveLineAndDup}" rendered="#{not expedienteMeAdd.editMode and editList.editNew and not expedienteMeAdd.camaraCivilNacional}" eventsQueue="editLine"
+							   					  title="#{messages['button_save_and_dup']}" 
+							   				   reRender="#{id}ListTable">
+							<span class="line_save_dup"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column> 
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+					<s:decorate id="ctl#{id}Decoration" template="/layout/table/edit.xhtml" >
+						<h:selectOneMenu id="tipoInterviniente"	
+									style="width:120px"	disabled="#{expedienteMeAdd.isDisableTipoInterviniente()}"
+									styleClass="#{instance.isError('tipoInterviniente')? 'errorEditField' : ''}" 
+									 value="#{instance.tipoInterviniente}">
+							<s:selectItems var="lookupItem"
+										 label="#{expedienteMeAdd.getDescripcionTipoInterviniente(lookupItem)}"
+										 value="#{expedienteMeAdd.getTiposIntervinienteWith(instance.tipoInterviniente)}"
+								noSelectionLabel="#{(expedienteMeAdd.tiposInterviniente.size == 1) or expedienteMeAdd.isCamaraCivilNacional() ? null : messages['intervinienteExp.tipoInterviniente.lookup_select']}">
+							</s:selectItems>
+							<s:convertEntity/>
+							<a4j:support event="onchange" rendered="#{expedienteMeAdd.useNumeroExpedienteAdministrativo or expedienteMeAdd.useNumeroBeneficio or expedienteMeAdd.useLeyAplicable}" reRender="datosExtraInterviniente" ajaxSingle="true" eventsQueue="editProperty"/>
+						</h:selectOneMenu> 
+					</s:decorate>
+			        </rich:column>
+			        <rich:column width="500px" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+			        	<s:div id="datosInterviniente">
+						<table style="width:100%" cellpadding="2" cellspacing="0" >
+						<tr>
+							<td>
+			       	    		<h:commandLink style="margin-right:5px"
+									rendered="#{false and instance.interviniente == null}"
+				    	    	    action="#{expedienteMeAdd.lookupInterviniente(id, '/web/interviniente/intervinienteList.xhtml', '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}">
+			        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+								<s:conversationPropagation type="join" />
+			       	    		</h:commandLink>
+			       	    		<a4j:commandLink style="margin-right:5px"  eventsQueue="editLine" ajaxSingle="true"
+									rendered="#{false and instance.interviniente != null}"
+				    	    	    actionListener="#{expedienteMeAdd.clearInterviniente(id)}"
+				    	    	    action="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml">
+			        	    	    <h:graphicImage value="/img/icon/clear.gif"/>
+								<s:conversationPropagation type="join" />
+			       	    		</a4j:commandLink>
+							</td><td colspan="3">
+								<table style="width:100%" cellpadding="0" cellspacing="0">
+								<tr><td>
+								<s:span rendered="#{not expedienteMeAdd.camaraCivilNacional or not expedienteMeAdd.isObjetoJuicioVoluntario()}">
+								<h:selectBooleanCheckbox value="#{instance.personaJuridica}"
+								valueChangeListener="#{expedienteMeAdd.onChangePersonaJuridica}"
+								styleClass="#{instance.isError('personaJuridica') ? 'errorEditField' : ''}">
+			                    	<a4j:support event="onclick" reRender="datosInterviniente,datosDocumento,datosSexo" ajaxSingle="true" eventsQueue="editProperty"/>
+								</h:selectBooleanCheckbox>
+								<h:outputText value="#{messages['interviniente.personaJuridica']}" />
+								</s:span>
+								</td>
+								<td>
+								<s:span rendered="#{expedienteMeAdd.showNoSaleEnCaratula()}">
+								<h:selectBooleanCheckbox value="#{instance.noSaleEnCaratula}"
+								styleClass="#{instance.isError('noSaleEnCaratula') ? 'errorEditField' : ''}">
+								</h:selectBooleanCheckbox>
+								<h:outputText value="#{messages['actorDemandado.noSaleEnCaratula.shortLabel']}" />
+								</s:span>
+								</td>
+								<td>
+								<s:span rendered="#{expedienteMeAdd.showMostrarIniciales()}">
+								<h:selectBooleanCheckbox value="#{instance.mostrarIniciales}"
+								styleClass="#{instance.isError('mostrarIniciales') ? 'errorEditField' : ''}">
+								</h:selectBooleanCheckbox>
+								<h:outputText value="#{messages['actorDemandado.mostrarIniciales']}" />
+								</s:span>
+								</td></tr>
+								</table>
+							</td>
+						</tr>
+						<tr><td>
+							<s:div id="apellidos">
+							#{instance.personaJuridica ? messages['actorDemandado.razonSocial.shortLabel'] : messages['actorDemandado.apellidos.shortLabel']}
+							</s:div>
+						</td><td colspan="3">
+								<h:inputText id="#{id}Apellidos"
+									size="75" maxlength="200"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('apellidos')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.apellidos}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td></tr>
+						<tr><td>
+							<s:fragment rendered="#{not instance.personaJuridica}">
+							#{messages['actorDemandado.nombre.shortLabel']}
+							</s:fragment>
+						</td><td colspan="3">
+							<s:fragment rendered="#{not instance.personaJuridica}">
+								<h:inputText id="#{id}Nombre"
+									size="75" maxlength="50"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('nombre')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.nombre}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+							</s:fragment>
+						</td></tr>						
+						<tr><td>
+							<s:fragment rendered="#{instance.personaJuridica and expedienteMeAdd.usaIntervinientesFrecuentes }">
+							#{messages['actorDemandado.sigla.shortLabel']}
+							</s:fragment>
+						</td><td colspan="3">
+							<s:fragment rendered="#{instance.personaJuridica and expedienteMeAdd.usaIntervinientesFrecuentes}">
+								<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0">
+			                		<h:inputText id="#{id}sigla"
+					                           size="75"
+					                           disabled="#{instance.interviniente != null}"
+			                				  value="#{instance.sigla}" 
+										  converter="siglaEnumerationConverter">
+			                		</h:inputText>
+			                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+			                			onclick="#{rich:component('siglaSuggestion')}.callSuggestion(true)"
+			                    		alt="" />
+			            		</h:panelGrid>				    
+								<rich:suggestionbox height="400" width="400" id="siglaSuggestion" for="#{id}sigla" suggestionAction="#{siglaEnumeration.autocomplete}"
+									var="sigla">
+									<h:column>
+										<h:outputText value="#{siglaEnumeration.labelFor(sigla)}"/>
+									</h:column>
+			 	                    <a4j:support event="onselect" reRender="datosInterviniente,datosDocumento" ajaxSingle="true" action="#{instance.onSelectSigla}">
+			 	                    	<f:setPropertyActionListener value="#{sigla}" target="#{siglaEnumeration.selected}" >
+			 	                    		<s:convertEntity/>
+			 	                    	</f:setPropertyActionListener>
+			 	                    	<f:setPropertyActionListener value="#{sigla}" target="#{instance.sigla}" >
+			 	                    		<s:convertEntity/>
+			 	                    	</f:setPropertyActionListener>
+			 	                    </a4j:support>
+								</rich:suggestionbox>
+							</s:fragment>
+						</td></tr>
+						<tr><td>
+							<s:fragment rendered="#{not instance.personaJuridica and expedienteMeAdd.useApellidoMaterno}">
+							#{messages['actorDemandado.apellidoMaterno.shortLabel']}
+							</s:fragment>
+						</td><td colspan="3">
+							<s:fragment rendered="#{not instance.personaJuridica and expedienteMeAdd.useApellidoMaterno}">
+								<h:inputText id="#{id}ApellidoMaterno"
+									size="75" maxlength="50"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('apellidoMaterno')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.apellidoMaterno}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+							</s:fragment>
+						</td></tr>
+						<tr><td>
+							<s:fragment rendered="#{not instance.personaJuridica and expedienteMeAdd.useIniciales}">
+							#{messages['actorDemandado.iniciales']}
+							</s:fragment>
+						</td><td colspan="3">
+							<s:fragment rendered="#{not instance.personaJuridica and expedienteMeAdd.useIniciales}">
+								<h:inputText id="#{id}Iniciales"
+									size="20" maxlength="20"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('iniciales')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.iniciales}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+							</s:fragment>
+						</td></tr>
+						<tr><td colspan="4">
+					   	<s:div id="datosExtraInterviniente">
+					   	<s:fragment rendered="#{instance.actor and (expedienteMeAdd.useNumeroExpedienteAdministrativo or expedienteMeAdd.useNumeroBeneficio or expedienteMeAdd.useLeyAplicable)}">
+						<table cellpadding="2" cellspacing="0" >
+						<tr><td>
+							<s:fragment rendered="#{expedienteMeAdd.useNumeroExpedienteAdministrativo and instance.actor}">
+							#{messages['actorDemandado.nroExpAdm.shortLabel']}
+							</s:fragment>
+						</td><td>
+							<s:fragment rendered="#{expedienteMeAdd.useNumeroExpedienteAdministrativo and instance.actor}">
+								<h:inputText id="#{id}NroExpAdm"
+									size="30" maxlength="50"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('nroExpAdm')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.nroExpAdm}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+							</s:fragment>
+						</td><td>
+							<s:fragment rendered="#{expedienteMeAdd.useNumeroBeneficio and instance.actor}">
+							<rich:spacer width="5"></rich:spacer>
+							#{messages['actorDemandado.beneficiario.shortLabel']}
+							</s:fragment>
+						</td><td>
+							<s:fragment rendered="#{expedienteMeAdd.useNumeroBeneficio and instance.actor}">
+								<h:inputText id="#{id}Beneficiario"
+									size="15" maxlength="50"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('beneficiario')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.beneficiario}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+							</s:fragment>
+						</td></tr>
+						<tr><td>
+							<s:fragment rendered="#{expedienteMeAdd.useLeyAplicable and instance.actor}">
+							#{messages['actorDemandado.leyAplicable.shortLabel']}
+							</s:fragment>
+						</td><td colspan="3">
+							<s:fragment rendered="#{expedienteMeAdd.useLeyAplicable and instance.actor}">
+								<h:selectOneMenu id="#{id}LeyAplicable"
+											 value="#{instance.leyAplicable}">
+									<s:selectItems var="lookupItem"
+												 label="#{leyAplicableEnumeration.labelFor(lookupItem)}"
+												 value="#{leyAplicableEnumeration.items}"
+										noSelectionLabel="#{messages['intervinienteExp.leyAplicable.lookup_select']}">
+									</s:selectItems>
+									<s:convertEntity/>
+								</h:selectOneMenu>
+							</s:fragment>
+						</td></tr>						
+						</table>
+						</s:fragment>
+						</s:div>
+						</td></tr>						
+						<tr><td>
+							<s:fragment rendered="#{instance.personaJuridica and expedienteMeAdd.useNumeroIGJ}">
+							#{messages['actorDemandado.numeroIGJ.shortLabel']}
+							</s:fragment>
+						</td><td colspan="3">
+							<s:fragment rendered="#{instance.personaJuridica and expedienteMeAdd.useNumeroIGJ}">
+								<h:inputText id="#{id}NumeroIGJ"
+									size="75" maxlength="22"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('NumeroIGJ')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.numeroIGJ}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+							</s:fragment>
+						</td></tr>
+
+						<s:fragment rendered="#{expedienteMeAdd.inputDomicilio}">					
+						<tr><td colspan="4">
+							#{expedienteMeAdd.useDomicilioDenunciadoConstituido ? messages['actorDemandado.domicilioDenunciado.shortLabel'] : messages['actorDemandado.domicilio.shortLabel']}
+						</td></tr>
+						<tr><td>
+							#{messages['actorDemandado.calleDomicilio.shortLabel']}
+						</td><td colspan="3">
+								<h:inputText id="#{id}Domicilio"
+									size="75"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('domicilio')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.domicilio}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td></tr>
+						<tr><td>
+							#{messages['actorDemandado.numeroDomicilio.shortLabel']}
+						</td><td colspan="3">
+						<table cellpadding="0" cellspacing="0">
+						<tr><td>
+								<h:inputText id="#{id}NumeroDomicilio"
+									size="5"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('numeroDomicilio')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.numeroDomicilio}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td><td>
+							<rich:spacer width="5"></rich:spacer>
+							#{messages['actorDemandado.detalleDomicilio.shortLabel']}
+						</td><td>
+								<rich:spacer width="5"></rich:spacer>
+								<h:inputText id="#{id}DetalleDomicilio"
+									size="20"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('detalleDomicilio')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.detalleDomicilio}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td></tr>
+						</table>
+						</td></tr>
+						
+						<tr><td>
+							#{messages['actorDemandado.localidad.shortLabel']}
+						</td><td colspan="3">
+								<h:inputText id="#{id}Localidad"
+									size="75"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('localidad')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.localidad}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td></tr>
+						<tr><td>
+							#{messages['actorDemandado.provincia.shortLabel']}
+						</td><td colspan="3">
+							<table cellpadding="0" cellspacing="0">
+							<tr><td>
+								<h:selectOneMenu id="#{id}Provincia"
+											 value="#{instance.provincia}"
+											 styleClass="#{instance.isError('provincia')? 'errorEditField' : ''}">
+									<s:selectItems var="provincia"
+												 label="#{provinciaEnumeration.labelFor(provincia)}"
+												 value="#{provinciaEnumeration.items}"
+										noSelectionLabel="#{messages['list.lookup_select']}">
+									</s:selectItems>
+									<s:convertEntity/>
+								</h:selectOneMenu>
+							</td><td>
+								<s:fragment rendered="#{sessionState.usaCodigoPostal}">
+									<rich:spacer width="5"></rich:spacer>
+									#{messages['actorDemandado.codPostal.shortLabel']}
+								</s:fragment>
+							</td><td>
+								<s:fragment rendered="#{sessionState.usaCodigoPostal}">
+								<rich:spacer width="5"></rich:spacer>
+								<h:inputText id="#{id}CodPostal"
+										size="5"
+										style="text-transform:uppercase;"
+										styleClass="#{instance.isError('codPostal')? 'errorEditField' : ''}"
+										value="#{instance.codPostal}"
+										/>
+								</s:fragment>
+							</td><td>
+								<s:fragment rendered="#{expedienteMeAdd.pideZona}">
+									<rich:spacer width="5"></rich:spacer>
+									#{messages['actorDemandado.codZona.shortLabel']}
+								</s:fragment>
+							</td><td>
+								<s:fragment rendered="#{expedienteMeAdd.pideZona}">
+									<rich:spacer width="5"></rich:spacer>
+									<h:inputText id="#{id}CodZona"
+										size="5"
+										style="text-transform:uppercase;"
+										styleClass="#{instance.isError('codZona')? 'errorEditField' : ''}"
+										value="#{instance.codZona}"
+										/>
+								</s:fragment>
+							</td></tr>
+							</table>
+						</td></tr>
+						</s:fragment>
+				
+						<s:fragment rendered="#{instance.new and expedienteMeAdd.useDomicilioDenunciadoConstituido}">					
+						<tr><td colspan="4" style="border-bottom:1px solid #C0C0C0;padding-bottom:5px"></td></tr>						
+						<tr><td colspan="4">
+							<table style="width:100%" cellpadding="0" cellspacing="0">
+							<tr><td>
+							#{messages['actorDemandado.domicilioConstituido.shortLabel']}
+							</td><td align="right">
+								<h:selectBooleanCheckbox value="#{instance.copiarDomicilioDenunciado}"/>
+								<h:outputText value="#{messages['actorDemandado.copiarDomicilioDenunciado']}" />
+							</td></tr>
+							</table>
+						</td></tr>
+						<tr><td>
+							#{messages['actorDemandado.calleDomicilio.shortLabel']}
+						</td><td colspan="3">
+								<h:inputText id="#{id}DomicilioConstituido"
+									size="75"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('domicilioConstituido')? 'errorEditField' : ''}"
+									value="#{instance.domicilioConstituido}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td></tr>
+						<tr><td>
+							#{messages['actorDemandado.numeroDomicilio.shortLabel']}
+						</td><td colspan="3">
+						<table  cellpadding="0" cellspacing="0">
+						<tr><td>
+								<h:inputText id="#{id}NumeroDomicilioConstituido"
+									size="5"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('numeroDomicilioConstituido')? 'errorEditField' : ''}"
+									value="#{instance.numeroDomicilioConstituido}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td><td>
+							<rich:spacer width="10"></rich:spacer>
+							#{messages['actorDemandado.detalleDomicilio.shortLabel']}
+						</td><td>
+								<rich:spacer width="5"></rich:spacer>
+								<h:inputText id="#{id}DetalleDomicilioConstituido"
+									size="20"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('detalleDomicilioConstituido')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.detalleDomicilioConstituido}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td></tr>
+						</table>
+						</td></tr>
+						<tr><td>
+							#{messages['actorDemandado.localidad.shortLabel']}
+						</td><td colspan="3">
+								<h:inputText id="#{id}LocalidadConstituido"
+									size="75"
+									style="text-transform:uppercase;"
+									styleClass="#{instance.isError('localidadConstituido')? 'errorEditField' : ''}"
+									disabled="#{instance.interviniente != null}"
+									value="#{instance.localidadConstituido}"
+									converter="#{upperCaseFilteredConverter}"
+									/>
+						</td></tr>
+						<tr><td>
+							#{messages['actorDemandado.provincia.shortLabel']}
+						</td><td colspan="3">
+							<table cellpadding="0" cellspacing="0">
+							<tr><td>
+							<h:selectOneMenu id="#{id}ProvinciaConstituido"
+										styleClass="#{instance.isError('provinciaConstituido')? 'errorEditField' : ''}"
+										 value="#{instance.provinciaConstituido}">
+								<s:selectItems var="provincia"
+											 label="#{provinciaEnumeration.labelFor(provincia)}"
+											 value="#{provinciaEnumeration.items}"
+									noSelectionLabel="#{messages['list.lookup_select']}">
+								</s:selectItems>
+								<s:convertEntity/>
+							</h:selectOneMenu>
+							</td><td>
+								<s:fragment rendered="#{sessionState.usaCodigoPostal}">
+									<rich:spacer width="5"></rich:spacer>
+									#{messages['actorDemandado.codPostal.shortLabel']}
+								</s:fragment>
+							</td><td>
+								<s:fragment rendered="#{sessionState.usaCodigoPostal}">
+									<rich:spacer width="5"></rich:spacer>
+									<h:inputText id="#{id}CodPostalConstituido"
+										size="5"
+										style="text-transform:uppercase;"
+										styleClass="#{instance.isError('codPostalConstituido')? 'errorEditField' : ''}"
+										value="#{instance.codPostalConstituido}"
+										/>
+								</s:fragment>
+							</td><td>
+								<s:fragment rendered="#{expedienteMeAdd.pideZona}">
+									<rich:spacer width="5"></rich:spacer>
+									#{messages['actorDemandado.codZona.shortLabel']}
+								</s:fragment>
+							</td><td>
+								<s:fragment rendered="#{expedienteMeAdd.pideZona}">
+									<rich:spacer width="5"></rich:spacer>
+									<h:inputText id="#{id}CodZonaConstituido"
+										size="5"
+										style="text-transform:uppercase;"
+										styleClass="#{instance.isError('codZonaConstituido')? 'errorEditField' : ''}"
+										value="#{instance.codZonaConstituido}"
+										/>
+								</s:fragment>
+							</td></tr>
+							</table>
+						</td></tr>
+						</s:fragment>
+						<s:fragment rendered="#{expedienteMeAdd.camaraCivilNacional and expedienteMeAdd.isObjetoJuicioVoluntario() and expedienteMeAdd.isObjetoJuicioFamilia()}">
+						<tr><td colspan="4"  style="border-bottom:1px solid #C0C0C0;padding-bottom:5px"></td></tr>
+						<tr><td>
+							#{messages['intervinienteVisitaExp.centroInternamiento']}
+						</td>
+						<td colspan="3">
+						<s:div id="centroInternamientoDecoration">
+							<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" >
+		                		<h:inputText id="#{id}centroInternamiento"
+		                				  value="#{instance.centroInternamiento}" 
+		                				  styleClass="#{instance.isError('centroInternamiento') ? 'errorEditField' : ''}"
+		                				  size="60"
+		                				onfocus="this.select();"
+									  converter="centroInternamientoFamiliaEnumerationConverter">
+		                		</h:inputText>
+		                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+		                			onclick="#{rich:component('centroInternamientoSuggestion')}.callSuggestion(true)"
+		                    		alt="" />
+		            		</h:panelGrid>				    
+							<rich:suggestionbox height="400" width="400" id="centroInternamientoSuggestion" for="#{id}centroInternamiento" suggestionAction="#{centroInternamientoFamiliaEnumeration.autocomplete}" 
+								var="centroInternamiento">
+								<h:column>
+									<h:outputText value="#{centroInternamientoFamiliaEnumeration.labelFor(centroInternamiento)}"/>
+								</h:column>
+		 	                    <a4j:support event="onselect" reRender="centroInternamientoDecoration" ajaxSingle="true">
+		 	                    	<f:setPropertyActionListener value="#{centroInternamiento}" target="#{centroInternamientoFamiliaEnumeration.selected}" >
+		 	                    		<s:convertEntity/>
+		 	                    	</f:setPropertyActionListener>
+		 	                    	<f:setPropertyActionListener value="#{centroInternamiento}" target="#{instance.centroInternamiento}" >
+		 	                    		<s:convertEntity/>
+		 	                    	</f:setPropertyActionListener>
+		 	                    </a4j:support>
+							</rich:suggestionbox>
+						</s:div>
+						</td></tr>
+						</s:fragment>
+						
+						</table>
+						</s:div>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+			        	<s:div id="datosDocumento">
+						<s:decorate id="tipoDocumento#{id}Decoration" template="/layout/table/edit.xhtml" >
+							<h:selectOneMenu style="width:100%" id="tipoDocumentoIdentidad"
+										 value="#{instance.tipoDocumento}">
+								<s:selectItems var="lookupItem"
+											 label="#{tipoDocumentoIdentidadEnumeration.labelFor(lookupItem)}"
+											 value="#{instance.personaJuridica ? tipoDocumentoIdentidadEnumeration.itemsPersonaJuridica : tipoDocumentoIdentidadEnumeration.itemsMesa}"
+									noSelectionLabel="#{messages['interviniente.selectTipoDocumentoIdentidada']}">
+								</s:selectItems>
+								<s:convertEntity/>
+							</h:selectOneMenu>
+        	                <h:inputText id="numero#{id}DocId"
+        	                		style="margin-top:5px;text-transform:uppercase;"
+									styleClass="#{instance.isError('documento') ? 'errorEditField' : ''}"
+        	                		disabled="#{instance.interviniente != null}"
+		                           size="14"
+		                      maxlength="14"
+		                          value="#{instance.numero}">
+			                </h:inputText>							
+						</s:decorate>
+						<h:selectOneMenu id="nacionalidad"
+									style="margin-top:5px; width:100%"
+									 value="#{instance.nacionalidad}">
+							<s:selectItems var="lookupItem"
+										disabled="#{instance.personaJuridica}"
+										 label="#{nacionalidadEnumeration.labelFor(lookupItem)}"
+										 value="#{nacionalidadEnumeration.items}"
+								noSelectionLabel="#{messages['interviniente.selectNacionalidad']}">
+							</s:selectItems>
+							<s:convertEntity/>
+						</h:selectOneMenu>
+						</s:div>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:div id="datosSexo">
+						<s:decorate id="sexo#{id}Decoration" template="/layout/table/edit.xhtml" >
+							<h:selectOneRadio id="sex#{id}Id" style="width:95px" layout="pageDirection"
+									disabled="#{instance.personaJuridica}"
+									styleClass="#{instance.isError('sexo')? 'errorEditField' : ''}"
+									 value="#{instance.sexo}">
+									 <f:selectItems value="#{sexoCivilEnumeration.items}" />
+							</h:selectOneRadio>
+						</s:decorate>
+						</s:div>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}">
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"
+						      rendered="#{true and s:hasPermission('ExpedienteIngreso','update')}">
+			            <a4j:commandLink actionListener="#{editList.onCancelLine}" eventsQueue="editLine"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="#{id}ListTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="item" value="#{item}" rendered="#{not editList.isEditing(item)}">
+			        <rich:column width="1" styleClass="topAlign #{editList.rowStyle(item, 'newRowColumn', 'rowColumn', 'reservedRowColumn')}" >
+			            <a4j:commandLink action="#{editList.onEditLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{!editList.isNew(item)}"
+									   reRender="#{id}ListTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{editList.onEditLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_new']}"
+									   rendered="#{editList.isNew(item)}"
+									   reRender="#{id}ListTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.rowStyle(item, 'newRowColumn', 'rowColumn', 'reservedRowColumn')}"  >
+			            <h:outputText value="#{expedienteMeAdd.getDescripcionTipoInterviniente(item.tipoInterviniente)}" rendered="#{not empty item.tipoInterviniente}"/>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.rowStyle(item, 'newRowColumn', 'rowColumn', 'reservedRowColumn')}"  >
+			            <h:outputText value="#{item.apellidos}"/>	
+			            <s:fragment rendered="#{not empty item.apellidoMaterno and not item.personaJuridica and expedienteMeAdd.useApellidoMaterno}">
+						<h:outputText value=" (#{item.apellidoMaterno})"/>
+						</s:fragment>			            			            
+			            <h:outputText value=" #{item.nombre}"/>
+			            <s:fragment rendered="#{not empty item.numeroIGJ}">
+			            <br/>
+						<h:outputText value="I.G.J.: #{item.numeroIGJ}"/>
+						</s:fragment>			            			            
+
+			            <s:fragment rendered="#{not empty item.nroExpAdm}">
+			            <br/>
+						<h:outputText value="Nº Exp. Adm: #{item.nroExpAdm}"/>
+						</s:fragment>			            			            
+			            <s:fragment rendered="#{not empty item.beneficiario}">
+			            <br/>
+						<h:outputText value="Nº Beneficio: #{item.beneficiario}"/>
+						</s:fragment>			            			            
+			            <s:fragment rendered="#{not empty item.leyAplicable}">
+			            <br/>
+						<h:outputText value="Ley Aplicable: #{leyAplicableEnumeration.labelFor(item.leyAplicable)}"/>
+						</s:fragment>			            			            
+
+			            <h:outputText value="#{editList.getFlagsAsText(item)}"/>
+			            <s:fragment rendered="#{not empty item.domicilio}">
+			            <br/>
+			            <h:outputText value="#{item.domicilio}"/>			            
+			            <h:outputText value=", #{item.numeroDomicilio}" rendered="#{not empty item.numeroDomicilio}"/>
+			            <h:outputText value=", #{item.detalleDomicilio}" rendered="#{not empty item.detalleDomicilio}"/>			            
+			            </s:fragment>
+			            <s:fragment rendered="#{not empty item.localidad}">
+			            <br/>
+			            <h:outputText value="#{item.localidad}"/>			            
+			            </s:fragment>
+			            <s:fragment rendered="#{not empty item.provincia}">
+			            <br/>
+			            <h:outputText value="#{item.provincia.descripcion}"/>			            
+			            </s:fragment>
+			            <h:outputText value=", #{item.codPostal}" rendered="#{not empty item.codPostal}"/>
+						<br/>
+						<s:fragment rendered="#{item.centroInternamiento != null}">
+			            #{messages['intervinienteVisitaExp.centroInternamiento']}: #{item.centroInternamiento.nombre}
+			            </s:fragment>
+						
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.rowStyle(item, 'newRowColumn', 'rowColumn', 'reservedRowColumn')}"  >
+			        	<s:fragment rendered="#{not empty item.numero}">
+			          		 <h:outputText style="font-size:0.8em" value="#{item.tipoDocumento.descripcion} " rendered="#{not empty item.tipoDocumento}"/>
+			           		 <h:outputText style="font-size:1.4em;font-weight:bold;" value="#{item.numeroFormat}"/>
+			           		 <s:fragment rendered="#{not empty item.nacionalidad}">
+			            			<br/>
+				         		   <h:outputText style="font-size:0.8em" value="#{item.nacionalidad.descripcion}" />
+			          		  </s:fragment>
+			            </s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.rowStyle(item, 'newRowColumn', 'rowColumn', 'reservedRowColumn')}" style="text-align:center" >
+			            <h:outputText value="#{sexoCivilEnumeration.getLabel(item.sexo)}"/>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.rowStyle(item, 'newRowColumn', 'rowColumn', 'reservedRowColumn')}" style="text-align:center">
+			            <h:outputText value="#{item.getNoCaratula_PenditeVerificar_Label()}"/>
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.rowStyle(item, 'newRowColumn', 'rowColumn', 'reservedRowColumn')}">
+			            <h:commandLink action="#{editList.onDeleteLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{!editList.isNew(item)}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="#{id}ListTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+
+		</s:decorate>	
+</ui:composition>

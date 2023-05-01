@@ -1,0 +1,289 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission(tipoOficinaTurnoPermiso,'read')}">
+		<ui:param name="icon" value="#{icon}" />    
+		<ui:param name="title" value="#{title}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(turnoFiscaliaList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{turnoFiscaliaList}"/>
+
+			<s:decorate id="fromDesdeFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoFiscalia.fromDesdeFecha']}</ui:define>
+					<rich:calendar id="fromDesdeFechaFilter" 
+					enableManualInput="true" showWeeksBar="false"					
+								value="#{turnoFiscaliaSearch.fromDesdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="toDesdeFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoFiscalia.toDesdeFecha']}</ui:define>
+					<rich:calendar id="toDesdeFechaFilter" 
+					enableManualInput="true" showWeeksBar="false"					
+								value="#{turnoFiscaliaSearch.toDesdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="fiscaliaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{oficinaName}</ui:define>
+	                <h:inputText id="fiscaliaFilter"
+	                          value="#{turnoFiscaliaSearch.fiscalia}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="oficinaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoFiscalia.oficina']}</ui:define>
+	
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0" summary="#{messages['lookup.summary']}">	                
+		            	<h:panelGroup>
+							<h:inputText id="oficinaCodigo"
+									  style="margin-right:5px"
+									  value="#{turnoFiscaliaSearch.oficinaCodigo}"
+						valueChangeListener="#{turnoFiscaliaSearch.onChangeOficinaCodigo}">
+								<a4j:support event="onblur" reRender="oficinaDescription" ajaxSingle="true"  eventsQueue="editProperty"/>
+							</h:inputText>
+		            	</h:panelGroup>
+
+		       	    	<h:commandLink style="margin-right:5px"
+			    	    	    action="#{turnoFiscaliaHome.lookupSearchOficina('/web/oficina/oficinaList.xhtml', returnPage)}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+		       	    	</h:commandLink>
+		            	<h:panelGroup id="oficinaDescription" style="margin-right:5px">
+							<h:outputText value="#{messages['turnoFiscalia.oficina.lookup_select']}" 
+						    	rendered="#{turnoFiscaliaSearch.oficina == null}"/>
+						    <s:fragment rendered="#{turnoFiscaliaSearch.oficina != null}">
+				            	#{turnoFiscaliaSearch.oficina.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px"
+							action="#{turnoFiscaliaSearch.clearOficina}"
+						  reRender="oficinaFilterDecoration" 
+						  rendered="#{turnoFiscaliaSearch.oficina != null}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['turnoFiscalia.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty turnoFiscaliaList.resultListWithNew}"/>
+		</ui:define>
+		<h:form>
+		
+			<a4j:region>
+		    <div class="results" id="turnoFiscaliaList">
+			    <rich:dataTable id="turnoFiscaliaTable" 
+			                var="item"
+			              value="#{turnoFiscaliaList.resultListWithNew}" 
+                       rendered="#{not empty turnoFiscaliaList.resultListWithNew}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission(tipoOficinaTurnoPermiso,'update') or turnoFiscaliaSearch.hasSelectionPage()}">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoFiscaliaList.getOrderStyle('desdeFecha', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['turnoFiscalia.desdeFecha.shortLabel']}">
+				                    <f:param name="turnoFiscaliaOrder" value="#{turnoFiscaliaList.getOrderParam('desdeFecha')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoFiscaliaList.getOrderStyle('fiscalia', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{oficinaName}">
+				                    <f:param name="turnoFiscaliaOrder" value="#{turnoFiscaliaList.getOrderParam('fiscalia')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['turnoFiscalia.oficina.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" width="1" rendered="#{true and !turnoFiscaliaSearch.hasReturnPage() and s:hasPermission(tipoOficinaTurnoPermiso,'update')}">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+				<rich:subTable  id="editRow" var="instance" value="#{turnoFiscaliaHome.instance}" rendered="#{turnoFiscaliaHome.instance.equals(item)}">
+			        <rich:column width="1" styleClass="#{turnoFiscaliaList.isManaged(instance)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission(tipoOficinaTurnoPermiso,'update') or turnoFiscaliaSearch.hasSelectionPage()}">
+			            <a4j:commandLink actionListener="#{turnoFiscaliaList.onAcceptLine}" eventsQueue="editProperty"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="turnoFiscaliaTable">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoFiscaliaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+            <s:decorate id="desdeFechaDecoration" template="/layout/table/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoFiscalia.desdeFecha']}</ui:define>
+					<rich:calendar id="desdeFecha" 
+	                       required="true" showWeeksBar="false"
+					 enableManualInput="true"					
+					       	 disabled="#{!turnoFiscaliaHome.hasEditPermission(tipoOficinaTurnoPermiso,'add','update')}"
+								 value="#{turnoFiscaliaHome.instance.desdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="desdeFechaDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="desdeFechaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoFiscaliaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+            <s:decorate id="fiscaliaDecoration" template="/layout/table/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoFiscalia.fiscalia']}</ui:define>
+	                <h:inputText id="fiscalia"
+	                       required="true"
+					       disabled="#{!turnoFiscaliaHome.hasEditPermission(tipoOficinaTurnoPermiso,'add','update')}"
+	                          value="#{turnoFiscaliaHome.instance.fiscalia}">
+	                    <a4j:support event="onblur" reRender="fiscaliaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoFiscaliaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+
+			<s:decorate id="oficinaDecoration" template="/layout/table/edit.xhtml" >
+ 
+		            <h:panelGrid columns="3" cellpadding="0" cellspacing="0"  summary="#{messages['lookup.summary']}">
+		            	<h:panelGroup>
+							<h:inputText id="oficinaCodigo"
+									  style="margin-right:5px"
+						           rendered="#{turnoFiscaliaHome.hasEditPermission(tipoOficinaTurnoPermiso,'add','update')}"
+									  value="#{turnoFiscaliaHome.oficinaCodigo}"
+						valueChangeListener="#{turnoFiscaliaHome.onChangeOficinaCodigo}">
+								<a4j:support event="onblur" reRender="oficinaDecoration" ajaxSingle="true"  eventsQueue="editProperty"/>
+							</h:inputText>
+		            	</h:panelGroup>
+		       	    	<a4j:commandLink style="margin-right:5px"  eventsQueue="editProperty" ajaxSingle="true"
+						      rendered="#{turnoFiscaliaHome.hasEditPermission(tipoOficinaTurnoPermiso,'add','update')}" 
+			    	    	    action="#{turnoFiscaliaHome.lookupOficina('/web/oficina/oficinaList.xhtml', returnPage)}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+							<s:conversationPropagation type="join" />
+		       	    	</a4j:commandLink>
+		            	<h:panelGroup style="margin-right:5px">
+							<h:outputText value="#{messages['turnoFiscalia.oficina.lookup_none']}" 
+						    	rendered="#{instance.oficina == null}"/>
+						    <s:fragment rendered="#{instance.oficina != null}">
+				            	#{instance.oficina.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+					</h:panelGrid>
+			</s:decorate>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{turnoFiscaliaList.isManaged(instance)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and !turnoFiscaliaSearch.hasReturnPage() and s:hasPermission(tipoOficinaTurnoPermiso,'update')}">
+			            <a4j:commandLink actionListener="#{turnoFiscaliaList.onCancelLine}" eventsQueue="editProperty"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="turnoFiscaliaTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="item" value="#{item}" rendered="#{not turnoFiscaliaHome.instance.equals(item)}">
+			        <rich:column width="1" styleClass="#{turnoFiscaliaList.isManaged(item)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission(tipoOficinaTurnoPermiso,'update') or turnoFiscaliaSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{turnoFiscaliaList.doSelection(item, '/web/turnoFiscalia/turnoFiscaliaEdit.xhtml')}"
+							   rendered="#{turnoFiscaliaSearch.hasReturnPage() and turnoFiscaliaList.isManaged(item)}"
+ 					      styleClass="line_selector"
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			            <a4j:commandLink action="#{turnoFiscaliaList.doLineEdit(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{!turnoFiscaliaSearch.hasReturnPage() and turnoFiscaliaList.isManaged(item)}"
+									   reRender="turnoFiscaliaTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{turnoFiscaliaList.doLineEdit(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_new']}"
+									   rendered="#{!turnoFiscaliaSearch.hasReturnPage() and not turnoFiscaliaList.isManaged(item)}"
+									   reRender="turnoFiscaliaTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoFiscaliaHome.isManaged(item)? 'rowColumn': 'newRowColumn'}"  >
+			            <h:outputText value="#{item.desdeFecha}">
+			                <s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoFiscaliaHome.isManaged(item)? 'rowColumn': 'newRowColumn'} align-right"  >
+			            #{item.fiscalia}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoFiscaliaHome.isManaged(item)? 'rowColumn': 'newRowColumn'}"  >
+						<s:fragment rendered="#{item.oficina != null}">
+
+			            #{item.oficina.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{turnoFiscaliaList.isManaged(item)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and !turnoFiscaliaSearch.hasReturnPage() and s:hasPermission(tipoOficinaTurnoPermiso,'update')}">
+			            <h:commandLink action="#{turnoFiscaliaList.doLineDelete(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{turnoFiscaliaList.isManaged(item) and s:hasPermission(tipoOficinaTurnoPermiso,'update')}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="turnoFiscaliaTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				</rich:dataTable>
+		    </div>
+			</a4j:region>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{turnoFiscaliaList.getPaginator(turnoFiscaliaList)}"/>
+	  			<ui:param name="componentName" value="turnoFiscalia"/>
+	  		</s:decorate>
+		</ui:define>
+	
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{turnoFiscaliaSearch.hasReturnPage()}" 
+		        			  view="#{turnoFiscaliaSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{title}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/turnoFiscalia/turnoFiscaliaList.jrxml" />
+		<ui:param name="reportList" value="#{turnoFiscaliaList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

@@ -1,0 +1,156 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="tipoAsignacionCodificado" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{tipoAsignacionCodificadoHome.managed ? messages['tipoAsignacionCodificado.edit'] : messages['tipoAsignacionCodificado.add']}" />    
+		<ui:param name="description" value="#{messages['tipoAsignacionCodificado.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="codigoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['tipoAsignacion.codigo']}</ui:define>
+	                <h:inputText id="codigo" 
+	                       required="true"
+					       disabled="#{!tipoAsignacionCodificadoHome.hasEditPermission('TipoAsignacionCodificado','add','update')}"
+	                           size="10"
+	                      maxlength="10"
+	                          value="#{tipoAsignacionCodificadoHome.instance.codigo}">
+	                    <a4j:support event="onblur" reRender="codigoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="descripcionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['tipoAsignacion.descripcion']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputTextarea id="descripcion"
+	                               cols="98"
+	                               rows="2"
+					       	 disabled="#{!tipoAsignacionCodificadoHome.hasEditPermission('TipoAsignacionCodificado','add','update')}"
+	                       required="true"
+	                              value="#{tipoAsignacionCodificadoHome.instance.descripcion}">
+	                    <a4j:support event="onblur" reRender="descripcionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputTextarea>
+	                </div>
+                              
+            </s:decorate>
+
+			<s:decorate id="materiaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['tipoAsignacion.materia']}</ui:define>
+					<h:selectOneMenu id="materia"
+							  rendered="#{tipoAsignacionCodificadoHome.hasEditPermission('TipoAsignacionCodificado','add','update')}"
+							  required="true"
+								 value="#{tipoAsignacionCodificadoHome.instance.materia}">
+						<s:selectItems var="lookupItem"
+									 label="#{materiaEnumeration.labelFor(lookupItem)}"
+									 value="#{materiaEnumeration.globalMateriaList}"
+							noSelectionLabel="#{messages['tipoAsignacion.materia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="materiaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{materiaEnumeration.labelFor(tipoAsignacionCodificadoHome.instance.materia)}"
+						   rendered="#{!tipoAsignacionCodificadoHome.hasEditPermission('TipoAsignacionCodificado','add','update')}" />
+ 
+			</s:decorate>
+
+<!-- 
+			<s:decorate id="tipoInstanciaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['tipoAsignacion.tipoInstancia']}</ui:define>
+					<h:selectOneMenu id="tipoInstancia"
+							  rendered="#{tipoAsignacionCodificadoHome.hasEditPermission('TipoAsignacionCodificado','add','update')}"
+								 value="#{tipoAsignacionCodificadoHome.instance.tipoInstancia}">
+						<s:selectItems var="lookupItem"
+									 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+									 value="#{tipoInstanciaEnumeration.items}"
+							noSelectionLabel="#{messages['tipoAsignacion.tipoInstancia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="tipoInstanciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{tipoInstanciaEnumeration.labelFor(tipoAsignacionCodificadoHome.instance.tipoInstancia)}"
+						   rendered="#{!tipoAsignacionCodificadoHome.hasEditPermission('TipoAsignacionCodificado','add','update')}" />
+ 
+			</s:decorate>
+ -->			
+            <s:decorate id="categoriaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['tipoAsignacion.categoria']}</ui:define>
+					<h:selectOneMenu id="categoria" required="true"
+					disabled="#{!tipoAsignacionCodificadoHome.hasEditPermission('TipoAsignacionCodificado','add','update')}"
+						      value="#{tipoAsignacionCodificadoHome.instance.categoria}">
+						<f:selectItems value="#{categoriaTipoAsignacionEnumeration.getItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="categoriaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{tipoAsignacionCodificadoHome.doCancel}"
+						view="#{tipoAsignacionCodificadoSearch.getReturnPage('/web/tipoAsignacionCodificado/tipoAsignacionCodificadoList.xhtml')}"
+						rendered="#{tipoAsignacionCodificadoHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{tipoAsignacionCodificadoHome.doAdd(tipoAsignacionCodificadoSearch.getReturnPage('/web/tipoAsignacionCodificado/tipoAsignacionCodificadoList.xhtml'))}"
+					rendered="#{!tipoAsignacionCodificadoHome.managed and s:hasPermission('TipoAsignacionCodificado','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{tipoAsignacionCodificadoHome.doUpdate(tipoAsignacionCodificadoSearch.getReturnPage('/web/tipoAsignacionCodificado/tipoAsignacionCodificadoList.xhtml'))}"
+						rendered="#{tipoAsignacionCodificadoHome.managed and s:hasPermission('TipoAsignacionCodificado','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{tipoAsignacionCodificadoHome.doCancel}"
+						view="#{tipoAsignacionCodificadoSearch.getReturnPage('/web/tipoAsignacionCodificado/tipoAsignacionCodificadoList.xhtml')}"
+						rendered="#{!tipoAsignacionCodificadoHome.managed}"/>
+					<rich:spacer width="15" rendered="#{tipoAsignacionCodificadoHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{tipoAsignacionCodificadoHome.doDelete(tipoAsignacionCodificadoSearch.getReturnPage('/web/tipoAsignacionCodificado/tipoAsignacionCodificadoList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{tipoAsignacionCodificadoHome.managed and s:hasPermission('TipoAsignacionCodificado','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

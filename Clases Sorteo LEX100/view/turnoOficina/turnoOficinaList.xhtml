@@ -1,0 +1,322 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('TurnoOficina','read')}">
+		<ui:param name="icon" value="turno" />    
+		<ui:param name="title" value="#{messages['turnoOficina.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(turnoOficinaList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{turnoOficinaList}"/>
+
+			<s:decorate id="desdeFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoOficina.desdeFecha']}</ui:define>
+					<rich:calendar id="desdeFechaFilter" 
+					enableManualInput="true"					
+								value="#{turnoOficinaSearch.desdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="hastaFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoOficina.hastaFecha']}</ui:define>
+					<rich:calendar id="hastaFechaFilter" 
+					enableManualInput="true"					
+								value="#{turnoOficinaSearch.hastaFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate template="/layout/separator.xhtml">
+				<ui:param name="label" value="#{messages['turnoOficina.oficina']}"/>
+			</s:decorate>
+			<s:decorate id="oficinaCodigoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoOficina.oficinaCodigo']}</ui:define>
+	                <h:inputText id="oficinaCodigoFilter" 
+	                           size="40"
+	                          value="#{turnoOficinaSearch.oficinaCodigo}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="oficinaDescripcionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoOficina.oficinaDescripcion']}</ui:define>
+	                <h:inputText id="oficinaDescripcionFilter" 
+	                           size="98"
+	                          value="#{turnoOficinaSearch.oficinaDescripcion}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="oficinaTipoOficinaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoOficina.oficinaTipoOficina']}</ui:define>
+				<h:selectOneMenu id="oficinaTipoOficinaFilter"
+					      value="#{turnoOficinaSearch.oficinaTipoOficina}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoOficinaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoOficinaEnumeration.items}"
+						noSelectionLabel="#{messages['turnoOficina.tipoOficina.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="oficinaTipoInstanciaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoOficina.oficinaTipoInstancia']}</ui:define>
+				<h:selectOneMenu id="oficinaTipoInstanciaFilter"
+					      value="#{turnoOficinaSearch.oficinaTipoInstancia}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoInstanciaEnumeration.items}"
+						noSelectionLabel="#{messages['turnoOficina.tipoInstancia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="oficinaCompetenciaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoOficina.oficinaCompetencia']}</ui:define>
+				<h:selectOneMenu id="oficinaCompetenciaFilter"
+					      value="#{turnoOficinaSearch.oficinaCompetencia}">
+					<s:selectItems var="lookupItem"
+								 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+								 value="#{competenciaEnumeration.items}"
+						noSelectionLabel="#{messages['turnoOficina.competencia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="oficinaCamaraFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{empty sessionState.globalOficina}">
+			    <ui:define name="label">#{messages['turnoOficina.oficinaCamara']}</ui:define>
+				<h:selectOneMenu id="oficinaCamaraFilter"
+					      value="#{turnoOficinaSearch.oficinaCamara}">
+					<s:selectItems var="lookupItem"
+								 label="#{camaraEnumeration.labelFor(lookupItem)}"
+								 value="#{camaraEnumeration.items}"
+						noSelectionLabel="#{messages['turnoOficina.camara.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['turnoOficina.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty turnoOficinaList.resultListWithNew}"/>
+		</ui:define>
+		<h:form>
+		
+			<a4j:region>
+		    <div class="results" id="turnoOficinaList">
+			    <rich:dataTable id="turnoOficinaTable" 
+			                var="item"
+			              value="#{turnoOficinaList.resultListWithNew}" 
+                       rendered="#{not empty turnoOficinaList.resultListWithNew}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('TurnoOficina','update') or turnoOficinaSearch.hasSelectionPage()}">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoOficinaList.getOrderStyle('desdeFecha', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['turnoOficina.desdeFecha.shortLabel']}">
+				                    <f:param name="turnoOficinaOrder" value="#{turnoOficinaList.getOrderParam('desdeFecha')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoOficinaList.getOrderStyle('hastaFecha', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['turnoOficina.hastaFecha.shortLabel']}">
+				                    <f:param name="turnoOficinaOrder" value="#{turnoOficinaList.getOrderParam('hastaFecha')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" >
+								#{messages['turnoOficina.oficina.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" width="1" rendered="#{true and !turnoOficinaSearch.hasReturnPage() and s:hasPermission('TurnoOficina','update')}">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+				<rich:subTable  id="editRow" var="instance" value="#{turnoOficinaHome.instance}" rendered="#{turnoOficinaHome.instance.equals(item)}">
+			        <rich:column width="1" styleClass="#{turnoOficinaList.isManaged(instance)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission('TurnoOficina','update') or turnoOficinaSearch.hasSelectionPage()}">
+			            <a4j:commandLink actionListener="#{turnoOficinaList.onAcceptLine}" eventsQueue="editProperty"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="turnoOficinaTable">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+							<s:defaultAction/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoOficinaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+            <s:decorate id="desdeFechaDecoration" template="/layout/table/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoOficina.desdeFecha']}</ui:define>
+					<rich:calendar id="desdeFecha" 
+	                       required="true"
+					 enableManualInput="true"					
+					       	 disabled="#{!turnoOficinaHome.hasEditPermission('TurnoOficina','add','update')}"
+								 value="#{turnoOficinaHome.instance.desdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="desdeFechaDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="desdeFechaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoOficinaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+            <s:decorate id="hastaFechaDecoration" template="/layout/table/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoOficina.hastaFecha']}</ui:define>
+					<rich:calendar id="hastaFecha" 
+	                       required="true"
+					 enableManualInput="true"					
+					       	 disabled="#{!turnoOficinaHome.hasEditPermission('TurnoOficina','add','update')}"
+								 value="#{turnoOficinaHome.instance.hastaFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="hastaFechaDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="hastaFechaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoOficinaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}">
+
+			<s:decorate id="oficinaDecoration" template="/layout/table/edit.xhtml">
+ 
+		            <h:panelGrid columns="3" cellpadding="0" cellspacing="0"  summary="#{messages['lookup.summary']}">
+		            	<h:panelGroup>
+							<h:inputText id="oficinaCodigo"
+									  style="margin-right:5px"
+						           rendered="#{turnoOficinaHome.hasEditPermission('TurnoOficina','add','update')}"
+									  value="#{turnoOficinaHome.oficinaCodigo}"
+									converter="#{upperCaseConverter}"									
+						valueChangeListener="#{turnoOficinaHome.onChangeOficinaCodigo}">
+								<a4j:support event="onblur" reRender="oficinaDecoration" ajaxSingle="true"  eventsQueue="editProperty"/>
+							</h:inputText>
+		            	</h:panelGroup>
+		       	    	<a4j:commandLink style="margin-right:5px"  eventsQueue="editProperty" ajaxSingle="true"
+						      rendered="#{turnoOficinaHome.hasEditPermission('TurnoOficina','add','update')}" 
+			    	    	    action="#{turnoOficinaHome.lookupOficina('/web/oficina/oficinaList.xhtml', '/web/turnoOficina/turnoOficinaList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+							<s:conversationPropagation type="join" />
+		       	    	</a4j:commandLink>
+		            	<h:panelGroup style="margin-right:5px">
+							<h:outputText value="#{messages['turnoOficina.oficina.lookup_none']}" 
+						    	rendered="#{instance.oficina == null}"/>
+						    <s:fragment rendered="#{instance.oficina != null}">
+				            	#{instance.oficina.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+					</h:panelGrid>
+			</s:decorate>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{turnoOficinaList.isManaged(instance)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and !turnoOficinaSearch.hasReturnPage() and s:hasPermission('TurnoOficina','update')}">
+			            <a4j:commandLink actionListener="#{turnoOficinaList.onCancelLine}" eventsQueue="editProperty"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="turnoOficinaTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="item" value="#{item}" rendered="#{not turnoOficinaHome.instance.equals(item)}">
+			        <rich:column width="1" styleClass="#{turnoOficinaList.isManaged(item)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission('TurnoOficina','update') or turnoOficinaSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{turnoOficinaList.doSelection(item, '/web/turnoOficina/turnoOficinaEdit.xhtml')}"
+							   rendered="#{turnoOficinaSearch.hasReturnPage() and turnoOficinaList.isManaged(item)}"
+ 					      styleClass="line_selector"
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			            <a4j:commandLink action="#{turnoOficinaList.doLineEdit(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{!turnoOficinaSearch.hasReturnPage() and turnoOficinaList.isManaged(item)}"
+									   reRender="turnoOficinaTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{turnoOficinaList.doLineEdit(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_new']}"
+									   rendered="#{!turnoOficinaSearch.hasReturnPage() and not turnoOficinaList.isManaged(item)}"
+									   reRender="turnoOficinaTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoOficinaHome.isManaged(item)? 'rowColumn': 'newRowColumn'}"  >
+			            <h:outputText value="#{item.desdeFecha}">
+			                <s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoOficinaHome.isManaged(item)? 'rowColumn': 'newRowColumn'}"  >
+			            <h:outputText value="#{item.hastaFecha}">
+			                <s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoOficinaHome.isManaged(item)? 'rowColumn': 'newRowColumn'}">
+						<s:fragment rendered="#{item.oficina != null}">
+ 						#{item.oficina.codigo} - 
+			            #{item.oficina.descripcion}
+			            </s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{turnoOficinaList.isManaged(item)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and !turnoOficinaSearch.hasReturnPage() and s:hasPermission('TurnoOficina','update')}">
+			            <h:commandLink action="#{turnoOficinaList.doLineDelete(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{turnoOficinaList.isManaged(item) and s:hasPermission('TurnoOficina','update')}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="turnoOficinaTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				</rich:dataTable>
+		    </div>
+			</a4j:region>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{turnoOficinaList.getPaginator(turnoOficinaList)}"/>
+	  			<ui:param name="componentName" value="turnoOficina"/>
+	  		</s:decorate>
+		</ui:define>
+	
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{turnoOficinaSearch.hasReturnPage()}" 
+		        			  view="#{turnoOficinaSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['turnoOficina.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/turnoOficina/turnoOficinaList.jrxml" />
+		<ui:param name="reportList" value="#{turnoOficinaList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

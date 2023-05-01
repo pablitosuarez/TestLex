@@ -1,0 +1,223 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="reasignacionMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="#{expedienteMeReasignacion.icon}"/>    
+		<ui:param name="title" value="#{messages['incompetencia.juzgado']}"/>
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+	<br/>
+
+	<!-- Expediente  -->
+	<s:decorate id="expedienteDecoration" template="/layout/edit.xhtml" >
+		    <ui:define name="label">#{messages['expedienteMeReasignacion.expedienteNumAnio']}</ui:define>
+		    <ui:param name="required" value="true"/>
+     		<h:panelGrid id="numeroSearch" columns="6" style="color:#000;" cellpadding="0" cellspacing="0">
+                <h:inputText id="numeroFilter" class="numeroExpediente" 
+                			readonly="#{false and not empty expedienteMeReasignacion.reasignacionEdit.expediente}"
+						   size="10"
+						   maxlength="9"
+                          value="#{expedienteMeReasignacion.reasignacionEdit.numeroExpediente}">
+                </h:inputText>
+                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+	     			<h:outputLabel value="/" />
+                </h:panelGroup>
+                <h:inputText id="anioFilter" class="anioExpediente"
+                		  style="margin-right:5px"
+                	   readonly="#{false and not empty expedienteMeReasignacion.reasignacionEdit.expediente}"
+                		   size="5"
+					  maxlength="4"
+                          value="#{expedienteMeReasignacion.reasignacionEdit.anioExpediente}">
+                </h:inputText>
+                <s:span rendered="#{not empty expedienteMeReasignacion.codigoSubexpediente}">
+	                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+		     			<h:outputLabel value="/" />
+	                </h:panelGroup>
+	                <h:inputText id="codigoSubexpedienteFilter"
+	                 			style="margin-right:5px"
+	                			readonly="true"
+	                			disabled="true"
+							   size="4"
+	                          value="#{expedienteMeReasignacion.codigoSubexpediente}">
+	                </h:inputText>
+				</s:span>                
+				<h:commandLink style="margin-right:5px" inmediate="true"  eventsQueue="editProperty" ajaxSingle="true"
+    	    	    actionListener="#{expedienteMeAsignacion.doSave1()}" title="#{messages['expediente.title.validar']}">
+       	    	    <h:graphicImage value="/img/icon/check.png" style="vertical-align:top"/>
+      	    	</h:commandLink>
+				<s:link style="margin-right:5px"
+					action="#{expedienteMeReasignacion.lookupExpediente('/web/expediente/expedienteSelectionList.xhtml', siteController.currentPage.target)}">
+					<h:graphicImage value="/img/icon/lookup-button.gif"/>
+					<s:conversationPropagation type="join" />
+				</s:link>
+            </h:panelGrid>
+	</s:decorate>
+	
+	<s:div id="familiaExpedientes">
+	<s:fragment rendered="#{empty expedienteMeReasignacion.reasignacionEdit.expediente and not empty expedienteMeReasignacion.familiaExpedientes and expedienteMeReasignacion.familiaExpedientes.size() > 1}">
+		<s:decorate id="expedientesFamiliaDecoration" template="/layout/edit.xhtml" >
+			<ui:define name="label">#{messages['expedienteMeReasignacion.seleccioneExpediente']}</ui:define>
+		    <ui:param name="required" value="true"/>
+	    	<div style="font-size:1.2em;font-weight:bold">
+			<ui:repeat var="expedienteFamilia" value="#{expedienteMeReasignacion.familiaExpedientes}">
+				<h:commandLink value="#{expedienteManager.getIdxAnaliticoFirst(expedienteFamilia)} #{expedienteManager.getCaratulaResumida(expedienteFamilia.caratula, 120)}" 
+								action="#{expedienteMeReasignacion.doSelectExpediente(expedienteFamilia)}"
+							   title="#{expedienteManager.getIdxAnaliticoFirst(expedienteFamilia)}}"
+ 							   /> 
+				<br/>
+			</ui:repeat>
+			</div>
+	    </s:decorate>
+	</s:fragment>
+	</s:div>
+	
+	<s:div id="divCaratula">
+	<s:div  rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+		<s:div styleClass="rounded bigShadow caratula">
+		#{expedienteMeReasignacion.reasignacionEdit.expediente.caratula}
+		</s:div>
+		<br/>
+        <s:decorate id="oficinaExpedienteDecoration" template="/layout/edit.xhtml" >
+        	<ui:define name="label">#{messages['expedienteMeReasignacion.oficinasRadicacion']}</ui:define>
+            <div style="font-size:1.5em;font-weight:bold">
+             	#{expedienteMeReasignacion.descripcionOficinaRadicacion}
+             </div>
+             
+       </s:decorate>
+	<br/>
+	</s:div>
+	</s:div>
+
+	
+	<s:div id="datosReasignacion">
+
+		<s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.isIncompetenciaCambioOJ()}">
+			<s:decorate id="objetoJuicioActualDecoration" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['incompetencia.objetoJuicio.actual']}</ui:define>
+			    <div style="font-size:1.5em;font-weight:bold">
+			      	#{expedienteMeReasignacion.reasignacionEdit.expediente.objetoJuicioPrincipal.descripcionCompleta}
+			    </div>
+			</s:decorate>
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/incompetencia/include/objetoJuicio-inc.xhtml'}"/>
+		</s:fragment>	
+
+		<s:decorate id="oficinaDestinoFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.reasignacionEdit.showSelectorDeOficinas()}">
+		    <ui:define name="label">#{messages['expedienteMeReasignacion.oficinaDestino']}</ui:define>
+				<h:selectOneMenu id="oficinaDestino" 
+							 value="#{expedienteMeReasignacion.reasignacionEdit.oficinaDestino}">
+					<s:selectItems var="lookupItem" noSelectionLabel="#{(expedienteMeReasignacion.oficinasDestino.size() > 1)? messages['expedienteMeReasignacion.oficinaDestino.lookup_select'] : ''}"
+								 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeReasignacion.oficinasDestino}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="datosReasignacion" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneMenu>
+		</s:decorate>
+		
+		<s:fragment rendered="#{oficinaManager.inMesaEntradaCamara()}">
+		<s:div id="incompetenciaInternaDiv">
+		<s:decorate id="tipoIncompetenciaInternaDecoration" template="/layout/edit.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.tipoIncompetenciaInterna']}</ui:define>
+				<h:selectOneMenu id="tipoIncompetenciaInterna" 
+							 value="#{expedienteMeReasignacion.reasignacionEdit.tipoIncompetenciaInterna}">
+					<s:selectItems var="lookupItem" 
+								 label="#{messages[lookupItem.label]}"
+								 value="#{expedienteMeReasignacion.tiposIncompetenciaInterna}">
+					</s:selectItems>
+					<s:convertEnum/>
+					<a4j:support event="onchange" reRender="incompetenciaInternaDiv" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneMenu>
+		</s:decorate>
+
+		<s:decorate id="juzgadoOrigen" template="/layout/edit.xhtml" rendered="#{!expedienteMeReasignacion.excluirOficinas and not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.juzgadoOrigen']}</ui:define>
+            <div style="font-size:1.5em;font-weight:bold">
+             	#{expedienteMeReasignacion.reasignacionEdit.oficinaDestino.descripcion}
+             </div>
+		</s:decorate>
+		
+		<s:decorate id="excluirOtrasOficinas" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.excluirOficinas and not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.excluirOtrasOficinas']}</ui:define>
+		    	<table><tr><td style="vertical-align:top">
+				<s:link
+					action="#{expedienteMeReasignacion.excluirOficinasIncompetencia('/web/oficinaSorteo/oficinaSorteoList.xhtml', '/webCustom/mesaEntrada/expediente/incompetencia/incompetencia.xhtml')}">
+					<h:graphicImage value="/img/icon/lookup-button.gif"/>
+					<s:conversationPropagation type="join" />
+				</s:link>
+				</td><td style="padding-left:10px">
+				<s:fragment rendered="#{not empty expedienteMeReasignacion.excludeOficinas}">
+				<ui:repeat var="oficinaSorteo" value="#{expedienteMeReasignacion.excludeOficinas}">
+					<s:div style="font-size:1.5em;font-weight:bold">#{oficinaSorteo.oficina.descripcion}</s:div>
+				</ui:repeat>
+				</s:fragment>
+				</td>
+				</tr>		
+				</table>		
+		</s:decorate>
+		</s:div>
+		</s:fragment>
+	
+		<s:decorate id="observacionesDecoration" template="/layout/edit.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+			    <ui:define name="label">#{messages['expedienteMeReasignacion.observaciones']}</ui:define>
+		            <h:inputText id="observaciones"
+		            		   size="100"
+		                      value="#{expedienteMeReasignacion.reasignacionEdit.observaciones}">
+		            </h:inputText>
+		</s:decorate>
+	<!-- group competencia -->
+	
+		</s:div>	
+
+  	<!-- end group Expediente Principal -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+ 
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+			
+		            <h:commandButton id="button-save" styleClass="button main-button"
+						value="#{messages['expediente.title.validar']}" 
+						action="#{expedienteMeReasignacion.doSave1}">
+						<s:defaultAction/>
+					</h:commandButton>
+
+		            <h:commandButton styleClass="button main-button"
+		             	rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}"
+		             	onclick="Richfaces.showModalPanel('waitDialog');"
+						value="#{messages['button_finalizar']}" 
+						action="#{expedienteMeReasignacion.doIncompetencia(1, '/webCustom/mesaEntrada/expediente/reasignacion/reasignacionMeFin.xhtml')}"/>
+
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

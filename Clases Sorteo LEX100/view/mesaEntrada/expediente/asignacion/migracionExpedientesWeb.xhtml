@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+	<ui:define name="body">
+		<ui:decorate id="form" template="/layout/editForm.xhtml">
+			<ui:param name="icon" value="#{expedienteMeAsignacion.tipoSorteoAnySala ? 'asignacionSala': 'asignacionJuzgado'}" />    
+			<ui:param name="title" value="#{messages['migracionExpedientes.title']}"/>
+			<div align="center">
+			<h:form>					
+				<h:panelGrid id="panel1" columns="1" border="0" cellpadding="8q" cellspacing="0" aling="center">
+					<h:panelGroup aling="center">							
+						<div align="center">
+							<rich:dataTable id="expedientesWeb" value="#{migracionExpedientesController.resultExpWeb}" var="resultado" >								 	
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header" style="font-weight:bold">#{messages['migracionExpedientesWeb.resultado.id']}</f:facet>			
+									#{resultado.id}
+									<br/>
+						        </rich:column>
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header">#{messages['migracionExpedientesWeb.resultado.numero']}</f:facet>			
+									#{resultado.numero}
+									<br/>
+						        </rich:column>					        
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header">#{messages['migracionExpedientesWeb.resultado.clave']}</f:facet>			
+									#{resultado.clave}
+									<br/>
+						        </rich:column>
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header">#{messages['migracionExpedientesWeb.resultado.anio']}</f:facet>			
+									#{resultado.anio}
+									<br/>
+						        </rich:column>
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header" styleClass="toolbaritem"  style="width:140px">#{messages['migracionExpedientesWeb.resultado.caratula']}</f:facet>			
+									#{resultado.caratula}
+									<br/>
+						        </rich:column>
+						         <rich:column styleClass="rowColumn" >
+						       		<f:facet name="header" styleClass="toolbaritem"  style="width:140px">#{messages['migracionExpedientesWeb.resultado.fechaSorteo']}</f:facet>						       		
+						       		<h:outputText value="#{resultado.fechaSorteo}">
+  											<f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+									</h:outputText>
+						       		<br/>
+						        </rich:column>
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header">#{messages['migracionExpedientesWeb.resultado.numJuzgado']}</f:facet>			
+									#{resultado.numJuzgado}
+									<br/>
+						        </rich:column>
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header">#{messages['migracionExpedientesWeb.resultado.numSec']}</f:facet>			
+									#{resultado.numSec}
+									<br/>
+						        </rich:column>
+						        <rich:column styleClass="rowColumn" >
+									<f:facet name="header">#{messages['migracionExpedientesWeb.resultado.salida']}</f:facet>			
+									#{resultado.result}
+									<br/>
+						        </rich:column>					       
+					      	</rich:dataTable>
+				      	</div>
+			      	</h:panelGroup>				
+					<h:panelGroup >						
+						<div align="center">
+							<h:commandButton styleClass="button main-button" 
+							value="#{messages['migracionExpedientes.button']}"
+							onclick="#{rich:component('waitDialog')}.show();"
+							oncomplete="#{rich:component('waitDialog')}.hide();#{migracionExpedientesController.traerResultados()};"
+							update="expedientesWeb"										
+							action="#{migracionExpedientesController.empezarAMigrar()}"/>
+							<h:commandButton styleClass="button main-button" 
+							value="Refrescar"
+							update="expedientesWeb" />
+						</div>							
+					</h:panelGroup>															
+				</h:panelGrid>
+			</h:form>
+			</div>	
+		</ui:decorate>			
+	</ui:define>
+</ui:composition>

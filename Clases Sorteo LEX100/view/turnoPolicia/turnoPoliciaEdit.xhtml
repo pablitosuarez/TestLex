@@ -1,0 +1,129 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="turnoPolicia" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{turnoPoliciaHome.managed ? messages['turnoPolicia.edit'] : messages['turnoPolicia.add']}" />    
+		<ui:param name="description" value="#{messages['turnoPolicia.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="desdeFechaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoPolicia.desdeFecha']}</ui:define>
+					<rich:calendar id="desdeFecha" 
+	                       required="true" showWeeksBar="false"
+					 enableManualInput="true"					
+					       	 disabled="#{!turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}"
+								 value="#{turnoPoliciaHome.instance.desdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="desdeFechaDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="desdeFechaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+
+			<s:decorate id="oficinaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['turnoPolicia.oficina']}</ui:define>
+ 
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0"  summary="#{messages['lookup.summary']}">
+		            	<h:panelGroup>
+							<h:inputText id="oficinaCodigo"
+									  style="margin-right:5px"
+						           rendered="#{turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}"
+									  value="#{turnoPoliciaHome.oficinaCodigo}"
+						valueChangeListener="#{turnoPoliciaHome.onChangeOficinaCodigo}">
+								<a4j:support event="onblur" reRender="oficinaDecoration" ajaxSingle="true"  eventsQueue="editProperty"/>
+							</h:inputText>
+		            	</h:panelGroup>
+		       	    	<s:link view="/web/oficina/oficinaList.xhtml" style="margin-right:5px"
+						      rendered="#{turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}"
+			    	    	    action="#{turnoPoliciaHome.lookupOficina('/web/turnoPolicia/turnoPoliciaEdit.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+							<s:conversationPropagation type="join" />
+		       	    	</s:link>
+		            	<h:panelGroup style="margin-right:5px">
+							<h:outputText value="#{messages['turnoPolicia.oficina.lookup_none']}" 
+						    	rendered="#{turnoPoliciaHome.instance.oficina == null}"/>
+						    <s:fragment rendered="#{turnoPoliciaHome.instance.oficina != null}">
+				            	#{turnoPoliciaHome.instance.oficina.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+							action="#{turnoPoliciaHome.clearLookupOficina}"
+						  reRender="oficinaDecoration" 
+						  rendered="#{turnoPoliciaHome.instance.oficina != null and turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{turnoPoliciaHome.doCancel}"
+						view="#{turnoPoliciaSearch.getReturnPage('/web/turnoPolicia/turnoPoliciaList.xhtml')}"
+						rendered="#{turnoPoliciaHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{turnoPoliciaHome.doAdd(turnoPoliciaSearch.getReturnPage('/web/turnoPolicia/turnoPoliciaList.xhtml'))}"
+					rendered="#{!turnoPoliciaHome.managed and s:hasPermission('TurnoPolicia','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{turnoPoliciaHome.doUpdate(turnoPoliciaSearch.getReturnPage('/web/turnoPolicia/turnoPoliciaList.xhtml'))}"
+						rendered="#{turnoPoliciaHome.managed and s:hasPermission('TurnoPolicia','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{turnoPoliciaHome.doCancel}"
+						view="#{turnoPoliciaSearch.getReturnPage('/web/turnoPolicia/turnoPoliciaList.xhtml')}"
+						rendered="#{!turnoPoliciaHome.managed}"/>
+					<rich:spacer width="15" rendered="#{turnoPoliciaHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{turnoPoliciaHome.doDelete(turnoPoliciaSearch.getReturnPage('/web/turnoPolicia/turnoPoliciaList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{turnoPoliciaHome.managed and s:hasPermission('TurnoPolicia','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

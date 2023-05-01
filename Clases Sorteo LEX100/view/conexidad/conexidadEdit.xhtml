@@ -1,0 +1,245 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="conexidad" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{conexidadHome.managed ? messages['conexidad.edit'] : messages['conexidad.add']}" />    
+		<ui:param name="description" value="#{messages['conexidad.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="tipoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['conexidad.tipo']}</ui:define>
+					<h:selectOneMenu id="tipo"
+					disabled="#{!conexidadHome.hasEditPermission('Conexidad','add','update')}"
+						      value="#{conexidadHome.instance.tipo}">
+						<f:selectItems value="#{tipoConexidadEnumeration.getItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="tipoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="principalDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['conexidad.principal']}</ui:define>
+	                <h:selectBooleanCheckbox id="principal"
+					       	           disabled="#{!conexidadHome.hasEditPermission('Conexidad','add','update')}"
+	                                      value="#{conexidadHome.instance.principal}"/>
+            </s:decorate>
+
+			<s:decorate id="expedienteOrigenDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['conexidad.expedienteOrigen']}</ui:define>
+				    <ui:param name="required" value="true"/>
+ 
+		            <h:panelGrid columns="3" cellpadding="0" cellspacing="0"  summary="#{messages['lookup.summary']}">
+		            	<h:panelGroup>
+		            	</h:panelGroup>
+		       	    	<s:link view="/web/expedienteIngreso/expedienteIngresoList.xhtml" style="margin-right:5px"
+						      rendered="#{conexidadHome.hasEditPermission('Conexidad','add','update')}"
+			    	    	    action="#{conexidadHome.lookupExpedienteOrigen('/web/conexidad/conexidadEdit.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+							<s:conversationPropagation type="join" />
+		       	    	</s:link>
+		            	<h:panelGroup style="margin-right:5px">
+							<h:outputText value="#{messages['conexidad.expedienteOrigen.lookup_none']}" 
+						    	rendered="#{conexidadHome.instance.expedienteOrigen == null}"/>
+						    <s:fragment rendered="#{conexidadHome.instance.expedienteOrigen != null}">
+				            	#{conexidadHome.instance.expedienteOrigen.id}
+							</s:fragment>
+				    	</h:panelGroup>
+					</h:panelGrid>
+
+			</s:decorate>
+
+			<s:decorate id="expedienteRelacionadoDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['conexidad.expedienteRelacionado']}</ui:define>
+				    <ui:param name="required" value="true"/>
+ 
+		            <h:panelGrid columns="3" cellpadding="0" cellspacing="0"  summary="#{messages['lookup.summary']}">
+		            	<h:panelGroup>
+		            	</h:panelGroup>
+		       	    	<s:link view="/web/expedienteIngreso/expedienteIngresoList.xhtml" style="margin-right:5px"
+						      rendered="#{conexidadHome.hasEditPermission('Conexidad','add','update')}"
+			    	    	    action="#{conexidadHome.lookupExpedienteRelacionado('/web/conexidad/conexidadEdit.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+							<s:conversationPropagation type="join" />
+		       	    	</s:link>
+		            	<h:panelGroup style="margin-right:5px">
+							<h:outputText value="#{messages['conexidad.expedienteRelacionado.lookup_none']}" 
+						    	rendered="#{conexidadHome.instance.expedienteRelacionado == null}"/>
+						    <s:fragment rendered="#{conexidadHome.instance.expedienteRelacionado != null}">
+				            	#{conexidadHome.instance.expedienteRelacionado.id}
+							</s:fragment>
+				    	</h:panelGroup>
+					</h:panelGrid>
+
+			</s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+
+		<s:decorate id="criterioCnxListList" template="/layout/lines/collection.xhtml">
+			<ui:param name="label" value="#{messages['conexidad.criterioCnxList']}" />    
+			<ui:param name="icon" value="criterioCnx" />
+			<ui:param name="initialState" value="#{empty conexidadHome.instance.criterioCnxList? 'closed':'open'}" />    
+	        <div class="association" id="criterioCnxListChildren">
+        
+			<ui:define name="emptyMessage">        
+	            <h:outputText value="#{messages['conexidad.criterioCnxList.list_none']}" styleClass="emptyMessage" 
+	                       rendered="#{empty conexidadHome.instance.criterioCnxList}"/>
+	        </ui:define>
+
+            <rich:dataTable value="#{conexidadHome.instance.criterioCnxList}" 
+							  var="criterioCnx" 
+						 rendered="#{not empty conexidadHome.instance.criterioCnxList}" 
+					   rowClasses="rvgRowOne,rvgRowTwo"
+							   id="criterioCnxListTable">
+
+
+
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Nombre Criterio Cnx
+						</f:facet>
+
+			            #{criterioCnx.nombre}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center"  >
+						<f:facet name="header">
+							Excluir Objetos Juicio
+						</f:facet>
+			            <h:graphicImage rendered="#{criterioCnx.excluirObjetosJuicio}" value="/img/icon/checked.gif"/>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-right"  >
+						<f:facet name="header">
+							Prioridad
+						</f:facet>
+			            #{criterioCnx.prioridad}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Objeto Juicio
+						</f:facet>
+						<s:fragment rendered="#{criterioCnx.objetoJuicio != null}">
+
+			            #{criterioCnx.objetoJuicio.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-right"  >
+						<f:facet name="header">
+							#{messages['criterioCnx.tema.shortLabel']}
+						</f:facet>
+			            #{criterioCnx.tema.id}
+						<br/>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{conexidadHome.removeFromCriterioCnxList(criterioCnx)}"
+										title="#{messages['list_remove']}">
+							<h:graphicImage value="/img/icon/clear.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{criterioCnxList.doLineSelection(criterioCnx, '/web/criterioCnx/criterioCnxEdit.xhtml', '/web/conexidad/conexidadEdit.xhtml')}"
+										title="#{messages['list_select']}">
+							<h:graphicImage value="/img/icon/select_right.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+	            </rich:dataTable>
+	        
+	        </div>
+
+    		<ui:define name="lowButtons">
+		        <s:div styleClass="lowButtons">
+		        
+		            <s:button view="/web/criterioCnx/criterioCnxList.xhtml"
+		              		action="#{conexidadHome.lookupAddToCriterioCnxList('/web/conexidad/conexidadEdit.xhtml')}"
+			            		id="addCriterioCnxList" styleClass="button"
+							 value="#{messages['button_add']} #{messages['criterioCnx']}">
+		            </s:button>
+					<!-- many to many -->
+		            <s:button view="/web/criterioCnx/criterioCnxList.xhtml"
+		              		action="#{conexidadHome.lookupAddToCriterioCnxListMultiple('/web/conexidad/conexidadEdit.xhtml')}"
+			            		id="addCriterioCnxListMultiple" styleClass="button"
+							 value="#{messages['button_add']} #{messages['criterioCnx']} Multiple">
+		            </s:button>		            		            		            
+		            
+		        </s:div>
+		    </ui:define>
+		</s:decorate>
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{conexidadHome.doCancel}"
+						view="#{conexidadSearch.getReturnPage('/web/conexidad/conexidadList.xhtml')}"
+						rendered="#{conexidadHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{conexidadHome.doAdd(conexidadSearch.getReturnPage('/web/conexidad/conexidadList.xhtml'))}"
+					rendered="#{!conexidadHome.managed and s:hasPermission('Conexidad','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{conexidadHome.doUpdate(conexidadSearch.getReturnPage('/web/conexidad/conexidadList.xhtml'))}"
+						rendered="#{conexidadHome.managed and s:hasPermission('Conexidad','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{conexidadHome.doCancel}"
+						view="#{conexidadSearch.getReturnPage('/web/conexidad/conexidadList.xhtml')}"
+						rendered="#{!conexidadHome.managed}"/>
+					<rich:spacer width="15" rendered="#{conexidadHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{conexidadHome.doDelete(conexidadSearch.getReturnPage('/web/conexidad/conexidadList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{conexidadHome.managed and s:hasPermission('Conexidad','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

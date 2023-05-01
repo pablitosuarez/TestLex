@@ -1,0 +1,246 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('TipoAsignacionCodificado','read')}">
+		<ui:param name="icon" value="tipoAsignacion" />    
+		<ui:param name="title" value="#{messages['tipoAsignacionCodificado.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(tipoAsignacionCodificadoList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{tipoAsignacionCodificadoList}"/>
+
+			<s:decorate id="codigoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['tipoAsignacion.codigo']}</ui:define>
+	                <h:inputText id="codigoFilter" 
+	                           size="10"
+	                          value="#{tipoAsignacionCodificadoSearch.codigo}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="descripcionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['tipoAsignacion.descripcion']}</ui:define>
+	                <h:inputText id="descripcionFilter" 
+	                           size="98"
+	                          value="#{tipoAsignacionCodificadoSearch.descripcion}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="materiaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['tipoAsignacion.materia']}</ui:define>
+				<h:selectOneMenu id="materiaFilter"
+					      value="#{tipoAsignacionCodificadoSearch.materia}">
+					<s:selectItems var="lookupItem"
+								 label="#{materiaEnumeration.labelFor(lookupItem)}"
+								 value="#{materiaEnumeration.globalMateriaList}"
+						noSelectionLabel="#{messages['tipoAsignacion.materia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+<!-- 
+			<s:decorate id="tipoInstanciaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['tipoAsignacion.tipoInstancia']}</ui:define>
+				<h:selectOneMenu id="tipoInstanciaFilter"
+					      value="#{tipoAsignacionCodificadoSearch.tipoInstancia}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoInstanciaEnumeration.items}"
+						noSelectionLabel="#{messages['tipoAsignacion.tipoInstancia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+ -->
+ 			<s:decorate id="categoriaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['tipoAsignacion.categoria']}</ui:define>
+				<h:selectOneMenu id="categoriaFilter"
+					      value="#{tipoAsignacionCodificadoSearch.categoria}">
+					<f:selectItems value="#{categoriaTipoAsignacionEnumeration.getItems(messages['lookup_select'])}" />
+				</h:selectOneMenu>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['tipoAsignacionCodificado.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty tipoAsignacionCodificadoList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="tipoAsignacionCodificadoList">
+			    <rich:dataTable id="tipoAsignacionCodificadoTable" 
+			                var="item"
+			              value="#{tipoAsignacionCodificadoList.resultList}" 
+                       rendered="#{not empty tipoAsignacionCodificadoList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('TipoAsignacionCodificado','update') or tipoAsignacionCodificadoSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{tipoAsignacionCodificadoList.getOrderStyle('codigo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['tipoAsignacion.codigo.shortLabel']}">
+				                    <f:param name="tipoAsignacionCodificadoOrder" value="#{tipoAsignacionCodificadoList.getOrderParam('codigo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{tipoAsignacionCodificadoList.getOrderStyle('descripcion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['tipoAsignacion.descripcion.shortLabel']}">
+				                    <f:param name="tipoAsignacionCodificadoOrder" value="#{tipoAsignacionCodificadoList.getOrderParam('descripcion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['tipoAsignacionCodificado.materia.shortLabel']}
+							</rich:column>
+<!-- 
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['tipoAsignacionCodificado.tipoInstancia.shortLabel']}
+							</rich:column>
+ -->
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{tipoAsignacionCodificadoList.getOrderStyle('categoria', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['tipoAsignacion.categoria.shortLabel']}">
+				                    <f:param name="tipoAsignacionCodificadoOrder" value="#{tipoAsignacionCodificadoList.getOrderParam('categoria')}"/>
+				                </s:link>
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('TipoAsignacionCodificado','update') or tipoAsignacionCodificadoSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{tipoAsignacionCodificadoList.doSelection(item, '/web/tipoAsignacionCodificado/tipoAsignacionCodificadoEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!tipoAsignacionCodificadoSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.codigo}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.descripcion}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.materia != null}">
+
+			            #{item.materia.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+<!-- 
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.tipoInstancia != null}">
+
+			            #{item.tipoInstancia.nombre}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+ -->
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{categoriaTipoAsignacionEnumeration.getLabel(item.categoria)}"/>
+						<br/>
+			        </rich:column>
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{tipoAsignacionCodificadoList.getPaginator(tipoAsignacionCodificadoList)}"/>
+	  			<ui:param name="componentName" value="tipoAsignacionCodificado"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!tipoAsignacionCodificadoSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!tipoAsignacionCodificadoSearch.hasReturnPage() and s:hasPermission('TipoAsignacionCodificado','add')}" 
+        					  view="/web/tipoAsignacionCodificado/tipoAsignacionCodificadoEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{tipoAsignacionCodificadoList.onAdd()}"
+	                 		 value="#{messages['tipoAsignacion.button.new']}">
+        	    	<f:param name="tipoAsignacionCodificadoId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{tipoAsignacionCodificadoSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{tipoAsignacionCodificadoList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{tipoAsignacionCodificadoList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{tipoAsignacionCodificadoSearch.hasReturnPage()}"
+		        			action="#{tipoAsignacionCodificadoList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{tipoAsignacionCodificadoSearch.hasReturnPage()}" 
+		        			  view="#{tipoAsignacionCodificadoSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{tipoAsignacionCodificadoSearch.hasReturnPage()}" 
+		        			  view="#{tipoAsignacionCodificadoSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['tipoAsignacionCodificado.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/tipoAsignacionCodificado/tipoAsignacionCodificadoList.jrxml" />
+		<ui:param name="reportList" value="#{tipoAsignacionCodificadoList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

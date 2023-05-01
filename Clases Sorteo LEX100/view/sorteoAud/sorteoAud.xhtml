@@ -1,0 +1,270 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+    
+	<h:form>
+	<ui:decorate id="form" template="/layout/form.xhtml">
+		<ui:param name="icon" value="sorteoAud" />    
+		<ui:param name="title" value="#{messages['sorteoAud']}" />    
+		<ui:param name="description" value="#{messages['sorteoAud.comment']}" />
+
+		<!-- group default -->
+        <ui:decorate template="/layout/group/groupAuto.xhtml">
+		<ui:param name="id" value="default"/>
+
+		<ui:decorate template="/layout/grid/gridForm.xhtml">			
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="1">
+    	    <s:decorate id="codigo" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.codigo']}</ui:define>
+
+			            #{sorteoAudHome.instance.codigo}
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="2">
+    	    <s:decorate id="descripcion" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.descripcion']}</ui:define>
+
+			            #{sorteoAudHome.instance.descripcion}
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="2">
+    	    <s:decorate id="rubros" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.rubros']}</ui:define>
+
+			            #{sorteoAudHome.instance.rubros}
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="1">
+    	    <s:decorate id="conTurno" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.conTurno']}</ui:define>
+						<h:outputText value="#{turnoSorteoEnumeration.getLabel(sorteoAudHome.instance.conTurno)}"/>
+	        </s:decorate>
+		</td>
+		<td class="gridcolumn" colspan="1">
+    	    <s:decorate id="bolasPorOficina" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.bolasPorOficina']}</ui:define>
+			            #{sorteoAudHome.instance.bolasPorOficina}
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="1">
+
+			<s:decorate id="camara" template="/layout/display.xhtml" rendered="#{empty sessionState.globalOficina}">
+				<ui:define name="label">#{messages['sorteoAud.camara']}</ui:define>
+				<h:outputText value="#{messages['sorteoAud.camara.lookup_none']}" 
+		    		rendered="#{sorteoAudHome.instance.camara == null}"/>
+						<s:fragment rendered="#{sorteoAudHome.instance.camara != null}">
+
+			            #{sorteoAudHome.instance.camara.descripcion}
+						</s:fragment>
+			</s:decorate>
+		</td>
+		<td class="gridcolumn" colspan="1">
+
+			<s:decorate id="tipoInstancia" template="/layout/display.xhtml" >
+				<ui:define name="label">#{messages['sorteoAud.tipoInstancia']}</ui:define>
+				<h:outputText value="#{messages['sorteoAud.tipoInstancia.lookup_none']}" 
+		    		rendered="#{sorteoAudHome.instance.tipoInstancia == null}"/>
+						<s:fragment rendered="#{sorteoAudHome.instance.tipoInstancia != null}">
+
+			            #{sorteoAudHome.instance.tipoInstancia.nombre}
+						</s:fragment>
+			</s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="1">
+
+			<s:decorate id="competencia" template="/layout/display.xhtml" >
+				<ui:define name="label">#{messages['sorteoAud.competencia']}</ui:define>
+				<h:outputText value="#{messages['sorteoAud.competencia.lookup_none']}" 
+		    		rendered="#{sorteoAudHome.instance.competencia == null}"/>
+						<s:fragment rendered="#{sorteoAudHome.instance.competencia != null}">
+
+			            #{sorteoAudHome.instance.competencia.descripcion}
+						</s:fragment>
+			</s:decorate>
+		</td>
+		<td class="gridcolumn" colspan="1">
+
+			<s:decorate id="tipoOficina" template="/layout/display.xhtml" >
+				<ui:define name="label">#{messages['sorteoAud.tipoOficina']}</ui:define>
+				<h:outputText value="#{messages['sorteoAud.tipoOficina.lookup_none']}" 
+		    		rendered="#{sorteoAudHome.instance.tipoOficina == null}"/>
+						<s:fragment rendered="#{sorteoAudHome.instance.tipoOficina != null}">
+
+			            #{sorteoAudHome.instance.tipoOficina.descripcion}
+						</s:fragment>
+			</s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="1">
+    	    <s:decorate id="rangoMinimos" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.rangoMinimos']}</ui:define>
+			            #{sorteoAudHome.instance.rangoMinimos}
+	        </s:decorate>
+		</td>
+		<td class="gridcolumn" colspan="1">
+    	    <s:decorate id="idSorteo" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.idSorteo']}</ui:define>
+			            #{sorteoAudHome.instance.idSorteo}
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="1">
+    	    <s:decorate id="status" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.status']}</ui:define>
+			            #{sorteoAudHome.instance.status}
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="2">
+    	    <s:decorate id="usuario" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.usuario']}</ui:define>
+
+			            #{sorteoAudHome.instance.usuario}
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="1">
+    	    <s:decorate id="fechaModificacion" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.fechaModificacion']}</ui:define>
+			            <h:outputText value="#{sorteoAudHome.instance.fechaModificacion}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm"/>
+			            </h:outputText>
+	        </s:decorate>
+		</td>
+			</tr>
+		<tr class="gridrow">
+		<td class="gridcolumn" colspan="2">
+    	    <s:decorate id="descripcionModificacion" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoAud.descripcionModificacion']}</ui:define>
+
+			            #{sorteoAudHome.instance.descripcionModificacion}
+	        </s:decorate>
+		</td>
+		</tr>
+		</ui:decorate> <!-- end gridForm -->		
+		</ui:decorate>
+		<!-- end group default -->		
+
+    	<ui:define name="collections">
+		</ui:define>
+	
+        <div style="clear:both"/>
+        
+    	<ui:define name="buttons">
+	    	<div class="actionButtons">      
+	    	    <s:button styleClass="button done main-button " 
+	    	    	  action="#{sorteoAudSearch.done()}"
+						view="#{sorteoAudSearch.getReturnPage('/web/sorteoAud/sorteoAudList.xhtml')}"
+					   value="#{messages['button_done']}"/>
+					<rich:spacer width="15"/>	
+
+		    </div>
+		</ui:define>
+	</ui:decorate>
+	</h:form>
+
+	<div class="indent_lines">
+	<f:subview rendered="#{false and sorteoAudHome.managed}">
+	<h:form>
+		<s:decorate id="oficinaSorteoListLines" template="/layout/lines/lines.xhtml">		
+
+
+			<ui:param name="label" value="#{messages['sorteoAud.oficinaSorteoList']}" />    
+			<ui:param name="icon" value="oficinaSorteo" />
+			<ui:param name="initialState" value="#{empty oficinaSorteoList.bySorteoResultList? 'closed':'open'}" />    
+
+	        <div class="association" id="oficinaSorteoListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['sorteoAud.oficinaSorteoList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty oficinaSorteoList.bySorteoResultList}"/>
+		        </ui:define>
+				<rich:dataTable value="#{oficinaSorteoList.bySorteoResultList}" 
+	                           var="oficinaSorteo" 
+	                      rendered="#{not empty oficinaSorteoList.bySorteoResultList}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="oficinaSorteoListTable">
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('SorteoAud','update') or oficinaSorteoSearch.hasSelectionPage()}">
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{oficinaSorteoList.doLineSelection(oficinaSorteo, '/web/oficinaSorteo/oficinaSorteo.xhtml', '/web/sorteoAud/sorteoAud.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!sorteoAudSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center"  >
+						<f:facet name="header">
+			                <s:link styleClass="#{oficinaSorteoList.getOrderStyle('turno', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['oficinaSorteo.turno.shortLabel']}">
+			                    <f:param name="oficinaSorteoOrder" value="#{oficinaSorteoList.getOrderParam('turno')}"/>
+			                </s:link>
+						</f:facet>
+			            <h:graphicImage rendered="#{oficinaSorteo.turno}" value="/img/icon/checked.gif"/>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn" >
+						<f:facet name="header">
+			                <s:link styleClass="#{oficinaSorteoList.getOrderStyle('oficina', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['oficinaSorteo.oficina.shortLabel']}">
+			                    <f:param name="oficinaSorteoOrder" value="#{oficinaSorteoList.getOrderParam('oficina')}"/>
+			                </s:link>
+						</f:facet>
+						<s:fragment rendered="#{oficinaSorteo.oficina != null}">
+			            #{oficinaSorteo.oficina.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-right"  >
+						<f:facet name="header">
+			                <s:link styleClass="#{oficinaSorteoList.getOrderStyle('orden', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['oficinaSorteo.orden.shortLabel']}">
+			                    <f:param name="oficinaSorteoOrder" value="#{oficinaSorteoList.getOrderParam('orden')}"/>
+			                </s:link>
+						</f:facet>
+			            #{oficinaSorteo.orden}
+						<br/>
+			        </rich:column>
+            	</rich:dataTable>
+	        </div>
+
+		    <ui:define name="paginator">
+				<s:decorate template="/layout/listPaginator.xhtml">
+		  			<ui:param name="paginator" value="#{oficinaSorteoList.getPaginator(oficinaSorteoList)}"/>
+		  			<ui:param name="componentName" value="oficinaSorteo"/>
+		  		</s:decorate>
+			</ui:define>
+
+		</s:decorate>
+	</h:form>
+	</f:subview>
+	</div>
+	   
+</ui:define>
+
+</ui:composition>

@@ -1,0 +1,252 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('Conexidad','read')}">
+		<ui:param name="icon" value="conexidad" />    
+		<ui:param name="title" value="#{messages['conexidad.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(conexidadList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{conexidadList}"/>
+
+			<s:decorate id="tipoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidad.tipo']}</ui:define>
+				<h:selectOneMenu id="tipoFilter"
+					      value="#{conexidadSearch.tipo}">
+					<f:selectItems value="#{tipoConexidadEnumeration.getItems(messages['lookup_select'])}" />
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="expedienteOrigenFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidad.expedienteOrigen']}</ui:define>
+
+	
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0" summary="#{messages['lookup.summary']}">	                
+		            	<h:panelGroup>
+		            	</h:panelGroup>
+
+		       	    	<h:commandLink style="margin-right:5px"
+			    	    	    action="#{conexidadHome.lookupSearchExpedienteOrigen('/web/expedienteIngreso/expedienteIngresoList.xhtml', '/web/conexidad/conexidadList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+		       	    	</h:commandLink>
+		            	<h:panelGroup id="expedienteOrigenDescription" style="margin-right:5px">
+							<h:outputText value="#{messages['conexidad.expedienteOrigen.lookup_select']}" 
+						    	rendered="#{conexidadSearch.expedienteOrigen == null}"/>
+						    <s:fragment rendered="#{conexidadSearch.expedienteOrigen != null}">
+				            	#{conexidadSearch.expedienteOrigen.id}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px"
+							action="#{conexidadSearch.clearExpedienteOrigen}"
+						  reRender="expedienteOrigenFilterDecoration" 
+						  rendered="#{conexidadSearch.expedienteOrigen != null}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+			<s:decorate id="expedienteRelacionadoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidad.expedienteRelacionado']}</ui:define>
+
+	
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0" summary="#{messages['lookup.summary']}">	                
+		            	<h:panelGroup>
+		            	</h:panelGroup>
+
+		       	    	<h:commandLink style="margin-right:5px"
+			    	    	    action="#{conexidadHome.lookupSearchExpedienteRelacionado('/web/expedienteIngreso/expedienteIngresoList.xhtml', '/web/conexidad/conexidadList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+		       	    	</h:commandLink>
+		            	<h:panelGroup id="expedienteRelacionadoDescription" style="margin-right:5px">
+							<h:outputText value="#{messages['conexidad.expedienteRelacionado.lookup_select']}" 
+						    	rendered="#{conexidadSearch.expedienteRelacionado == null}"/>
+						    <s:fragment rendered="#{conexidadSearch.expedienteRelacionado != null}">
+				            	#{conexidadSearch.expedienteRelacionado.id}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px"
+							action="#{conexidadSearch.clearExpedienteRelacionado}"
+						  reRender="expedienteRelacionadoFilterDecoration" 
+						  rendered="#{conexidadSearch.expedienteRelacionado != null}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['conexidad.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty conexidadList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="conexidadList">
+			    <rich:dataTable id="conexidadTable" 
+			                var="item"
+			              value="#{conexidadList.resultList}" 
+                       rendered="#{not empty conexidadList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('Conexidad','update') or conexidadSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{conexidadList.getOrderStyle('tipo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['conexidad.tipo.shortLabel']}">
+				                    <f:param name="conexidadOrder" value="#{conexidadList.getOrderParam('tipo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{conexidadList.getOrderStyle('principal', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['conexidad.principal.shortLabel']}">
+				                    <f:param name="conexidadOrder" value="#{conexidadList.getOrderParam('principal')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+				                <s:link styleClass="#{conexidadList.getOrderStyle('expedienteOrigen.id', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['conexidad.expedienteOrigen.shortLabel']} Id Expediente Ingreso">
+			    	                <f:param name="conexidadOrder" value="#{conexidadList.getOrderParam('expedienteOrigen.id')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+				                <s:link styleClass="#{conexidadList.getOrderStyle('expedienteRelacionado.id', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['conexidad.expedienteRelacionado.shortLabel']} Id Expediente Ingreso">
+			    	                <f:param name="conexidadOrder" value="#{conexidadList.getOrderParam('expedienteRelacionado.id')}"/>
+				                </s:link>
+							</rich:column>
+
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('Conexidad','update') or conexidadSearch.hasSelectionPage()}">
+			           	<h:selectBooleanCheckbox value="#{conexidadSearch.selectionMap[item]}" rendered="#{conexidadSearch.inSelectionMultiple}">
+			        		<a4j:support event="onclick" ajaxSingle="true"/>
+			        	</h:selectBooleanCheckbox>
+			        
+			            <h:commandLink action="#{conexidadList.doSelection(item, '/web/conexidad/conexidadEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!conexidadSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{tipoConexidadEnumeration.getLabel(item.tipo)}"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-center"  >
+			            <h:graphicImage rendered="#{item.principal}" value="/img/icon/checked.gif"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.expedienteOrigen.id}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.expedienteRelacionado.id}
+						<br/>
+			        </rich:column>
+
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{conexidadList.getPaginator(conexidadList)}"/>
+	  			<ui:param name="componentName" value="conexidad"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!conexidadSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!conexidadSearch.hasReturnPage() and s:hasPermission('Conexidad','add')}" 
+        					  view="/web/conexidad/conexidadEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{conexidadList.onAdd()}"
+	                 		 value="#{messages['conexidad.button.new']}">
+        	    	<f:param name="conexidadId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{conexidadSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{conexidadList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{conexidadList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{conexidadSearch.hasReturnPage()}"
+		        			action="#{conexidadList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{conexidadSearch.hasReturnPage()}" 
+		        			  view="#{conexidadSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{conexidadSearch.hasReturnPage()}" 
+		        			  view="#{conexidadSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['conexidad.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/conexidad/conexidadList.jrxml" />
+		<ui:param name="reportList" value="#{conexidadList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

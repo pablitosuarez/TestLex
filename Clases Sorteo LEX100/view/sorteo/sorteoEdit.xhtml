@@ -1,0 +1,515 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="sorteo" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{sorteoHome.managed ? messages['sorteo.edit'] : messages['sorteo.add']}" />    
+		<ui:param name="description" value="#{messages['sorteo.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="codigoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.codigo']}</ui:define>
+	                <h:inputText id="codigo" 
+	                		required="true"
+					       disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                           size="35"
+	                      maxlength="64"
+	                          value="#{sorteoHome.instance.codigo}">
+	                    <a4j:support event="onblur" reRender="codigoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="descripcionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.descripcion']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputText id="descripcion"
+	                               size="98"
+					       	 disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                              value="#{sorteoHome.instance.descripcion}">
+	                    <a4j:support event="onblur" reRender="descripcionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+	                </div>                              
+            </s:decorate>
+            <s:decorate id="rubrosDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.rubros']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputText id="rubros"
+	                               size="98"
+					       	 disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                              value="#{sorteoHome.instance.rubros}">
+	                    <a4j:support event="onblur" reRender="rubrosDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+	                </div>
+                              
+            </s:decorate>
+            <!-- 
+            <s:decorate id="rubrosAsignacionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.rubrosAsignacion']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputText id="rubrosAsignacion"
+	                               size="98"
+					       	 disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                              value="#{sorteoHome.instance.rubrosAsignacion}">
+	                    <a4j:support event="onblur" reRender="rubrosAsignacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+	                </div>
+                              
+            </s:decorate>
+             -->
+            <s:decorate id="conTurnoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.conTurno']}</ui:define>
+					<h:selectOneRadio id="conTurno"
+								  layout="pageDirection" 
+	                       required="true"
+					disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+						      value="#{sorteoHome.instance.conTurno}">
+						<f:selectItems value="#{turnoSorteoEnumeration.items}" />
+						<a4j:support event="onclick" reRender="conTurnoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneRadio>
+            </s:decorate>
+
+            <s:decorate id="bolasPorOficinaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.bolasPorOficina']}</ui:define>
+	                <h:inputText id="bolasPorOficina"
+					       disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                          value="#{sorteoHome.instance.bolasPorOficina}">
+	                    <a4j:support event="onblur" reRender="bolasPorOficinaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="rangoMinimosDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.rangoMinimos']}</ui:define>
+	                <h:inputText id="rangoMinimos"
+					       disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                          value="#{sorteoHome.instance.rangoMinimos}">
+	                    <a4j:support event="onblur" reRender="rangoMinimosDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="minimoNumeroBolasDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.minimoNumeroBolas']}</ui:define>
+	                <h:inputText id="minimoNumeroBolas"
+					       disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                          value="#{sorteoHome.instance.minimoNumeroBolas}">
+	                    <a4j:support event="onblur" reRender="minimoNumeroBolasDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+
+			<s:decorate id="camaraDecoration" template="/layout/edit.xhtml" rendered="#{empty sessionState.globalCamara}">
+					<ui:define name="label">#{messages['sorteo.camara']}</ui:define>
+ 
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0"  summary="#{messages['lookup.summary']}">
+		            	<h:panelGroup>
+		            	</h:panelGroup>
+		       	    	<s:link view="/web/camara/camaraList.xhtml" style="margin-right:5px"
+						      rendered="#{sorteoHome.hasEditPermission('Sorteo','add','update')}"
+			    	    	    action="#{sorteoHome.lookupCamara('/web/sorteo/sorteoEdit.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+							<s:conversationPropagation type="join" />
+		       	    	</s:link>
+		            	<h:panelGroup style="margin-right:5px">
+							<h:outputText value="#{messages['sorteo.camara.lookup_none']}" 
+						    	rendered="#{sorteoHome.instance.camara == null}"/>
+						    <s:fragment rendered="#{sorteoHome.instance.camara != null}">
+				            	#{sorteoHome.instance.camara.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+							action="#{sorteoHome.clearLookupCamara}"
+						  reRender="camaraDecoration" 
+						  rendered="#{sorteoHome.instance.camara != null and sorteoHome.hasEditPermission('Sorteo','add','update')}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+            <s:decorate id="tipoRadicacionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.tipoRadicacion']}</ui:define>
+					<h:selectOneMenu id="tipoRadicacion"
+					disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+						      value="#{sorteoHome.instance.tipoRadicacion}">
+						<f:selectItems value="#{tipoRadicacionEnumeration.getItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="tipoRadicacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="grupoMateriaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.grupoMateria']}</ui:define>
+					<h:selectOneMenu id="grupoMateria"
+						      value="#{sorteoHome.instance.grupoMateria}">
+						<f:selectItems value="#{grupoMateriaEnumeration.getItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="grupoMateriaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+			<s:decorate id="materiaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['sorteo.materia']}</ui:define>
+					<h:selectOneMenu id="materia"
+							  rendered="#{sorteoHome.hasEditPermission('Sorteo','add','update')}"
+								 value="#{sorteoHome.instance.materia}">
+						<s:selectItems var="lookupItem"
+									 label="#{materiaEnumeration.labelFor(lookupItem)}"
+									 value="#{sorteoHome.materiasCamara}"
+							noSelectionLabel="#{messages['sorteo.materia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="materiaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{materiaEnumeration.labelFor(sorteoHome.instance.materia)}"
+						   rendered="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}" />
+ 
+			</s:decorate>
+
+			<s:decorate id="tipoInstanciaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['sorteo.tipoInstancia']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="tipoInstancia"
+							  required="true"
+							  rendered="#{sorteoHome.hasEditPermission('Sorteo','add','update')}"
+								 value="#{sorteoHome.instance.tipoInstancia}">
+						<s:selectItems var="lookupItem"
+									 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+									 value="#{tipoInstanciaEnumeration.items}"
+							noSelectionLabel="#{messages['sorteo.tipoInstancia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="tipoInstanciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{tipoInstanciaEnumeration.labelFor(sorteoHome.instance.tipoInstancia)}"
+						   rendered="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}" />
+ 
+			</s:decorate>
+
+			<s:decorate id="competenciaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['sorteo.competencia']}</ui:define>
+					<h:selectOneMenu id="competencia"
+							  rendered="#{sorteoHome.hasEditPermission('Sorteo','add','update')}"
+								 value="#{sorteoHome.instance.competencia}">
+						<s:selectItems var="lookupItem"
+									 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+									 value="#{sorteoHome.competencias}"
+							noSelectionLabel="#{messages['sorteo.competencia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="competenciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{competenciaEnumeration.labelFor(sorteoHome.instance.competencia)}"
+						   rendered="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}" />
+ 
+			</s:decorate>
+			
+			<s:decorate id="tipoOficinaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['sorteo.tipoOficina']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="tipoOficina"
+							  required="true"
+							  rendered="#{sorteoHome.hasEditPermission('Sorteo','add','update')}"
+								 value="#{sorteoHome.instance.tipoOficina}">
+						<s:selectItems var="lookupItem"
+									 label="#{tipoOficinaEnumeration.labelFor(lookupItem)}"
+									 value="#{tipoOficinaEnumeration.items}"
+							noSelectionLabel="#{messages['sorteo.tipoOficina.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="tipoOficinaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{tipoOficinaEnumeration.labelFor(sorteoHome.instance.tipoOficina)}"
+						   rendered="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}" />
+ 
+			</s:decorate>
+            <s:decorate id="codigoMesaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.codigoMesa']}</ui:define>
+	                <h:inputText id="codigoMesa" 
+					       disabled="#{!sorteoHome.hasEditPermission('Sorteo','add','update')}"
+	                           size="35"
+	                      maxlength="64"
+	                          value="#{sorteoHome.instance.codigoMesa}">
+	                    <a4j:support event="onblur" reRender="codigoMesaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+
+		<s:decorate id="tipoBolilleroListList" template="/layout/lines/collection.xhtml">
+			<ui:param name="label" value="#{messages['sorteo.tipoBolilleroList']}" />    
+			<ui:param name="icon" value="bolillero" />
+			<ui:param name="initialState" value="#{empty sorteoHome.instance.tipoBolilleroList? 'closed':'open'}" />    
+	        <div class="association" id="tipoBolilleroListChildren">
+        
+			<ui:define name="emptyMessage">        
+	            <h:outputText value="#{messages['sorteo.tipoBolilleroList.list_none']}" styleClass="emptyMessage" 
+	                       rendered="#{empty sorteoHome.instance.tipoBolilleroList}"/>
+	        </ui:define>
+
+            <rich:dataTable value="#{sorteoHome.instance.tipoBolilleroList}" 
+							  var="tipoBolillero" 
+						 rendered="#{not empty sorteoHome.instance.tipoBolilleroList}" 
+					   rowClasses="rvgRowOne,rvgRowTwo"
+							   id="tipoBolilleroListTable">
+
+
+
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Código Tipo Bolillero
+						</f:facet>
+
+			            #{tipoBolillero.codigo}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Descripción Tipo Bolillero
+						</f:facet>
+
+			            #{tipoBolillero.descripcion}
+						<br/>
+			        </rich:column>
+			        <rich:column width="1">
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{sorteoHome.removeFromTipoBolilleroList(tipoBolillero)}"
+										title="#{messages['list_remove']}">
+							<h:graphicImage value="/img/icon/clear.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+	            </rich:dataTable>
+	        
+	        </div>
+
+    		<ui:define name="lowButtons">
+		        <s:div styleClass="lowButtons">
+					<!-- many to many -->
+		            <s:button view="/web/tipoBolillero/tipoBolilleroList.xhtml"
+		              		action="#{sorteoHome.lookupAddToTipoBolilleroListMultiple('/web/sorteo/sorteoEdit.xhtml')}"
+			            		id="addTipoBolilleroListMultiple" styleClass="button"
+							 value="#{messages['button_add']} #{messages['tipoBolillero.list']}">
+		            </s:button>		            		            		            
+		            
+		        </s:div>
+		    </ui:define>
+		</s:decorate>
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{sorteoHome.doCancel}"
+						view="#{sorteoSearch.getReturnPage('/web/sorteo/sorteoList.xhtml')}"
+						rendered="#{sorteoHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{sorteoHome.doAdd(sorteoSearch.getReturnPage('/web/sorteo/sorteoEdit.xhtml'))}"
+					rendered="#{!sorteoHome.managed and s:hasPermission('Sorteo','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{sorteoHome.doUpdate(sorteoSearch.getReturnPage('/web/sorteo/sorteoList.xhtml'))}"
+						rendered="#{sorteoHome.managed and s:hasPermission('Sorteo','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{sorteoHome.doCancel}"
+						view="#{sorteoSearch.getReturnPage('/web/sorteo/sorteoList.xhtml')}"
+						rendered="#{!sorteoHome.managed}"/>
+					<rich:spacer width="15" rendered="#{sorteoHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{sorteoHome.doDelete(sorteoSearch.getReturnPage('/web/sorteo/sorteoList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{sorteoHome.managed and s:hasPermission('Sorteo','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	<f:subview rendered="#{sorteoHome.managed}">
+	<h:form>
+		<s:decorate id="oficinaSorteoListLines" template="/layout/lines/lines.xhtml">		
+
+
+			<ui:param name="label" value="#{messages['sorteo.oficinaSorteoList']}" />    
+			<ui:param name="icon" value="oficina" />
+			<ui:param name="initialState" value="#{empty oficinaSorteoList.bySorteoResultList? 'closed':'open'}" />    
+
+	        <div class="association" id="oficinaSorteoListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['sorteo.oficinaSorteoList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty oficinaSorteoList.bySorteoResultList}"/>
+		        </ui:define>
+				<a4j:region>
+				<rich:dataTable value="#{oficinaSorteoList.bySorteoResultList}" 
+	                           var="oficinaSorteo" 
+	                      rendered="#{not empty oficinaSorteoList.bySorteoResultList}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="oficinaSorteoListTable">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{not turnoSorteoEnumeration.isSinTurno(sorteoHome.instance.conTurno)}" >
+				                <s:link styleClass="#{oficinaSorteoList.getOrderStyle('turno', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['oficinaSorteo.turno.shortLabel']}">
+				                    <f:param name="oficinaSorteoOrder" value="#{oficinaSorteoList.getOrderParam('turno')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['oficina.codigo.shortLabel']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['oficinaSorteo.oficina.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" width="1" rendered="#{s:hasPermission('OficinaSorteo','update')}">
+			            		<span/>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" width="1" rendered="#{false and s:hasPermission('OficinaSorteo','update')}">
+			            		<span/>
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			
+			        <rich:column styleClass="align-center" rendered="#{not turnoSorteoEnumeration.isSinTurno(sorteoHome.instance.conTurno)}" >
+			            <h:graphicImage rendered="#{oficinaSorteo.turno}" value="/img/icon/check.png"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass=""  >
+						<s:fragment rendered="#{oficinaSorteo.oficina != null}">
+
+			            #{oficinaSorteo.oficina.codigo}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass=""  >
+						<s:fragment rendered="#{oficinaSorteo.oficina != null}">
+
+			            #{oficinaSorteo.oficina.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        
+			        <rich:column width="1" styleClass="#{oficinaSorteoList.isManaged(oficinaSorteo)? '': 'newRowColumn'}"
+						      rendered="#{false and s:hasPermission('OficinaSorteo','update')}">
+			            <h:commandLink action="#{oficinaSorteoList.doInhabilitar(oficinaSorteo)}" eventsQueue="editLine"
+										  title="#{messages['oficinaSorteo.inhabilitar']}" 
+									   rendered="#{oficinaSorteoList.isManaged(oficinaSorteo) and s:hasPermission('Sorteo','update')}"
+									   onclick="return confirm('#{messages['confirm_inhabilitar']}');"
+									   immediate="true"	 
+									   reRender="oficinaSorteoListTable">
+							<span class="line_lock"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+
+			        <rich:column width="1" styleClass="#{oficinaSorteoList.isManaged(oficinaSorteo)? '': 'newRowColumn'}"
+						      rendered="#{s:hasPermission('OficinaSorteo','update')}">
+			            <h:commandLink action="#{oficinaSorteoList.doLineDelete(oficinaSorteo)}" eventsQueue="editLine"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{oficinaSorteoList.isManaged(oficinaSorteo) and s:hasPermission('Sorteo','update')}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="oficinaSorteoListTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+	        
+    		<ui:define name="lowButtons">
+		    <s:div styleClass="lowButtons">
+	            <s:button view="/web/oficina/oficinaList.xhtml"
+	              		action="#{sorteoHome.lookupAddOficinas('/web/sorteo/sorteoEdit.xhtml')}"
+		            		id="addOficinas" styleClass="button"
+						 value="#{messages['button_add']} #{messages['sorteo.oficinaSorteoList']}">
+	            </s:button>		            		            		            
+				<h:commandButton 
+		        			actionListener="#{sorteoHome.doClearOficinaList()}"
+		        			immediate="true"
+						styleClass="button"
+					 value="#{messages['sorteo.oficinaSorteoList.clear']}"/>
+		 	</s:div>
+		    </ui:define>
+		    
+
+		    <ui:define name="paginator">
+				<s:decorate template="/layout/listPaginator.xhtml">
+		  			<ui:param name="paginator" value="#{oficinaSorteoList.getPaginator(oficinaSorteoList)}"/>
+		  			<ui:param name="componentName" value="oficinaSorteo"/>
+		  		</s:decorate>
+			</ui:define>
+
+ 	    <ui:define name="linesButtons">
+ 	    <table style="clear:both;width:100%;margin-top:50px"><tr><td align="center"> 
+		    <s:div styleClass="actionButtons" style="clear: both; background-color: rgb(247, 100, 100);">
+        		<h:commandButton 
+		        			action="#{sorteoHome.doCargaSorteoEnBolillero(false)}"
+		        			onclick="return confirm('#{messages['sorteo.cargaSorteoSinBlanquearBolillero.confirm']}');"		        			
+						styleClass="button"
+							 value="#{messages['sorteo.cargaSorteoSinBlanquearBolillero']}"/>
+							 
+        		<h:commandButton 
+		        			action="#{sorteoHome.doCargaSorteoEnBolillero(true)}"
+		        			onclick="return confirm('#{messages['sorteo.cargaSorteoConBlanquearBolillero.confirm']}');"		        			
+						styleClass="button"
+							 value="#{messages['sorteo.cargaSorteoConBlanquearBolillero']}"/>
+							 
+        		<h:commandButton 
+		        			action="#{sorteoHome.doBorrarBolillero()}"
+		        			onclick="return confirm('#{messages['sorteo.borrarBolillero.confirm']}');"		        			
+						styleClass="button"
+							 value="#{messages['sorteo.borrarBolillero']}"/>
+        		<h:commandButton 
+		        			action="#{sorteoHome.doVerificarBolillero()}"
+						styleClass="button"
+							 value="#{messages['sorteo.verificarBolillero']}"/>
+        		<h:commandButton rendered="#{sorteoHome.sorteoHasErrors}"
+		        			action="#{sorteoHome.doRepararBolillero()}"
+						styleClass="button"
+							 value="#{messages['sorteo.sincronizarBolillero']}"/>
+	    	</s:div>
+	    	</td></tr></table>
+		</ui:define>
+
+		</s:decorate>
+	</h:form>
+	</f:subview>
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

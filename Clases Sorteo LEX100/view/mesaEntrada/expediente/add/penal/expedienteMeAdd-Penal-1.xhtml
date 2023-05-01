@@ -1,0 +1,168 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{interpolator.interpolate(expedienteMeAdd.title, expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion)}"/>
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+	<br/>
+
+
+	<!-- Expediente Principal -->
+	<s:fragment id="expedientePrincipal" rendered="#{false and expedienteMeAdd.isVinculado()}">
+		<ui:include src="/webCustom/mesaEntrada/expediente/add/include/expedientePrincipal.xhtml"/>
+	</s:fragment>
+  	<!-- end group Expediente Principal -->
+
+	<!-- group delitos  -->
+	<s:fragment rendered="#{expedienteMeAdd.showDelitos()}">
+	<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/penal/include/delitoList-Penal-inc.xhtml'}">
+      	<ui:param name="label" value="#{messages['expedienteMe.delitos']}"/>
+		<ui:param name="icon" value="delito"/>
+		<ui:param name="id" value="delito"/>
+		<ui:param name="editList" value="#{expedienteMeAdd.delitoEditList}"/>
+	</ui:include>
+	<s:div rendered="#{expedienteMeAdd.showDerechosHumanos()}">
+        <h:selectBooleanCheckbox id="derechosHumanos" value="#{expedienteMeAdd.derechosHumanos}" /> 
+        <h:outputText style="font-size:12px;font-weight:bold" value="#{messages['expediente.derechosHumanos']}" /> 
+ 	 	<rich:spacer width="10px"></rich:spacer>
+	</s:div>
+	<s:div rendered="#{expedienteMeAdd.showCorrupcion()}">
+        <h:selectBooleanCheckbox id="corrupcion" value="#{expedienteMeAdd.corrupcion}" /> 
+        <h:outputText style="font-size:12px;font-weight:bold" value="#{messages['expediente.corrupcion']}" /> 
+ 	 	<rich:spacer width="10px"></rich:spacer>
+	</s:div>
+	</s:fragment>	
+ 	 <!--  end group delitos -->
+	
+	<!-- group interviniente -->
+	<s:fragment rendered="#{expedienteMeAdd.showIntervinientes()}">
+	<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/penal/include/interviniente-Penal-inc.xhtml'}">
+      	<ui:param name="label" value="#{messages['expedienteMe.intervinienteList']}"/>
+		<ui:param name="icon" value="interviniente"/>
+		<ui:param name="id" value="int"/>
+		<ui:param name="editList" value="#{expedienteMeAdd.intervinienteEditList}"/>
+	</ui:include>	
+	</s:fragment>	
+	<!-- end group interviniente --> 
+
+
+	
+	<!-- group competencia -->
+	<s:fragment rendered="#{expedienteMeAdd.showCompetenciasPenales() and empty expedienteMeAdd.getCompetenciaOficinaActual()}">
+		<h2 class="icon materia">
+	   		#{messages['expedienteMeAdd.competencia']}
+	    </h2>
+		<s:decorate id="competenciaDecoration" template="/layout/editBlock.xhtml" >
+				<h:selectOneRadio id="competencia" layout="lineDirection"
+							disabled="#{not empty expedienteMeAdd.getCompetenciaOficinaActual()}"
+							 value="#{expedienteMeAdd.competencia}">
+					<s:selectItems var="lookupItem"
+								 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeAdd.competenciasPenales}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="competenciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneRadio>
+		</s:decorate>
+	</s:fragment>	
+	<!-- end group competencia --> 
+
+   		<ui:define name="collections">
+		</ui:define>
+ 
+   		<ui:define name="buttons">     
+   			<s:fragment rendered="#{!expedienteMeAdd.editMode}">          
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_previous']}"
+						view="#{expedienteMeAdd.ingresoAnteriorSistema? '/webCustom/mesaEntrada/expediente/add/penal/ingresoAnteriorSistema-Penal-Menu.xhtml' : '/webCustom/mesaEntrada/expediente/add/penal/expedienteMeAdd-Penal-Menu.xhtml'}">
+						<s:conversationPropagation type="none"/>
+					</s:button>
+				
+				<rich:spacer width="15"/>	
+		            <h:commandButton id="button-save" style="display:none;" styleClass="button main-button"
+					value="#{messages['button_masDatos']}" 
+					action="#{expedienteMeAdd.doSave1}">
+					<s:defaultAction/>
+				</h:commandButton>
+				<!-- Next Button -->
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_next']}" 
+						action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/penal/expedienteMeAdd-Penal-Especial.xhtml')}"/>
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_next']}" 
+					action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/penal/expedienteMeAdd-Penal-2.xhtml')}"/>
+
+	            <h:commandButton styleClass="button main-button" rendered="#{not expedienteMeAdd.ingresoAnteriorSistema and not expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_asignar']}" 
+					onclick="Richfaces.showModalPanel('waitDialog');"
+					action="#{expedienteMeAdd.doSaveFin(1,'/webCustom/mesaEntrada/expediente/add/expedienteMeAddFin.xhtml')}"/>
+				
+				<s:div style="float:right" rendered="#{s:hasPermission('MesaEntrada','ingresoDiferido') or expedienteMeAdd.ingresoAnteriorSistema}">
+	            <h:commandButton styleClass="button main-button" rendered="#{not expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+					value="#{expedienteMeAdd.ingresoAnteriorSistema ? messages['expedienteMe.ingresoAnteriorSistema.button'] : messages['expedienteMe.ingresoDiferido.button']}"
+					actionListener="#{expedienteMeAdd.onShowIngresoDiferido('/webCustom/mesaEntrada/expediente/add/penal/expedienteMeAdd-Penal-1.xhtml')}" 
+					action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/expedienteMeIngresoDiferido.xhtml')}"/>
+				</s:div>		
+
+			</div>
+			</s:fragment>
+
+   			<s:fragment rendered="#{expedienteMeAdd.editMode}"> 
+	        <div class="actionButtons">
+					<s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						view="/web/expediente/expedienteCompleto.xhtml">
+					</s:button>
+
+					<rich:spacer width="15"/>	
+   			       
+		            <h:commandButton id="button-update" style="display:none;" styleClass="button main-button"
+						value="#{messages['button_masDatos']}" 
+						action="#{expedienteMeAdd.doSave1}">
+						<s:defaultAction/>
+					</h:commandButton>
+					<!-- Next Button -->
+		            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPageEspecial()}"
+						value="#{messages['button_next']}" 
+						action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/penal/expedienteMeAdd-Penal-Especial.xhtml')}"/>
+		            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPageEspecial()}"
+						value="#{messages['button_next']}" 
+						action="#{expedienteMeAdd.doSave1('/webCustom/mesaEntrada/expediente/add/penal/expedienteMeAdd-Penal-2.xhtml')}"/>
+
+		            
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{expedienteMeAdd.doSaveFin(1,'/web/expediente/expedienteCompleto.xhtml')}"/>
+		
+			</div>
+			</s:fragment>
+
+
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

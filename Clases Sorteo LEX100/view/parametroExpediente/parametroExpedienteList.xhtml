@@ -1,0 +1,206 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('ParametroExpediente','read')}">
+		<ui:param name="icon" value="parametroExpediente" />    
+		<ui:param name="title" value="#{messages['parametroExpediente.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(parametroExpedienteList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{parametroExpedienteList}"/>
+
+			<s:decorate id="valorFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['parametroExpediente.valor']}</ui:define>
+	                <h:inputText id="valorFilter" 
+	                           size="98"
+	                          value="#{parametroExpedienteSearch.valor}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="parametroFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['parametroExpediente.parametro']}</ui:define>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0">
+                		<h:inputText value="#{parametroExpedienteSearch.parametro}" id="parametroFilter"
+                			converter="parametroEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+                			onclick="#{rich:component('parametroFilterSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="400" width="400" id="parametroFilterSuggestion" for="parametroFilter" suggestionAction="#{parametroEnumeration.autocomplete}" 
+						var="lookupItem">
+						<h:column>
+							<h:outputText value="#{parametroEnumeration.labelFor(lookupItem)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="parametroFilterDecoration" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{lookupItem}" target="#{parametroEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{lookupItem}" target="#{parametroExpedienteSearch.parametro}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['parametroExpediente.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty parametroExpedienteList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="parametroExpedienteList">
+			    <rich:dataTable id="parametroExpedienteTable" 
+			                var="item"
+			              value="#{parametroExpedienteList.resultList}" 
+                       rendered="#{not empty parametroExpedienteList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('ParametroExpediente','update') or parametroExpedienteSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"  >
+				                <s:link styleClass="#{parametroExpedienteList.getOrderStyle('parametro.id', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['parametroExpediente.parametro.shortLabel']} Id Parametro">
+			    	                <f:param name="parametroExpedienteOrder" value="#{parametroExpedienteList.getOrderParam('parametro.id')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{parametroExpedienteList.getOrderStyle('indice', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['parametroExpediente.indice.shortLabel']}">
+				                    <f:param name="parametroExpedienteOrder" value="#{parametroExpedienteList.getOrderParam('indice')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{parametroExpedienteList.getOrderStyle('valor', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['parametroExpediente.valor.shortLabel']}">
+				                    <f:param name="parametroExpedienteOrder" value="#{parametroExpedienteList.getOrderParam('valor')}"/>
+				                </s:link>
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('ParametroExpediente','update') or parametroExpedienteSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{parametroExpedienteList.doSelection(item, '/web/parametroExpediente/parametroExpedienteEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!parametroExpedienteSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.parametro.id}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.indice}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.valor}
+						<br/>
+			        </rich:column>
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{parametroExpedienteList.getPaginator(parametroExpedienteList)}"/>
+	  			<ui:param name="componentName" value="parametroExpediente"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!parametroExpedienteSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!parametroExpedienteSearch.hasReturnPage() and s:hasPermission('ParametroExpediente','add')}" 
+        					  view="/web/parametroExpediente/parametroExpedienteEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{parametroExpedienteList.onAdd()}"
+	                 		 value="#{messages['parametroExpediente.button.new']}">
+        	    	<f:param name="parametroExpedienteId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{parametroExpedienteSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{parametroExpedienteList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{parametroExpedienteList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{parametroExpedienteSearch.hasReturnPage()}"
+		        			action="#{parametroExpedienteList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{parametroExpedienteSearch.hasReturnPage()}" 
+		        			  view="#{parametroExpedienteSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{parametroExpedienteSearch.hasReturnPage()}" 
+		        			  view="#{parametroExpedienteSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['parametroExpediente.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/parametroExpediente/parametroExpedienteList.jrxml" />
+		<ui:param name="reportList" value="#{parametroExpedienteList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

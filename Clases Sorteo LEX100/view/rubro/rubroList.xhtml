@@ -1,0 +1,227 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('Rubro','read')}">
+		<ui:param name="icon" value="rubro" />    
+		<ui:param name="title" value="#{messages['rubro.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(rubroList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{rubroList}"/>
+
+			<s:decorate id="codigoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['rubro.codigo']}</ui:define>
+	                <h:inputText id="codigoFilter" 
+	                           size="1"
+	                          value="#{rubroSearch.codigo}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="descripcionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['rubro.descripcion']}</ui:define>
+	                <h:inputText id="descripcionFilter" 
+	                           size="98"
+	                          value="#{rubroSearch.descripcion}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="materiaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['rubro.materia']}</ui:define>
+				<h:selectOneMenu id="materiaFilter"
+					      value="#{rubroSearch.materia}">
+					<s:selectItems var="lookupItem"
+								 label="#{materiaEnumeration.labelFor(lookupItem)}"
+								 value="#{materiaEnumeration.items}"
+						noSelectionLabel="#{messages['rubro.materia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="tipoInstanciaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['rubro.tipoInstancia']}</ui:define>
+				<h:selectOneMenu id="tipoInstanciaFilter"
+					      value="#{rubroSearch.tipoInstancia}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoInstanciaEnumeration.items}"
+						noSelectionLabel="#{messages['rubro.tipoInstancia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['rubro.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty rubroList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="rubroList">
+			    <rich:dataTable id="rubroTable" 
+			                var="item"
+			              value="#{rubroList.resultList}" 
+                       rendered="#{not empty rubroList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('Rubro','update') or rubroSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{rubroList.getOrderStyle('codigo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['rubro.codigo.shortLabel']}">
+				                    <f:param name="rubroOrder" value="#{rubroList.getOrderParam('codigo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{rubroList.getOrderStyle('descripcion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['rubro.descripcion.shortLabel']}">
+				                    <f:param name="rubroOrder" value="#{rubroList.getOrderParam('descripcion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['rubro.materia.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['rubro.tipoInstancia.shortLabel']}
+							</rich:column>
+
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('Rubro','update') or rubroSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{rubroList.doSelection(item, '/web/rubro/rubroEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!rubroSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.codigo}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.descripcion}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.materia != null}">
+
+			            #{item.materia.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.tipoInstancia != null}">
+
+			            #{item.tipoInstancia.nombre}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{rubroList.getPaginator(rubroList)}"/>
+	  			<ui:param name="componentName" value="rubro"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!rubroSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!rubroSearch.hasReturnPage() and s:hasPermission('Rubro','add')}" 
+        					  view="/web/rubro/rubroEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{rubroList.onAdd()}"
+	                 		 value="#{messages['rubro.button.new']}">
+        	    	<f:param name="rubroId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{rubroSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{rubroList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{rubroList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{rubroSearch.hasReturnPage()}"
+		        			action="#{rubroList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{rubroSearch.hasReturnPage()}" 
+		        			  view="#{rubroSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{rubroSearch.hasReturnPage()}" 
+		        			  view="#{rubroSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['rubro.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/rubro/rubroList.jrxml" />
+		<ui:param name="reportList" value="#{rubroList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

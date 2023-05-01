@@ -1,0 +1,268 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('TurnoPolicia','read')}">
+		<ui:param name="icon" value="turnoPolicia" />    
+		<ui:param name="title" value="#{messages['turnoPolicia.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(turnoPoliciaList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{turnoPoliciaList}"/>
+
+			<s:decorate id="fromDesdeFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoPolicia.fromDesdeFecha']}</ui:define>
+					<rich:calendar id="fromDesdeFechaFilter" 
+					enableManualInput="true" showWeeksBar="false"					
+								value="#{turnoPoliciaSearch.fromDesdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="toDesdeFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoPolicia.toDesdeFecha']}</ui:define>
+					<rich:calendar id="toDesdeFechaFilter" 
+					enableManualInput="true" showWeeksBar="false"					
+								value="#{turnoPoliciaSearch.toDesdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="oficinaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoPolicia.oficina']}</ui:define>
+	
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0" summary="#{messages['lookup.summary']}">	                
+		            	<h:panelGroup>
+							<h:inputText id="oficinaCodigo"
+									  style="margin-right:5px"
+									  value="#{turnoPoliciaSearch.oficinaCodigo}"
+									converter="#{upperCaseConverter}"									
+						valueChangeListener="#{turnoPoliciaSearch.onChangeOficinaCodigo}">
+								<a4j:support event="onblur" reRender="oficinaDescription" ajaxSingle="true"  eventsQueue="editProperty"/>
+							</h:inputText>
+		            	</h:panelGroup>
+
+		       	    	<h:commandLink style="margin-right:5px"
+			    	    	    action="#{turnoPoliciaHome.lookupSearchOficina('/web/oficina/oficinaList.xhtml', '/web/turnoPolicia/turnoPoliciaList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+		       	    	</h:commandLink>
+		            	<h:panelGroup id="oficinaDescription" style="margin-right:5px">
+							<h:outputText value="#{messages['turnoPolicia.oficina.lookup_select']}" 
+						    	rendered="#{turnoPoliciaSearch.oficina == null}"/>
+						    <s:fragment rendered="#{turnoPoliciaSearch.oficina != null}">
+				            	#{turnoPoliciaSearch.oficina.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px"
+							action="#{turnoPoliciaSearch.clearOficina}"
+						  reRender="oficinaFilterDecoration" 
+						  rendered="#{turnoPoliciaSearch.oficina != null}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['turnoPolicia.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty turnoPoliciaList.resultListWithNew}"/>
+		</ui:define>
+		<h:form>
+		
+			<a4j:region>
+		    <div class="results" id="turnoPoliciaList">
+			    <rich:dataTable id="turnoPoliciaTable" 
+			                var="item"
+			              value="#{turnoPoliciaList.resultListWithNew}" 
+                       rendered="#{not empty turnoPoliciaList.resultListWithNew}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('TurnoPolicia','update') or turnoPoliciaSearch.hasSelectionPage()}">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoPoliciaList.getOrderStyle('desdeFecha', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['turnoPolicia.desdeFecha.shortLabel']}">
+				                    <f:param name="turnoPoliciaOrder" value="#{turnoPoliciaList.getOrderParam('desdeFecha')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['turnoPolicia.oficina.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" width="1" rendered="#{true and !turnoPoliciaSearch.hasReturnPage() and s:hasPermission('TurnoPolicia','update')}">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+				<rich:subTable  id="editRow" var="instance" value="#{turnoPoliciaHome.instance}" rendered="#{turnoPoliciaHome.instance.equals(item)}">
+			        <rich:column width="1" styleClass="#{turnoPoliciaList.isManaged(instance)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission('TurnoPolicia','update') or turnoPoliciaSearch.hasSelectionPage()}">
+			            <a4j:commandLink actionListener="#{turnoPoliciaList.onAcceptLine}" eventsQueue="editProperty"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="turnoPoliciaTable">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoPoliciaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+            <s:decorate id="desdeFechaDecoration" template="/layout/table/edit.xhtml" >
+                	<ui:define name="label">#{messages['turnoPolicia.desdeFecha']}</ui:define>
+					<rich:calendar id="desdeFecha" 
+	                       required="true" showWeeksBar="false"
+					 enableManualInput="true"					
+					       	 disabled="#{!turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}"
+								 value="#{turnoPoliciaHome.instance.desdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="desdeFechaDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="desdeFechaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoPoliciaHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+
+			<s:decorate id="oficinaDecoration" template="/layout/table/edit.xhtml" >
+ 
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0"  summary="#{messages['lookup.summary']}">
+		            	<h:panelGroup>
+							<h:inputText id="oficinaCodigo"
+									  style="margin-right:5px"
+						           rendered="#{turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}"
+									  value="#{turnoPoliciaHome.oficinaCodigo}"
+						valueChangeListener="#{turnoPoliciaHome.onChangeOficinaCodigo}">
+								<a4j:support event="onblur" reRender="oficinaDecoration" ajaxSingle="true"  eventsQueue="editProperty"/>
+							</h:inputText>
+		            	</h:panelGroup>
+		       	    	<a4j:commandLink style="margin-right:5px"  eventsQueue="editProperty" ajaxSingle="true"
+						      rendered="#{turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}" 
+			    	    	    action="#{turnoPoliciaHome.lookupOficina('/web/oficina/oficinaList.xhtml', '/web/turnoPolicia/turnoPoliciaList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+							<s:conversationPropagation type="join" />
+		       	    	</a4j:commandLink>
+		            	<h:panelGroup style="margin-right:5px">
+							<h:outputText value="#{messages['turnoPolicia.oficina.lookup_none']}" 
+						    	rendered="#{instance.oficina == null}"/>
+						    <s:fragment rendered="#{instance.oficina != null}">
+				            	#{instance.oficina.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+							action="#{turnoPoliciaHome.clearLookupOficina}"
+						  reRender="oficinaDecoration" 
+						  rendered="#{instance.oficina != null and turnoPoliciaHome.hasEditPermission('TurnoPolicia','add','update')}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{turnoPoliciaList.isManaged(instance)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and !turnoPoliciaSearch.hasReturnPage() and s:hasPermission('TurnoPolicia','update')}">
+			            <a4j:commandLink actionListener="#{turnoPoliciaList.onCancelLine}" eventsQueue="editProperty"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="turnoPoliciaTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="item" value="#{item}" rendered="#{not turnoPoliciaHome.instance.equals(item)}">
+			        <rich:column width="1" styleClass="#{turnoPoliciaList.isManaged(item)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission('TurnoPolicia','update') or turnoPoliciaSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{turnoPoliciaList.doSelection(item, '/web/turnoPolicia/turnoPoliciaEdit.xhtml')}"
+							   rendered="#{turnoPoliciaSearch.hasReturnPage() and turnoPoliciaList.isManaged(item)}"
+ 					      styleClass="line_selector"
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			            <a4j:commandLink action="#{turnoPoliciaList.doLineEdit(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{!turnoPoliciaSearch.hasReturnPage() and turnoPoliciaList.isManaged(item)}"
+									   reRender="turnoPoliciaTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{turnoPoliciaList.doLineEdit(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_new']}"
+									   rendered="#{!turnoPoliciaSearch.hasReturnPage() and not turnoPoliciaList.isManaged(item)}"
+									   reRender="turnoPoliciaTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoPoliciaHome.isManaged(item)? 'rowColumn': 'newRowColumn'}"  >
+			            <h:outputText value="#{item.desdeFecha}">
+			                <s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{turnoPoliciaHome.isManaged(item)? 'rowColumn': 'newRowColumn'}"  >
+						<s:fragment rendered="#{item.oficina != null}">
+			            #{item.oficina.codigo} - 
+			            #{item.oficina.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{turnoPoliciaList.isManaged(item)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and !turnoPoliciaSearch.hasReturnPage() and s:hasPermission('TurnoPolicia','update')}">
+			            <h:commandLink action="#{turnoPoliciaList.doLineDelete(item)}" eventsQueue="editProperty"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{turnoPoliciaList.isManaged(item) and s:hasPermission('TurnoPolicia','update')}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="turnoPoliciaTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				</rich:dataTable>
+		    </div>
+			</a4j:region>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{turnoPoliciaList.getPaginator(turnoPoliciaList)}"/>
+	  			<ui:param name="componentName" value="turnoPolicia"/>
+	  		</s:decorate>
+		</ui:define>
+	
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{turnoPoliciaSearch.hasReturnPage()}" 
+		        			  view="#{turnoPoliciaSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['turnoPolicia.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/turnoPolicia/turnoPoliciaList.jrxml" />
+		<ui:param name="reportList" value="#{turnoPoliciaList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

@@ -1,0 +1,98 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+<s:div id="datosMediacion" >
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+		<ui:decorate template="/layout/grid/gridForm.xhtml">			
+
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="1">
+            <s:decorate id="numeroExpedienteMediacionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteEspecial.expedienteMediacion']}</ui:define>
+		                <h:inputText id="numeroExpedienteMediacion"
+		                		size="10"
+		                		maxlength="9"
+		                          value="#{expedienteMeAdd.numeroExpedienteMediacion}">
+		                </h:inputText>
+		                <s:span  style="padding:0 5px; font-size:1.2em">
+		                /
+		                </s:span>
+		                <h:inputText id="anioExpedienteMediacion"
+		                		 size="5"
+		                          value="#{expedienteMeAdd.anioExpedienteMediacion}">
+		                </h:inputText>
+
+						<rich:spacer width="10px"/>
+
+	       	    		<h:commandLink  style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+		    	    	    actionListener="#{expedienteMeAdd.updateExpedienteMediacion()}" title="#{messages['expediente.title.validar']}">
+		    	    	    
+	        	    	    <h:graphicImage value="/img/icon/check.png" style="vertical-align:top"/>
+	       	    		</h:commandLink >
+
+	       	    		<h:commandLink  style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+		    	    	    actionListener="#{expedienteMeAdd.resetExpedienteMediacion()}" title="#{messages['mediacionSelector.expediente.title.borrar']}">
+		    	    	    
+	        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+	       	    		</h:commandLink>
+
+					
+            </s:decorate>
+		</td>
+		<td class="grideditcolumn" colspan="1">
+		</td>
+		</tr>
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="2">
+			<s:decorate id="caratulaExpedienteDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">
+			    	<h:outputText rendered="#{not empty expedienteMeAdd.expedienteMediacion}" value="#{expedienteManager.getIdxAnaliticoFirst(expedienteMeAdd.expedienteMediacion)}"/>
+			    </ui:define>
+				<h:outputText value="#{expedienteMeAdd.expedienteMediacion.caratula}" rendered="#{not empty expedienteMeAdd.expedienteMediacion}" />
+				<br/>
+			</s:decorate>
+		</td>
+		</tr>
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="2">
+			<s:decorate id="oficinaExpedienteDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['mediacionSelector.radicacion']}</ui:define>
+				<h:outputText value="#{expedienteMeAdd.expedienteMediacionOficinaRadicacion.descripcion}" rendered="#{not empty expedienteMeAdd.expedienteMediacionOficinaRadicacion}" />
+				<br/>
+			</s:decorate>
+		</td>
+		</tr>
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="2">
+			<s:div  id="oficinaActualDecoration" >
+			<s:decorate template="/layout/editQuery.xhtml">
+			    <ui:define name="label">#{messages['mediacionSelector.oficinaActual']}</ui:define>		
+				<h:outputText value="#{expedienteMeAdd.expedienteMediacion.oficinaActual.descripcion}" rendered="#{not empty expedienteMeAdd.expedienteMediacion}" />
+				<br/>
+			</s:decorate>
+			</s:div>
+		</td>
+		</tr>
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="2">
+		</td>
+		</tr>
+		</ui:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+	</s:div>
+
+</ui:composition>

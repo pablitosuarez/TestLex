@@ -1,0 +1,185 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('TipoBolillero','read')}">
+		<ui:param name="icon" value="bolillero" />    
+		<ui:param name="title" value="#{messages['tipoBolillero.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(tipoBolilleroList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{tipoBolilleroList}"/>
+
+			<s:decorate id="codigoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['tipoBolillero.codigo']}</ui:define>
+	                <h:inputText id="codigoFilter" 
+	                           size="10"
+	                          value="#{tipoBolilleroSearch.codigo}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="descripcionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['tipoBolillero.descripcion']}</ui:define>
+	                <h:inputText id="descripcionFilter" 
+	                           size="98"
+	                          value="#{tipoBolilleroSearch.descripcion}">
+	                </h:inputText>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['tipoBolillero.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty tipoBolilleroList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="tipoBolilleroList">
+			    <rich:dataTable id="tipoBolilleroTable" 
+			                var="item"
+			              value="#{tipoBolilleroList.resultList}" 
+                       rendered="#{not empty tipoBolilleroList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('TipoBolillero','update') or tipoBolilleroSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{tipoBolilleroList.getOrderStyle('codigo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['tipoBolillero.codigo.shortLabel']}">
+				                    <f:param name="tipoBolilleroOrder" value="#{tipoBolilleroList.getOrderParam('codigo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{tipoBolilleroList.getOrderStyle('descripcion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['tipoBolillero.descripcion.shortLabel']}">
+				                    <f:param name="tipoBolilleroOrder" value="#{tipoBolilleroList.getOrderParam('descripcion')}"/>
+				                </s:link>
+							</rich:column>
+
+
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('TipoBolillero','update') or tipoBolilleroSearch.hasSelectionPage()}">
+			           	<h:selectBooleanCheckbox value="#{tipoBolilleroSearch.selectionMap[item]}" rendered="#{tipoBolilleroSearch.inSelectionMultiple}">
+			        		<a4j:support event="onclick" ajaxSingle="true"/>
+			        	</h:selectBooleanCheckbox>
+			        
+			            <h:commandLink action="#{tipoBolilleroList.doSelection(item, '/web/tipoBolillero/tipoBolilleroEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!tipoBolilleroSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.codigo}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.descripcion}
+						<br/>
+			        </rich:column>
+
+
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{tipoBolilleroList.getPaginator(tipoBolilleroList)}"/>
+	  			<ui:param name="componentName" value="tipoBolillero"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!tipoBolilleroSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!tipoBolilleroSearch.hasReturnPage() and s:hasPermission('TipoBolillero','add')}" 
+        					  view="/web/tipoBolillero/tipoBolilleroEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{tipoBolilleroList.onAdd()}"
+	                 		 value="#{messages['tipoBolillero.button.new']}">
+        	    	<f:param name="tipoBolilleroId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{tipoBolilleroSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{tipoBolilleroList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{tipoBolilleroList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{tipoBolilleroSearch.hasReturnPage()}"
+		        			action="#{tipoBolilleroList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{tipoBolilleroSearch.hasReturnPage()}" 
+		        			  view="#{tipoBolilleroSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{tipoBolilleroSearch.hasReturnPage()}" 
+		        			  view="#{tipoBolilleroSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['tipoBolillero.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/tipoBolillero/tipoBolilleroList.jrxml" />
+		<ui:param name="reportList" value="#{tipoBolilleroList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

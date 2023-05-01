@@ -1,0 +1,188 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('CondicionCnx','read')}">
+		<ui:param name="icon" value="condicionCnx" />    
+		<ui:param name="title" value="#{messages['condicionCnx.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(condicionCnxList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{condicionCnxList}"/>
+
+			<s:decorate id="parametroFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['condicionCnx.parametro']}</ui:define>
+	                <h:inputText id="parametroFilter" 
+	                           size="98"
+	                          value="#{condicionCnxSearch.parametro}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="tipoComparacionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['condicionCnx.tipoComparacion']}</ui:define>
+				<h:selectOneMenu id="tipoComparacionFilter"
+					      value="#{condicionCnxSearch.tipoComparacion}">
+					<f:selectItems value="#{tipoComparacionEnumeration.getItems(messages['lookup_select'])}" />
+				</h:selectOneMenu>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['condicionCnx.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty condicionCnxList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="condicionCnxList">
+			    <rich:dataTable id="condicionCnxTable" 
+			                var="item"
+			              value="#{condicionCnxList.resultList}" 
+                       rendered="#{not empty condicionCnxList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('CondicionCnx','update') or condicionCnxSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{condicionCnxList.getOrderStyle('parametro', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['condicionCnx.parametro.shortLabel']}">
+				                    <f:param name="condicionCnxOrder" value="#{condicionCnxList.getOrderParam('parametro')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{condicionCnxList.getOrderStyle('tipoComparacion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['condicionCnx.tipoComparacion.shortLabel']}">
+				                    <f:param name="condicionCnxOrder" value="#{condicionCnxList.getOrderParam('tipoComparacion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+				                <s:link styleClass="#{condicionCnxList.getOrderStyle('criterioCnx.id', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['condicionCnx.criterioCnx.shortLabel']} Id Criterio Cnx">
+			    	                <f:param name="condicionCnxOrder" value="#{condicionCnxList.getOrderParam('criterioCnx.id')}"/>
+				                </s:link>
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('CondicionCnx','update') or condicionCnxSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{condicionCnxList.doSelection(item, '/web/condicionCnx/condicionCnxEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!condicionCnxSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.parametro}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{tipoComparacionEnumeration.getLabel(item.tipoComparacion)}"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.criterioCnx.id}
+						<br/>
+			        </rich:column>
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{condicionCnxList.getPaginator(condicionCnxList)}"/>
+	  			<ui:param name="componentName" value="condicionCnx"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!condicionCnxSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!condicionCnxSearch.hasReturnPage() and s:hasPermission('CondicionCnx','add')}" 
+        					  view="/web/condicionCnx/condicionCnxEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{condicionCnxList.onAdd()}"
+	                 		 value="#{messages['condicionCnx.button.new']}">
+        	    	<f:param name="condicionCnxId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{condicionCnxSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{condicionCnxList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{condicionCnxList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{condicionCnxSearch.hasReturnPage()}"
+		        			action="#{condicionCnxList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{condicionCnxSearch.hasReturnPage()}" 
+		        			  view="#{condicionCnxSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{condicionCnxSearch.hasReturnPage()}" 
+		        			  view="#{condicionCnxSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['condicionCnx.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/condicionCnx/condicionCnxList.jrxml" />
+		<ui:param name="reportList" value="#{condicionCnxList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

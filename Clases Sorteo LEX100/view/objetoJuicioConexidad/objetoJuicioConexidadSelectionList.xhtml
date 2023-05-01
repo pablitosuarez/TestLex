@@ -1,0 +1,341 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('ObjetoJuicio','read')}">
+		<ui:param name="icon" value="objetoJuicio" />    
+		<ui:param name="title" value="#{messages['objetoJuicio.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(objetoJuicioSelectionList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{objetoJuicioSelectionList}"/>
+
+			<s:decorate id="codigoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.codigo']}</ui:define>
+	                <h:inputText id="codigoFilter" 
+	                           size="3"
+	                          value="#{objetoJuicioSelectionSearch.codigo}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="descripcionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.descripcion']}</ui:define>
+	                <h:inputText id="descripcionFilter" 
+	                           size="98"
+	                          value="#{objetoJuicioSelectionSearch.descripcion}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="rubroLetterFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.rubroLetter']}</ui:define>
+	                <h:inputText id="rubroLetterFilter" 
+	                           size="10"
+	                          value="#{objetoJuicioSelectionSearch.rubroLetter}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="rubroAsignacionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.rubroAsignacion']}</ui:define>
+	                <h:inputText id="rubroAsignacionFilter" 
+	                           size="10"
+	                          value="#{objetoJuicioSelectionSearch.rubroAsignacion}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="rubroEstadisticoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.rubroEstadistico']}</ui:define>
+	                <h:inputText id="rubroEstadisticoFilter" 
+	                           size="10"
+	                          value="#{objetoJuicioSelectionSearch.rubroEstadistico}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="tipoProcesoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.tipoProceso']}</ui:define>
+				<h:selectOneMenu id="tipoProcesoFilter"
+					      value="#{objetoJuicioSelectionSearch.tipoProceso}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoProcesoEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoProcesoEnumeration.items}"
+						noSelectionLabel="#{messages['objetoJuicio.tipoProceso.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="temaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.tema']}</ui:define>
+				<h:selectOneMenu id="temaFilter"
+					      value="#{objetoJuicioSelectionSearch.tema}">
+					<s:selectItems var="lookupItem"
+								 label="#{temaEnumeration.labelFor(lookupItem)}"
+								 value="#{temaEnumeration.items}"
+						noSelectionLabel="#{messages['objetoJuicio.tema.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="tipoRemesaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['objetoJuicio.tipoRemesa']}</ui:define>
+				<h:selectOneMenu id="tipoRemesaFilter"
+					      value="#{objetoJuicioSelectionSearch.tipoRemesa}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoRemesaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoRemesaEnumeration.items}"
+						noSelectionLabel="#{messages['objetoJuicio.tipoRemesa.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['objetoJuicio.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty objetoJuicioSelectionList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="objetoJuicioList">
+			    <rich:dataTable id="objetoJuicioTable" 
+			                var="item"
+			              value="#{objetoJuicioSelectionList.resultList}" 
+                       rendered="#{not empty objetoJuicioSelectionList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('ObjetoJuicio','update') or objetoJuicioSelectionSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							<rich:column styleClass="toolbaritem"  rendered="#{sessionState.hasMultiMateria()}">
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('materia.abreviatura', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['objetoJuicio.materia.shortLabel']}">
+			    	                <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('materia.abreviatura')}"/>
+				                </s:link>
+							</rich:column>
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('codigo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['objetoJuicio.codigo.shortLabel']}">
+				                    <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('codigo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('descripcion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['objetoJuicio.descripcion.shortLabel']}">
+				                    <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('descripcion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('rubroLetter', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['objetoJuicio.rubroLetter.shortLabel']}">
+				                    <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('rubroLetter')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('rubroAsignacion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['objetoJuicio.rubroAsignacion.shortLabel']}">
+				                    <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('rubroAsignacion')}"/>
+				                </s:link>
+							</rich:column>
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('rubroEstadistico', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['objetoJuicio.rubroEstadistico.shortLabel']}">
+				                    <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('rubroEstadistico')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('buscaConexidad', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['objetoJuicio.buscaConexidad.shortLabel']}">
+				                    <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('buscaConexidad')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['objetoJuicio.tema.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['objetoJuicio.tipoProceso.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+				                <s:link styleClass="#{objetoJuicioSelectionList.getOrderStyle('tipoRemesa.id', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['objetoJuicio.tipoRemesa.shortLabel']}">
+			    	                <f:param name="objetoJuicioOrder" value="#{objetoJuicioSelectionList.getOrderParam('tipoRemesa.id')}"/>
+				                </s:link>
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('ObjetoJuicio','update') or objetoJuicioSelectionSearch.hasSelectionPage()}">
+			           	<h:selectBooleanCheckbox value="#{objetoJuicioSelectionSearch.selectionMap[item]}" rendered="#{objetoJuicioSelectionSearch.inSelectionMultiple}">
+			        		<a4j:support event="onclick" ajaxSingle="true"/>
+			        	</h:selectBooleanCheckbox>
+			        
+			            <h:commandLink action="#{objetoJuicioSelectionList.doSelection(item, '/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!objetoJuicioSelectionSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  rendered="#{sessionState.hasMultiMateria()}">
+						<s:fragment rendered="#{item.materia != null}">
+
+			            #{item.materia.abreviatura}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.codigo}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.descripcion}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-center"  >
+
+			            #{item.rubroLetter}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center"  >
+
+			            #{item.rubroAsignacion}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center"  >
+
+			            #{item.rubroEstadistico}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-center"  >
+			            <h:graphicImage rendered="#{item.buscaConexidad}" value="/img/icon/checked.gif"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.tema != null}">
+
+			            #{item.tema.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.tipoProceso != null}">
+
+			            #{item.tipoProceso.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.tipoRemesa.descripcion}
+						<br/>
+			        </rich:column>
+
+
+
+
+
+
+
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{objetoJuicioSelectionList.getPaginator(objetoJuicioSelectionList)}"/>
+	  			<ui:param name="componentName" value="objetoJuicio"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!objetoJuicioSelectionSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!objetoJuicioSelectionSearch.hasReturnPage() and s:hasPermission('ObjetoJuicio','add')}" 
+        					  view="/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{objetoJuicioSelectionList.onAdd()}"
+	                 		 value="#{messages['objetoJuicio.button.new']}">
+        	    	<f:param name="objetoJuicioId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{objetoJuicioSelectionSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{objetoJuicioSelectionList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{objetoJuicioSelectionList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{objetoJuicioSelectionSearch.hasReturnPage()}"
+		        			action="#{objetoJuicioSelectionList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{objetoJuicioSelectionSearch.hasReturnPage()}" 
+		        			  view="#{objetoJuicioSelectionSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{objetoJuicioSelectionSearch.hasReturnPage()}" 
+		        			  view="#{objetoJuicioSelectionSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['objetoJuicio.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/objetoJuicio/objetoJuicioList.jrxml" />
+		<ui:param name="reportList" value="#{objetoJuicioSelectionList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

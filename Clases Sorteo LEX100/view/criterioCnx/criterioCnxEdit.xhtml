@@ -1,0 +1,522 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="criterioCnx" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{criterioCnxHome.managed ? messages['criterioCnx.edit'] : messages['criterioCnx.add']}" />    
+		<ui:param name="description" value="#{messages['criterioCnx.comment']}" />
+
+   		<ui:define name="formHeader">
+	        <div class="formHeader">
+
+			<s:decorate id="objetoJuicio" rendered="#{criterioCnxHome.instance.objetoJuicio != null}" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['criterioCnx.objetoJuicio']}</ui:define>
+				<s:fragment >
+		            #{criterioCnxHome.instance.objetoJuicio.descripcionCompleta}
+				</s:fragment>
+			</s:decorate>
+			<s:decorate id="tema"  rendered="#{criterioCnxHome.instance.tema != null}" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['criterioCnx.tema']}</ui:define>
+				<s:fragment>
+		            #{criterioCnxHome.instance.tema.descripcion}
+				</s:fragment>
+			</s:decorate>
+			<s:decorate id="tipoCausa"  rendered="#{criterioCnxHome.instance.tipoCausa != null}" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['criterioCnx.tipoCausa']}</ui:define>
+				<s:fragment>
+		            #{criterioCnxHome.instance.tipoCausa.codigo} - #{criterioCnxHome.instance.tipoCausa.descripcion}
+				</s:fragment>
+			</s:decorate>
+			<s:decorate id="materia"  rendered="#{criterioCnxHome.instance.materia != null and sessionState.getGlobalMateriaSet().size() == 1}" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['criterioCnx.materia']}</ui:define>
+				<s:fragment>
+					#{materiaEnumeration.labelFor(criterioCnxHome.instance.materia)}
+				</s:fragment>
+			</s:decorate>
+			</div>
+		</ui:define>	<!--  end formHeader -->
+
+	<!-- group default -->
+
+
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+
+			<s:decorate id="camaraDecoration" template="/layout/edit.xhtml" rendered="#{empty sessionState.globalCamara}">
+					<ui:define name="label">#{messages['criterioCnx.camara']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="camara"
+							  required="true"
+							  rendered="#{criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+								 value="#{criterioCnxHome.instance.camara}">
+						<s:selectItems var="lookupItem"
+									 label="#{camaraEnumeration.labelFor(lookupItem)}"
+									 value="#{camaraEnumeration.items}"
+							noSelectionLabel="#{messages['criterioCnx.camara.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="camaraDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{camaraEnumeration.labelFor(criterioCnxHome.instance.camara)}"
+						   rendered="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}" />
+ 
+			</s:decorate>
+			<s:decorate id="materiaDecoration" rendered="#{empty criterioCnxHome.instance.tema and empty criterioCnxHome.instance.objetoJuicio and (sessionState.globalMateriaSet.size() > 1)}" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['criterioCnx.materia']}</ui:define>
+<!--				    <ui:param name="required" value="true"/>-->
+					<h:selectOneMenu id="materia"
+							  required="true"
+							  rendered="#{criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+								 value="#{criterioCnxHome.instance.materia}">
+						<s:selectItems var="lookupItem"
+									 label="#{materiaEnumeration.labelFor(lookupItem)}"
+									 value="#{criterioCnxHome.materiasCamara}"
+							noSelectionLabel="#{messages['criterioCnx.materia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="materiaDecoration, excluirOJ, OJList" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{materiaEnumeration.labelFor(criterioCnxHome.instance.materia)}"
+						   rendered="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}" />
+ 
+			</s:decorate>
+
+            <s:decorate id="nombreDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['criterioCnx.nombre']}</ui:define>
+	                <h:inputText id="nombre" 
+							  required="true"
+					       disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                           size="98"
+	                      maxlength="100"
+	                          value="#{criterioCnxHome.instance.nombre}">
+	                    <a4j:support event="onblur" reRender="nombreDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="prioridadDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="label">#{messages['criterioCnx.prioridad']}</ui:define>
+	                <h:inputText id="prioridad"
+					       disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                          value="#{criterioCnxHome.instance.prioridad}">
+	                    <a4j:support event="onblur" reRender="prioridadDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+                	<ui:define name="comment">#{messages['criterioCnx.prioridad.comment']}</ui:define>
+            </s:decorate>
+            
+            <s:decorate id="juicioVoluntario" rendered="#{criterioCnxHome.instance.objetoJuicio == null}" template="/layout/editComment.xhtml" >
+				<ui:define name="label">#{messages['criterioCnx.juicioVoluntario']}</ui:define>
+					<h:selectOneMenu id="juicioVoluntario"
+						      value="#{criterioCnxHome.instance.juicioVoluntario}">
+						<f:selectItems value="#{trueFalseEnumeration.getItems(messages['drop_list_select'])}" />
+					</h:selectOneMenu>
+                	<ui:define name="comment">#{messages['criterioCnx.juicioVoluntario.comment']}</ui:define>
+			</s:decorate>
+            
+            <s:decorate id="excluirPersonasJuridicas" template="/layout/editComment.xhtml" >
+				<ui:define name="label">#{messages['criterioCnx.excluirPersonasJuridicas']}</ui:define>
+					<h:selectOneMenu id="excluirPersonasJuridicas"
+						      value="#{criterioCnxHome.instance.excluirPersonasJuridicas}">
+						<f:selectItems value="#{trueFalseEnumeration.getItems(messages['drop_list_select'])}" />
+					</h:selectOneMenu>
+                	<ui:define name="comment">#{messages['criterioCnx.excluirPersonasJuridicas.comment']}</ui:define>
+			</s:decorate>
+            
+            <s:decorate id="asignaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['criterioCnx.asigna']}</ui:define>
+	                <h:selectBooleanCheckbox id="asigna"
+	     			                  required="true"
+					       	           disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                                      value="#{criterioCnxHome.instance.asigna}">
+						<a4j:support event="onclick" reRender="asignaDecoration, asignacionDiv" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectBooleanCheckbox>
+            </s:decorate>
+
+			<s:div id="asignacionDiv">
+            <s:decorate id="codigoAsignacionDecoration" template="/layout/editComment.xhtml" rendered="#{criterioCnxHome.instance.asigna}" >
+                	<ui:define name="label">#{messages['criterioCnx.codigoAsignacion']}</ui:define>
+	                <h:inputText id="codigoAsignacion"
+			                size="3"
+	                		maxlength="3"
+					       disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                          value="#{criterioCnxHome.instance.codigoAsignacion}">
+	                    <a4j:support event="onblur" reRender="codigoAsignacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+                	<ui:define name="comment">#{messages['criterioCnx.codigoAsignacion.comment']}</ui:define>
+            </s:decorate>
+            <s:decorate id="codigoCambioAsignacionDecoration" template="/layout/editComment.xhtml" rendered="#{criterioCnxHome.instance.asigna}" >
+                	<ui:define name="label">#{messages['criterioCnx.codigoCambioAsignacion']}</ui:define>
+	                <h:inputText id="codigoCambioAsignacion"
+			                size="3"
+	                		maxlength="3"
+					       disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                          value="#{criterioCnxHome.instance.codigoCambioAsignacion}">
+	                    <a4j:support event="onblur" reRender="codigoCambioAsignacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+                	<ui:define name="comment">#{messages['criterioCnx.codigoCambioAsignacion.comment']}</ui:define>
+            </s:decorate>
+			</s:div>
+			
+            <s:decorate id="dobleInicioDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['criterioCnx.dobleInicio']}</ui:define>
+	                <h:selectBooleanCheckbox id="dobleInicio"
+	     			                  required="true"
+					       	           disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                                      value="#{criterioCnxHome.instance.dobleInicio}"/>
+            </s:decorate>
+            
+			<s:decorate template="/layout/editSeparator.xhtml">
+				<ui:param name="label" value="#{messages['criterioCnx.ambitoBusquedaGroup']}"/>
+			</s:decorate>
+
+            <s:decorate id="ambitoVoluntarios" rendered="#{criterioCnxHome.instance.objetoJuicio == null}" template="/layout/editComment.xhtml" >
+				<ui:define name="label">#{messages['criterioCnx.ambitoVoluntarios']}</ui:define>
+					<h:selectOneMenu id="ambitoVoluntarios"
+						      value="#{criterioCnxHome.instance.ambitoVoluntarios}">
+						<f:selectItems value="#{trueFalseEnumeration.getItems(messages['drop_list_select'])}" />
+					</h:selectOneMenu>
+                	<ui:define name="comment">#{messages['criterioCnx.ambitoVoluntarios.comment']}</ui:define>
+			</s:decorate>
+            
+            <s:decorate id="tiposCausaDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="label">#{messages['criterioCnx.tiposCausa']}</ui:define>
+	                <h:inputText id="tiposCausa"
+	                           size="98"
+	                      maxlength="255"
+					       disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                         value="#{criterioCnxHome.instance.tiposCausa}">
+	                    <a4j:support event="onblur" reRender="tiposCausaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+                	<ui:define name="comment">#{messages['criterioCnx.tiposCausa.comment']}</ui:define>
+                              
+            </s:decorate>
+            
+            <s:decorate id="temasDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="label">#{messages['criterioCnx.temas']}</ui:define>
+	                <h:inputText id="temas"
+	                           size="98"
+	                      maxlength="255"
+					       disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                         value="#{criterioCnxHome.instance.temas}">
+	                    <a4j:support event="onblur" reRender="temasDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+                	<ui:define name="comment">#{messages['criterioCnx.temas.comment']}</ui:define>
+                              
+            </s:decorate>
+            
+            <s:decorate id="expedientesIniciadosDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="comment">#{messages['criterioCnx.expedientesIniciados.comment']}</ui:define>
+                	<ui:define name="label">#{messages['criterioCnx.expedientesIniciados']}</ui:define>
+					<h:selectOneMenu id="expedientesIniciados"
+								layout="lineDirection"
+					disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+						      value="#{criterioCnxHome.instance.expedientesIniciados}">
+						<f:selectItems value="#{trueFalseEnumeration.getItems(messages['drop_list_select'])}" />
+						<a4j:support event="onclick" reRender="expedientesIniciadosDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="expedientesEnTramiteDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="comment">#{messages['criterioCnx.expedientesEnTramite.comment']}</ui:define>
+                	<ui:define name="label">#{messages['criterioCnx.expedientesEnTramite']}</ui:define>
+					<h:selectOneMenu id="expedientesEnTramite"
+								layout="lineDirection"
+					disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+						      value="#{criterioCnxHome.instance.expedientesEnTramite}">
+						<f:selectItems value="#{trueFalseEnumeration.getItems(messages['drop_list_select'])}" />
+						<a4j:support event="onclick" reRender="expedientesEnTramiteDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="desdeFechaDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="comment">#{messages['criterioCnx.desdeFecha.comment']}</ui:define>
+                	<ui:define name="label">#{messages['criterioCnx.desdeFecha']}</ui:define>
+					<rich:calendar id="desdeFecha" 
+					 enableManualInput="true"					
+					       	 disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+								 value="#{criterioCnxHome.instance.desdeFecha}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="desdeFechaDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="desdeFechaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+            <s:decorate id="aniosAntiguedadDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="comment">#{messages['criterioCnx.aniosAntiguedad.comment']}</ui:define>
+                	<ui:define name="label">#{messages['criterioCnx.aniosAntiguedad']}</ui:define>
+	                <h:inputText id="aniosAntiguedad"
+					       disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                          value="#{criterioCnxHome.instance.aniosAntiguedad}">
+	                    <a4j:support event="onblur" reRender="aniosAntiguedadDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="igualObjetoJuicioDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="comment">#{messages['criterioCnx.igualObjetoJuicio.comment']}</ui:define>
+                	<ui:define name="label">#{messages['criterioCnx.igualObjetoJuicio']}</ui:define>
+					<h:selectOneMenu id="igualObjetoJuicio"
+								layout="lineDirection"
+					disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+						      value="#{criterioCnxHome.instance.igualObjetoJuicio}">
+						<f:selectItems value="#{trueFalseEnumeration.getItems(messages['drop_list_select'])}" />
+						<a4j:support event="onclick" reRender="igualObjetoJuicioDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="tiempoFinalizacionDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="comment">#{messages['criterioCnx.tiempoFinalizacion.comment']}</ui:define>
+                	<ui:define name="label">#{messages['criterioCnx.tiempoFinalizacion']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputText id="tiempoFinalizacion"
+					       	 disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+					       	 validator="#{intervaloValidator.validate}"
+	                              value="#{criterioCnxHome.instance.tiempoFinalizacion}">
+	                    <a4j:support event="onblur" reRender="tiempoFinalizacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+	                </div>
+                              
+            </s:decorate>
+            <s:div id="excluirOJ">
+            <s:decorate id="excluirObjetosJuicioDecoration" rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina) and not oficinaManager.isPenal(criterioCnxHome.instance.materia)}" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['criterioCnx.excluirObjetosJuicio']}</ui:define>
+	                <h:selectBooleanCheckbox id="excluirObjetosJuicio"
+					       	           disabled="#{!criterioCnxHome.hasEditPermission('CriterioCnx','add','update')}"
+	                                      value="#{criterioCnxHome.instance.excluirObjetosJuicio}"/>
+            </s:decorate>
+			</s:div>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+
+		<s:div id="OJList">
+		<s:decorate id="objetoJuicioListList" rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina) and not oficinaManager.isPenal(criterioCnxHome.instance.materia)}"  template="/layout/lines/collection.xhtml">
+			<ui:param name="label" value="#{messages['criterioCnx.objetoJuicioList']}" />    
+			<ui:param name="icon" value="objetoJuicio" />
+			<ui:param name="initialState" value="#{empty criterioCnxHome.instance.objetoJuicioList? 'closed':'open'}" />    
+	        <div class="association" id="objetoJuicioListChildren">
+        
+			<ui:define name="emptyMessage">        
+	            <h:outputText value="#{messages['criterioCnx.objetoJuicioList.list_none']}" styleClass="emptyMessage" 
+	                       rendered="#{empty criterioCnxHome.instance.objetoJuicioList}"/>
+	        </ui:define>
+
+            <rich:dataTable value="#{criterioCnxHome.instance.objetoJuicioList}" 
+							  var="objetoJuicio" 
+						 rendered="#{not empty criterioCnxHome.instance.objetoJuicioList}" 
+					   rowClasses="rvgRowOne,rvgRowTwo"
+							   id="objetoJuicioListTable">
+
+
+
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Código
+						</f:facet>
+
+			            #{objetoJuicio.codigo}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Descripción
+						</f:facet>
+
+			            #{objetoJuicio.descripcion}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Rubro
+						</f:facet>
+
+			            #{objetoJuicio.rubroLetter}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							#{messages['objetoJuicio.tema.shortLabel']}
+						</f:facet>
+						<s:fragment rendered="#{objetoJuicio.tema != null}">
+
+			            #{objetoJuicio.tema.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{criterioCnxHome.removeFromObjetoJuicioList(objetoJuicio)}"
+										title="#{messages['list_remove']}">
+							<h:graphicImage value="/img/icon/clear.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{objetoJuicioList.doLineSelection(objetoJuicio, '/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml', '/web/criterioCnx/criterioCnxEdit.xhtml')}"
+										title="#{messages['list_select']}">
+							<h:graphicImage value="/img/icon/select_right.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+	            </rich:dataTable>
+	        
+	        </div>
+
+    		<ui:define name="lowButtons">
+		        <s:div styleClass="lowButtons">
+		        
+		            <s:button view="/webCustom/objetoJuicioConexidad/objetoJuicioConexidadSelectionList.xhtml"
+		              		action="#{criterioCnxHome.lookupAddToObjetoJuicioList('/web/criterioCnx/criterioCnxEdit.xhtml')}"
+			            		id="addObjetoJuicioList" styleClass="button"
+							 value="#{messages['button_add']} #{messages['objetoJuicio']}">
+		            </s:button>
+					<!-- many to many -->
+		            <s:button view="/webCustom/objetoJuicioConexidad/objetoJuicioConexidadSelectionList.xhtml"
+		              		action="#{criterioCnxHome.lookupAddToObjetoJuicioListMultiple('/web/criterioCnx/criterioCnxEdit.xhtml')}"
+			            		id="addObjetoJuicioListMultiple" styleClass="button"
+							 value="#{messages['button_add']} #{messages['objetoJuicio']} Multiple">
+		            </s:button>		            		            		            
+		            
+		        </s:div>
+		    </ui:define>
+		</s:decorate>
+		</s:div>
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{criterioCnxHome.doCancel}"
+						view="#{criterioCnxSearch.getReturnPage('/web/criterioCnx/criterioCnxList.xhtml')}"
+						rendered="#{criterioCnxHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{criterioCnxHome.doCancel}"
+						view="#{criterioCnxSearch.getReturnPage('/web/criterioCnx/criterioCnxList.xhtml')}"
+						rendered="#{!criterioCnxHome.managed}"/>
+						
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{criterioCnxHome.doAdd('/web/criterioCnx/criterioCnxEdit.xhtml')}"
+					rendered="#{!criterioCnxHome.managed and s:hasPermission('CriterioCnx','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{criterioCnxHome.doUpdate(criterioCnxSearch.getReturnPage('/web/criterioCnx/criterioCnxList.xhtml'))}"
+						rendered="#{criterioCnxHome.managed and s:hasPermission('CriterioCnx','update')}"/>
+					<rich:spacer width="15" rendered="#{criterioCnxHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{criterioCnxHome.doDelete(criterioCnxSearch.getReturnPage('/web/criterioCnx/criterioCnxList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{criterioCnxHome.managed and s:hasPermission('CriterioCnx','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	<f:subview rendered="#{criterioCnxHome.managed}">
+	<h:form>
+		<s:decorate id="condicionCnxListLines" template="/layout/lines/lines.xhtml">		
+
+
+			<ui:param name="label" value="#{messages['criterioCnx.condicionCnxList']}" />    
+			<ui:param name="icon" value="condicion" />
+			<ui:param name="initialState" value="#{empty condicionCnxList.byCriterioCnxResultList? 'closed':'open'}" />    
+
+	        <div class="association" id="condicionCnxListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['criterioCnx.condicionCnxList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty condicionCnxList.byCriterioCnxResultList}"/>
+		        </ui:define>
+				<rich:dataTable value="#{condicionCnxList.byCriterioCnxResultList}" 
+	                           var="condicionCnx" 
+	                      rendered="#{not empty condicionCnxList.byCriterioCnxResultList}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="condicionCnxListTable">
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('CriterioCnx','update') or condicionCnxSearch.hasSelectionPage()}">
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{condicionCnxList.doLineSelection(condicionCnx, '/web/condicionCnx/condicionCnxEdit.xhtml', '/web/criterioCnx/criterioCnxEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!criterioCnxSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+			                <s:link styleClass="#{condicionCnxList.getOrderStyle('parametro', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['condicionCnx.parametro.shortLabel']}">
+			                    <f:param name="condicionCnxOrder" value="#{condicionCnxList.getOrderParam('parametro')}"/>
+			                </s:link>
+						</f:facet>
+
+			            #{condicionCnx.parametro}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+			                <s:link styleClass="#{condicionCnxList.getOrderStyle('tipoComparacion', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['condicionCnx.tipoComparacion.shortLabel']}">
+			                    <f:param name="condicionCnxOrder" value="#{condicionCnxList.getOrderParam('tipoComparacion')}"/>
+			                </s:link>
+						</f:facet>
+			            <h:outputText value="#{tipoComparacionEnumeration.getLabel(condicionCnx.tipoComparacion)}"/>
+						<br/>
+			        </rich:column>
+            	</rich:dataTable>
+	        </div>
+
+		    <ui:define name="paginator">
+				<s:decorate template="/layout/listPaginator.xhtml">
+		  			<ui:param name="paginator" value="#{condicionCnxList.getPaginator(condicionCnxList)}"/>
+		  			<ui:param name="componentName" value="condicionCnx"/>
+		  		</s:decorate>
+			</ui:define>
+
+    		<ui:define name="lowButtons">
+		        <div class="lowButtons">
+		            <s:button 	  view="/web/condicionCnx/condicionCnxEdit.xhtml"
+								action="#{condicionCnxList.onAdd('/web/criterioCnx/criterioCnxEdit.xhtml')}" 
+								styleClass="button main-button"
+								rendered="#{s:hasPermission('CondicionCnx','add')}"								
+								 value="#{messages['condicionCnx.button.add']}">
+		                 <f:param name="criterioCnxId"
+		                         value="#{criterioCnxHome.instance.id}"/>
+
+		            </s:button>
+		        </div>
+		    </ui:define>
+		</s:decorate>
+	</h:form>
+	</f:subview>
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

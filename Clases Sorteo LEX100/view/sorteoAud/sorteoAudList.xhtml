@@ -1,0 +1,421 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('SorteoAud','read')}">
+		<ui:param name="icon" value="sorteo" />    
+		<ui:param name="title" value="#{messages['sorteoAud.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(sorteoAudList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{sorteoAudList}"/>
+
+			<s:decorate template="/layout/grid/gridForm.xhtml">			
+			<tr class="grideditrow">
+			<td class="grideditcolumn" colspan="1">
+			<s:decorate id="codigoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.codigo']}</ui:define>
+	                <h:inputText id="codigoFilter" 
+	                           size="10"
+	                          value="#{sorteoAudSearch.codigo}">
+	                </h:inputText>
+			</s:decorate>
+			</td>		
+			</tr>
+			<tr class="grideditrow">
+			<td class="grideditcolumn" colspan="2">
+			<s:decorate id="descripcionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.descripcion']}</ui:define>
+	                <h:inputText id="descripcionFilter" 
+	                           size="98"
+	                          value="#{sorteoAudSearch.descripcion}">
+	                </h:inputText>
+			</s:decorate>
+			</td>		
+			</tr>
+			<tr class="grideditrow">
+			<td class="grideditcolumn" colspan="2">
+			<s:decorate id="rubrosFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.rubros']}</ui:define>
+	                <h:inputText id="rubrosFilter" 
+	                           size="98"
+	                          value="#{sorteoAudSearch.rubros}">
+	                </h:inputText>
+			</s:decorate>
+			</td>		
+			</tr>
+			<tr class="grideditrow">
+			<td class="grideditcolumn" colspan="1">
+			<s:decorate id="camaraFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{empty sessionState.globalCamara}">
+			    <ui:define name="label">#{messages['sorteoAud.camara']}</ui:define>
+	
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0" summary="#{messages['lookup.summary']}">	                
+		            	<h:panelGroup>
+		            	</h:panelGroup>
+
+		       	    	<h:commandLink style="margin-right:5px"
+			    	    	    action="#{sorteoAudHome.lookupSearchCamara('/web/camara/camaraList.xhtml', '/web/sorteoAud/sorteoAudList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+		       	    	</h:commandLink>
+		            	<h:panelGroup id="camaraDescription" style="margin-right:5px">
+							<h:outputText value="#{messages['sorteoAud.camara.lookup_select']}" 
+						    	rendered="#{sorteoAudSearch.camara == null}"/>
+						    <s:fragment rendered="#{sorteoAudSearch.camara != null}">
+				            	#{sorteoAudSearch.camara.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px"
+							action="#{sorteoAudSearch.clearCamara}"
+						  reRender="camaraFilterDecoration" 
+						  rendered="#{sorteoAudSearch.camara != null}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+			</td>		
+			<td class="grideditcolumn" colspan="1">
+			<s:decorate id="tipoInstanciaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.tipoInstancia']}</ui:define>
+				<h:selectOneMenu id="tipoInstanciaFilter"
+					      value="#{sorteoAudSearch.tipoInstancia}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoInstanciaEnumeration.items}"
+						noSelectionLabel="#{messages['sorteoAud.tipoInstancia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			</td>		
+			</tr>
+			<tr class="grideditrow">
+			<td class="grideditcolumn" colspan="1">
+			<s:decorate id="competenciaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.competencia']}</ui:define>
+				<h:selectOneMenu id="competenciaFilter"
+					      value="#{sorteoAudSearch.competencia}">
+					<s:selectItems var="lookupItem"
+								 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+								 value="#{competenciaEnumeration.items}"
+						noSelectionLabel="#{messages['sorteoAud.competencia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			</td>		
+			<td class="grideditcolumn" colspan="1">
+			<s:decorate id="tipoOficinaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.tipoOficina']}</ui:define>
+				<h:selectOneMenu id="tipoOficinaFilter"
+					      value="#{sorteoAudSearch.tipoOficina}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoOficinaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoOficinaEnumeration.items}"
+						noSelectionLabel="#{messages['sorteoAud.tipoOficina.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			</td>		
+			</tr>
+			<tr class="grideditrow">
+			<td class="grideditcolumn" colspan="2">
+			<s:decorate id="usuarioFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.usuario']}</ui:define>
+	                <h:inputText id="usuarioFilter" 
+	                           size="98"
+	                          value="#{sorteoAudSearch.usuario}">
+	                </h:inputText>
+			</s:decorate>
+			</td>		
+			</tr>
+			<tr class="grideditrow">
+			<td class="grideditcolumn" colspan="2">
+			<s:decorate id="descripcionModificacionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.descripcionModificacion']}</ui:define>
+	                <h:inputText id="descripcionModificacionFilter" 
+	                           size="98"
+	                          value="#{sorteoAudSearch.descripcionModificacion}">
+	                </h:inputText>
+			</s:decorate>
+			</td>		
+			</tr>
+			</s:decorate> <!-- end gridForm -->		
+			<s:decorate id="rangoFechasFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoAud.rangoFechas']}</ui:define>
+            <table>
+            	<thead>
+            		<td></td>
+            	<td>#{messages['sorteoAud.fechaDesde']}</td>
+            		<td>#{messages['sorteoAud.fechaHasta']}</td>
+            	</thead>
+            	<s:fragment>
+            	<tr>
+            		<td style="padding-right:10px">
+               		#{messages['sorteoAud.fechaModificacion.shortLabel']}
+               		</td>
+               		<td>
+               			<rich:calendar value="#{sorteoAudSearch.fechaModificacionDesde}" enableManualInput="true"
+               			popup="true" datePattern="dd/MM/yyyy" inputSize="10" showWeeksBar="false"/>
+               		</td>            	
+               		<td>
+               			<rich:calendar value="#{sorteoAudSearch.fechaModificacionHasta}" enableManualInput="true"
+               			popup="true" datePattern="dd/MM/yyyy" inputSize="10" showWeeksBar="false"/>
+               		</td>            	
+            	</tr>
+            	</s:fragment>
+            </table>			
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['sorteoAud.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty sorteoAudList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="sorteoAudList">
+			    <rich:dataTable id="sorteoAudTable" 
+			                var="item"
+			              value="#{sorteoAudList.resultList}" 
+                       rendered="#{not empty sorteoAudList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('SorteoAud','update') or sorteoAudSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('usuario', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.usuario.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('usuario')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('descripcionModificacion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.descripcionModificacion.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('descripcionModificacion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('fechaModificacion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.fechaModificacion.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('fechaModificacion')}"/>
+				                </s:link>
+							</rich:column>
+
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('codigo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.codigo.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('codigo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('descripcion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.descripcion.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('descripcion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('rubros', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.rubros.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('rubros')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('conTurno', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.conTurno.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('conTurno')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('bolasPorOficina', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.bolasPorOficina.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('bolasPorOficina')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" rendered="#{empty sessionState.globalOficina}" >
+								#{messages['sorteoAud.camara.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['sorteoAud.tipoInstancia.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['sorteoAud.competencia.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['sorteoAud.tipoOficina.shortLabel']}
+							</rich:column>
+
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoAudList.getOrderStyle('rangoMinimos', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoAud.rangoMinimos.shortLabel']}">
+				                    <f:param name="sorteoAudOrder" value="#{sorteoAudList.getOrderParam('rangoMinimos')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                 #{messages['sorteoAud.minimoNumeroBolas.shortLabel']}
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('SorteoAud','update') or sorteoAudSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{sorteoAudList.doSelection(item, '/web/sorteoAud/sorteoAud.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!sorteoAudSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.usuario}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.descripcionModificacion}
+						<br/>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{item.fechaModificacion}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.codigo}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.descripcion}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.rubros}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-center"  >
+						<h:outputText value="#{turnoSorteoEnumeration.getLabel(item.conTurno)}"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.bolasPorOficina}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn" rendered="#{empty sessionState.globalOficina}" >
+						<s:fragment rendered="#{item.camara != null}">
+
+			            #{item.camara.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.tipoInstancia != null}">
+
+			            #{item.tipoInstancia.nombre}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.competencia != null}">
+
+			            #{item.competencia.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.tipoOficina != null}">
+
+			            #{item.tipoOficina.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.rangoMinimos}
+						<br/>
+			        </rich:column>
+			        
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.minimoNumeroBolas}
+						<br/>
+			        </rich:column>
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{sorteoAudList.getPaginator(sorteoAudList)}"/>
+	  			<ui:param name="componentName" value="sorteoAud"/>
+	  		</s:decorate>
+		</ui:define>
+	
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{sorteoAudSearch.hasReturnPage()}" 
+		        			  view="#{sorteoAudSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['sorteoAud.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/sorteoAud/sorteoAudList.jrxml" />
+		<ui:param name="reportList" value="#{sorteoAudList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

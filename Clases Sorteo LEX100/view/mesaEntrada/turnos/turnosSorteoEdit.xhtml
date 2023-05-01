@@ -1,0 +1,201 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="sorteo" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="sorteo" />    
+		<ui:param name="title" value="#{messages['turnosSorteo.asignacion']}" />    
+		<ui:param name="description" value="#{messages['sorteo.gestionTurnos.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/groupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="codigoDecoration" template="/layout/display.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.codigo']}</ui:define>
+	                <h:outputText id="codigo" 
+	                          value="#{sorteoHome.instance.codigo}">
+	                </h:outputText>
+            </s:decorate>
+            <s:decorate id="descripcionDecoration" template="/layout/display.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.descripcion']}</ui:define>
+	                <h:outputText id="descripcion"
+	                              value="#{sorteoHome.instance.descripcion}">
+	                </h:outputText>
+            </s:decorate>
+            <s:decorate id="conTurnoDecoration" template="/layout/display.xhtml" >
+                	<ui:define name="label">#{messages['sorteo.conTurno']}</ui:define>
+					<h:outputText value="#{turnoSorteoEnumeration.getLabel(sorteoHome.instance.conTurno)}"/>
+            </s:decorate>
+
+			<s:decorate id="tipoInstanciaDecoration" template="/layout/display.xhtml" >
+					<ui:define name="label">#{messages['sorteo.tipoInstancia']}</ui:define>
+					<h:outputText value="#{tipoInstanciaEnumeration.labelFor(sorteoHome.instance.tipoInstancia)}"/>
+ 
+			</s:decorate>
+
+			<s:decorate id="competenciaDecoration" template="//layout/display.xhtml" >
+					<ui:define name="label">#{messages['sorteo.competencia']}</ui:define>
+					<h:outputText value="#{competenciaEnumeration.labelFor(sorteoHome.instance.competencia)}"/>
+ 
+			</s:decorate>
+			
+			<s:decorate id="tipoOficinaDecoration" template="/layout/display.xhtml" >
+					<ui:define name="label">#{messages['sorteo.tipoOficina']}</ui:define>
+					<h:outputText value="#{tipoOficinaEnumeration.labelFor(sorteoHome.instance.tipoOficina)}"/>
+ 
+			</s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{sorteoHome.doCancel}"
+						view="#{sorteoSearch.getReturnPage('/webCustom/mesaEntrada/turnos/turnosSorteoList.xhtml')}"
+						rendered="#{sorteoHome.managed}"/>
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	<f:subview rendered="#{sorteoHome.managed}">
+	<h:form>
+		<s:decorate id="oficinaSorteoListLines" template="/layout/lines/lines.xhtml">		
+
+
+			<ui:param name="label" value="#{messages['sorteo.oficinaSorteoList']}" />    
+			<ui:param name="icon" value="oficina" />
+			<ui:param name="initialState" value="#{empty oficinaSorteoList.bySorteoResultList? 'closed':'open'}" />    
+
+	        <div class="association" id="oficinaSorteoListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['sorteo.oficinaSorteoList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty oficinaSorteoList.bySorteoResultList}"/>
+					<s:fragment rendered="#{not empty oficinaSorteoList.bySorteoResultList}">
+						<p class="form_description">#{messages['turnosSorteo.asignacion.comment']}</p>
+					</s:fragment>
+		        </ui:define>
+				<a4j:region>
+				<rich:dataTable value="#{oficinaSorteoList.bySorteoResultList}" 
+	                           var="oficinaSorteo" 
+	                      rendered="#{not empty oficinaSorteoList.bySorteoResultList}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="oficinaSorteoListTable">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" width="1" rendered="#{s:hasPermission('TurnosSorteo','update')}">
+			            		<span/>
+							</rich:column>
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{oficinaSorteoList.getOrderStyle('turno', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['oficinaSorteo.turno.shortLabel']}">
+				                    <f:param name="oficinaSorteoOrder" value="#{oficinaSorteoList.getOrderParam('turno')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+								#{messages['oficina.codigo.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['oficinaSorteo.oficina.shortLabel']}
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('TurnosSorteo','update')}">
+			           	<h:selectBooleanCheckbox value="#{oficinaSorteoSearch.selectionMap[oficinaSorteo]}">
+			        		<a4j:support event="onclick" ajaxSingle="true"/>
+			        	</h:selectBooleanCheckbox>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn align-center"  >
+			            <h:graphicImage rendered="#{oficinaSorteo.turno}" value="/img/icon/checked.gif"/>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+			            #{oficinaSorteo.oficina.codigo} 
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{oficinaSorteo.oficina != null}">
+
+			            #{oficinaSorteo.oficina.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+	        
+    		<ui:define name="lowButtons">
+		    <s:div styleClass="lowButtons">
+        		<h:commandButton rendered="#{not empty oficinaSorteoList.bySorteoResultList and s:hasPermission('TurnosSorteo','update')}"
+		        			actionListener="#{oficinaSorteoList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton rendered="#{not empty oficinaSorteoList.bySorteoResultList and s:hasPermission('TurnosSorteo','update')}"
+		        			actionListener="#{oficinaSorteoList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+	    	</s:div>
+		    </ui:define>
+
+		    <ui:define name="paginator">
+				<s:decorate template="/layout/listPaginator.xhtml">
+		  			<ui:param name="paginator" value="#{oficinaSorteoList.getPaginator(oficinaSorteoList)}"/>
+		  			<ui:param name="componentName" value="oficinaSorteo"/>
+		  		</s:decorate>
+			</ui:define>
+
+ 	    <ui:define name="linesButtons">
+ 	    <table style="clear:both;width:100%;margin-top:50px"><tr><td align="center"> 
+		    <s:div styleClass="actionButtons" style="clear: both; background-color: rgb(247, 100, 100);">
+        		<h:commandButton rendered="#{not empty oficinaSorteoList.bySorteoResultList and s:hasPermission('TurnosSorteo','update')}"
+		        			action="#{oficinaSorteoList.doConfirmarTurnos(sorteoHome.instance, true)}"
+						styleClass="button"
+							 value="#{messages['sorteo.confirmarTurnos.conBlanqueo']}"/>
+        		<h:commandButton rendered="#{not empty oficinaSorteoList.bySorteoResultList and s:hasPermission('TurnosSorteo','update')}"
+		        			action="#{oficinaSorteoList.doConfirmarTurnos(sorteoHome.instance, false)}"
+						styleClass="button"
+							 value="#{messages['sorteo.confirmarTurnos']}"/>
+	    	</s:div>
+	    	</td></tr></table>
+		</ui:define>
+
+		</s:decorate>
+	</h:form>
+	</f:subview>
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

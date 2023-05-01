@@ -1,0 +1,15 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<e:workbook xmlns:e="http://jboss.com/products/seam/excel"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<e:worksheet var="rubro" value="#{rubroList.allResults}">
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Descripcion"/>
+			</f:facet>
+			<e:cell value="#{not empty rubro.descripcion ? rubro.descripcion : ''}" />
+		</e:column>
+	</e:worksheet>		
+</e:workbook>

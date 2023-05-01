@@ -1,0 +1,275 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('CriterioCnx','read')}">
+		<ui:param name="icon" value="criterio" />    
+		<ui:param name="title" value="#{messages['criterioCnx.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(criterioCnxList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{criterioCnxList}"/>
+
+			<s:decorate id="nombreFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['criterioCnx.nombre']}</ui:define>
+	                <h:inputText id="nombreFilter" 
+	                           size="98"
+	                          value="#{criterioCnxSearch.nombre}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="camaraFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{empty sessionState.globalCamara}">
+			    <ui:define name="label">#{messages['criterioCnx.camara']}</ui:define>
+				<h:selectOneMenu id="camaraFilter"
+					      value="#{criterioCnxSearch.camara}">
+					<s:selectItems var="lookupItem"
+								 label="#{camaraEnumeration.labelFor(lookupItem)}"
+								 value="#{camaraEnumeration.items}"
+						noSelectionLabel="#{messages['criterioCnx.camara.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="materiaFilterDecoration" rendered="#{essionState.globalMateriaSet.size > 1}" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['criterioCnx.materia']}</ui:define>
+				<h:selectOneMenu id="materiaFilter"
+					      value="#{criterioCnxSearch.materia}">
+					<s:selectItems var="lookupItem"
+								 label="#{materiaEnumeration.labelFor(lookupItem)}"
+								 value="#{sessionState.globalMateriaSet}"
+						noSelectionLabel="#{messages['criterioCnx.materia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="objetoJuicioFilterDecoration" rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina)}"  template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['criterioCnx.objetoJuicio']}</ui:define>
+	
+		            <h:panelGrid columns="4" cellpadding="0" cellspacing="0" summary="#{messages['lookup.summary']}">	                
+		            	<h:panelGroup>
+							<h:inputText id="objetoJuicioCodigo"
+									  style="margin-right:5px"
+									  value="#{criterioCnxSearch.objetoJuicioCodigo}"
+						valueChangeListener="#{criterioCnxSearch.onChangeObjetoJuicioCodigo}">
+								<a4j:support event="onblur" reRender="objetoJuicioDescription" ajaxSingle="true"  eventsQueue="editProperty"/>
+							</h:inputText>
+		            	</h:panelGroup>
+
+		       	    	<h:commandLink style="margin-right:5px"
+			    	    	    action="#{criterioCnxHome.lookupSearchObjetoJuicio('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadSelectionList.xhtml', '/web/criterioCnx/criterioCnxList.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif"/>
+		       	    	</h:commandLink>
+		            	<h:panelGroup id="objetoJuicioDescription" style="margin-right:5px">
+							<h:outputText value="#{messages['criterioCnx.objetoJuicio.lookup_select']}" 
+						    	rendered="#{criterioCnxSearch.objetoJuicio == null}"/>
+						    <s:fragment rendered="#{criterioCnxSearch.objetoJuicio != null}">
+				            	#{criterioCnxSearch.objetoJuicio.descripcion}
+							</s:fragment>
+				    	</h:panelGroup>
+						<a4j:commandLink style="margin-right:5px"
+							action="#{criterioCnxSearch.clearObjetoJuicio}"
+						  reRender="objetoJuicioFilterDecoration" 
+						  rendered="#{criterioCnxSearch.objetoJuicio != null}">
+			        	    #{messages['lookup_clear']}
+						</a4j:commandLink>					        				    				    
+					</h:panelGrid>
+			</s:decorate>
+			<s:decorate id="temaFilterDecoration" rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina)}"  template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['criterioCnx.tema']}</ui:define>
+				<h:selectOneMenu id="temaFilter"
+					      value="#{criterioCnxSearch.tema}">
+					<s:selectItems var="lookupItem"
+								 label="#{temaEnumeration.labelFor(lookupItem)}"
+								 value="#{temaEnumeration.items}"
+						noSelectionLabel="#{messages['criterioCnx.tema.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['criterioCnx.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty criterioCnxList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="criterioCnxList">
+			    <rich:dataTable id="criterioCnxTable" 
+			                var="item"
+			              value="#{criterioCnxList.resultList}" 
+                       rendered="#{not empty criterioCnxList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('CriterioCnx','update') or criterioCnxSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{criterioCnxList.getOrderStyle('nombre', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['criterioCnx.nombre.shortLabel']}">
+				                    <f:param name="criterioCnxOrder" value="#{criterioCnxList.getOrderParam('nombre')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['criterioCnx.materia.shortLabel']}
+							</rich:column>
+
+							<rich:column rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina)}"  styleClass="toolbaritem"  >
+								#{messages['criterioCnx.tema.shortLabel']}
+							</rich:column>
+
+							<rich:column rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina)}"  styleClass="toolbaritem"  >
+								#{messages['criterioCnx.objetoJuicio.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{criterioCnxList.getOrderStyle('prioridad', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['criterioCnx.prioridad.shortLabel']}">
+				                    <f:param name="criterioCnxOrder" value="#{criterioCnxList.getOrderParam('prioridad')}"/>
+				                </s:link>
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('CriterioCnx','update') or criterioCnxSearch.hasSelectionPage()}">
+			           	<h:selectBooleanCheckbox value="#{criterioCnxSearch.selectionMap[item]}" rendered="#{criterioCnxSearch.inSelectionMultiple}">
+			        		<a4j:support event="onclick" ajaxSingle="true"/>
+			        	</h:selectBooleanCheckbox>
+			        
+			            <h:commandLink action="#{criterioCnxList.doSelection(item, '/web/criterioCnx/criterioCnxEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!criterioCnxSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+
+			            #{item.nombre}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.materia != null}">
+
+			            #{item.materia.codigo} - #{item.materia.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina)}"  styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.tema != null}">
+						#{item.tema.codigo} - 
+			            #{item.tema.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column rendered="#{oficinaManager.isNoPenal(sessionState.globalOficina)}"  styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.objetoJuicio != null}">
+
+			            #{item.objetoJuicio.codigo} - #{item.objetoJuicio.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.prioridad}
+						<br/>
+			        </rich:column>
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{criterioCnxList.getPaginator(criterioCnxList)}"/>
+	  			<ui:param name="componentName" value="criterioCnx"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!criterioCnxSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!criterioCnxSearch.hasReturnPage() and s:hasPermission('CriterioCnx','add')}" 
+        					  view="/web/criterioCnx/criterioCnxEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{criterioCnxList.onAdd()}"
+	                 		 value="#{messages['criterioCnx.button.new']}">
+        	    	<f:param name="criterioCnxId"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{criterioCnxSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{criterioCnxList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{criterioCnxList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{criterioCnxSearch.hasReturnPage()}"
+		        			action="#{criterioCnxList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{criterioCnxSearch.hasReturnPage()}" 
+		        			  view="#{criterioCnxSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{criterioCnxSearch.hasReturnPage()}" 
+		        			  view="#{criterioCnxSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['criterioCnx.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/criterioCnx/criterioCnxList.jrxml" />
+		<ui:param name="reportList" value="#{criterioCnxList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

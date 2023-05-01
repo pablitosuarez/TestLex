@@ -1,0 +1,409 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="causa" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{empty expedienteMeAdd.expedienteEspecialEdit.tipoCausa ? expedienteMeAdd.normalTitle : interpolator.interpolate(expedienteMeAdd.title, expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion)}"/>
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+
+	<br/>
+	
+	<s:fragment rendered="#{expedienteMeAdd.showCompetenciasCiviles()}">
+		<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMeAdd.competencia']}"/>
+		<ui:param name="id" value="competenciaGroup"/>	    
+		<s:decorate id="competenciaDecoration" template="/layout/editBlock.xhtml" >
+				<h:selectOneRadio id="competencia" layout="lineDirection"
+							 value="#{expedienteMeAdd.competencia}">
+					<s:selectItems var="lookupItem"
+								 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeAdd.competenciasCiviles}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="competenciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneRadio>
+		</s:decorate>
+		</ui:decorate>
+	</s:fragment>	
+
+	<!-- group tratamientoIncidental -->
+	<s:fragment rendered="#{expedienteMeAdd.showTratamientoIncidental()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.tratamientoIncidentalGroup']}"/>
+		<ui:param name="id" value="tratamientoIncidentalGroup"/>
+
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/tratamientoIncidental-inc.xhtml'}"/>
+	</ui:decorate>
+	</s:fragment>
+
+	<!-- group tipoRecursoGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showTipoRecurso()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expediente.tipoRecurso']}"/>
+		<ui:param name="id" value="tipoRecursoGroup"/>
+
+		<s:span id="tipoRecursoIncludeSpan">
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/tipoRecurso-inc.xhtml'}"/>
+		</s:span>
+	</ui:decorate>
+	</s:fragment>
+	
+	<s:decorate id="oficinaDestinoDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.showOficinaRadicacionPrevia}">
+	    <ui:define name="label">#{messages['expedienteMe.ingresoRadicacionPrevia.oficinaDestino']}</ui:define>
+		    <ui:param name="required" value="true"/>
+			<h:selectOneMenu id="oficinaDestino"
+						 value="#{expedienteMeAdd.radicacionPreviaEdit.oficinaDestino}">
+				<s:selectItems var="lookupItem"
+							 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+							 value="#{expedienteMeAdd.oficinasDestinoRadicacionPrevia}"
+					noSelectionLabel="#{messages['expedienteMeAdd.ingresoRadicacionPrevia.oficinaDestino.lookup_select']}">
+				</s:selectItems>
+				<s:convertEntity/>
+			</h:selectOneMenu>
+			<s:fragment rendered="#{expedienteMeAdd.showVerTodasOficinasDestino()}">
+				<rich:spacer width="10px"></rich:spacer>
+				<h:selectBooleanCheckbox id="verTodasOficinas" value="#{expedienteMeAdd.verTodasOficinasDestino}" >
+					<a4j:support event="onclick" reRender="oficinaDestinoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectBooleanCheckbox>
+				#{messages['expedienteMe.ingresoRadicacionPrevia.verTodas']}
+			</s:fragment>
+	</s:decorate>
+
+	<!-- group parametroGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showParametros()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml">
+       	<ui:param name="label" value="#{messages['expedienteMe.parametersGroup']}"/>
+		<ui:param name="id" value="parametersGroup"/>
+		
+		<ui:decorate template="/webComponent/dataSheet/include/dataSheetEditorGroup.xhtml"  >
+			<ui:param name="items" value="#{expedienteMeAdd.getParametrosAsPropertyList()}" />   
+			<ui:param name="modoMasivo" value="#{false}"/>
+		</ui:decorate>		
+
+	</ui:decorate>
+	</s:fragment>
+	
+	<!-- group secloGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showSeclo()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml">
+       	<ui:param name="label" value="#{messages['expedienteMe.secloGroup']}"/>
+		<ui:param name="id" value="secloGroup"/>
+		<s:decorate id="numeroExpedienteConexoDecoration" template="/layout/edit.xhtml" >
+		  	<ui:define name="label">#{messages['expediente.seclo.numeroAnio']}</ui:define>
+		    <h:inputText id="numeroSeclo"
+		    		size="10"
+		    		maxlength="9"
+		              value="#{expedienteMeAdd.numeroSeclo}">
+		    </h:inputText>
+		    <s:span  style="padding:0 5px; font-size:1.2em">
+		     /
+		     </s:span>
+		     <h:inputText id="anioSeclo"
+		     		 size="5"
+		               value="#{expedienteMeAdd.anioSeclo}">
+		     </h:inputText>
+		</s:decorate>
+	</ui:decorate>
+	</s:fragment>
+	
+	<!-- group montoJuicioGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showMontoJuicio()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.montoJuicioGroup']}"/>
+		<ui:param name="id" value="montoJuicioGroup"/>
+
+		<ui:decorate template="/layout/grid/gridForm.xhtml">			
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="1">
+        <s:decorate id="monedaDecoration" template="/layout/edit.xhtml" >
+             	<ui:define name="label">#{messages['expedienteMe.monto.moneda']}</ui:define>
+				<h:selectOneMenu id="moneda" required="#{expedienteMeAdd.isMontoJuicioRequired()}"
+						  rendered="#{expedienteHome.hasEditPermission('Expediente','add','update')}"
+							 value="#{expedienteMeAdd.montoJuicioEdit.moneda}">
+					<s:selectItems var="lookupItem"
+								 label="#{monedaEnumeration.labelFor(lookupItem)}"
+								 value="#{monedaEnumeration.items}"
+						noSelectionLabel="#{messages['expediente.moneda.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+		</s:decorate>
+		</td>
+		<td class="grideditcolumn" colspan="1">
+        <s:decorate id="cantidadDecoration" template="/layout/editShort.xhtml" >
+             	<ui:define name="label">#{messages['expedienteMe.monto.cantidad']}</ui:define>
+                <h:inputText id="cantidad" required="#{expedienteMeAdd.isMontoJuicioRequired()}"
+                          value="#{expedienteMeAdd.montoJuicioEdit.cantidad}"
+                           size="15">
+                </h:inputText>
+        </s:decorate>
+        </td>
+        </tr>
+        </ui:decorate>
+	</ui:decorate>
+	</s:fragment>
+
+	<!-- group conexidadDeclaradaGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showConexidadDeclarada()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.conexidadDeclaradaGroup']}"/>
+		<ui:param name="id" value="conexidadDeclaradaGroup"/>
+
+		<ui:include src="#{'/web/conexidadDeclarada/include/conexidadDeclaradaEditContent.xhtml'}">
+			<ui:param name="conexidadDeclarada" value="#{expedienteMeAdd.conexidadDeclarada}"/>
+			<ui:param name="manager" value="#{expedienteMeAdd}"/>
+		</ui:include>
+
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group conexidadDeclaradaGroup -->
+	
+	<!-- group conexidadDeclaradaSegundaInstanciaGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showConexidadDeclaradaSegundaInstancia()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.conexidadDeclaradaSegundaInstanciaGroup']}"/>
+		<ui:param name="id" value="conexidadDeclaradaSegundaInstanciaGroup"/>
+
+		<ui:include src="#{'/web/conexidadDeclarada/include/conexidadDeclarada2EditContent.xhtml'}">
+			<ui:param name="conexidadDeclarada" value="#{expedienteMeAdd.conexidadDeclaradaSegundaInstancia}"/>
+			<ui:param name="manager" value="#{expedienteMeAdd}"/>
+		</ui:include>
+
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group conexidadDeclaradaGroup -->
+
+	<!-- group vinculadoAExpedienteGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showVinculadoAExpediente()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.vinculadoAExpedienteGroup']}"/>
+		<ui:param name="id" value="vinculadoAExpedienteGroup"/>
+
+		<ui:include src="#{'/web/conexidadDeclarada/include/conexidadDeclaradaEditContent.xhtml'}">
+			<ui:param name="conexidadDeclarada" value="#{expedienteMeAdd.conexidadDeclarada}"/>
+			<ui:param name="manager" value="#{expedienteMeAdd}"/>
+		</ui:include>
+
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group vinculadoAExpedienteGroup -->
+	
+
+	<!-- group otrosDatosGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showOtrosDatos()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+    <ui:param name="label" value="#{messages['expedienteMe.otrosDatosGroup']}"/>
+	<ui:param name="id" value="otrosDatosGroup"/>
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/otrosDatosEditContent.xhtml'}"/>	
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group otrosDatosGroup -->
+	
+	<!-- group fojasGroup -->
+	<s:div rendered="#{expedienteMeAdd.showFojasCuerposEtc() and not expedienteMeAdd.hasPageEspecial()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteEspecial.fojasGroup']}"/>
+		<ui:param name="id" value="fojasGroup"/>
+			<s:decorate id="fojasDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.fojas']}</ui:define>
+						<h:inputText id="expedienteEspecialFojas"
+								size="4"
+								styleClass="#{expedienteMeAdd.fojasEdit.error ? 'errorEditField' : ''}"
+								  value="#{expedienteMeAdd.fojasEdit.fojas}"/>
+			</s:decorate>
+			<s:decorate id="cuerposDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.cuerpos']}</ui:define>
+						<h:inputText id="expedienteEspecialCuerpos"
+								size="4"
+								  value="#{expedienteMeAdd.fojasEdit.cuerpos}"/>
+			</s:decorate>
+			<s:decorate id="agregadosDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.agregados']}</ui:define>
+						<h:inputText id="expedienteEspecialAgregados"
+								size="4"
+								  value="#{expedienteMeAdd.fojasEdit.agregados}"/>
+			</s:decorate>
+			<s:decorate id="sobresDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.sobres']}</ui:define>
+						<h:inputText id="expedienteEspecialSobres"
+								size="4"
+								  value="#{expedienteMeAdd.fojasEdit.sobres}"/>
+			</s:decorate>
+			<s:decorate id="descripcionAgregadosDecoration" template="/layout/edit.xhtml"  rendered="#{expedienteMeAdd.isPedirFojas()}">
+					<ui:define name="label">#{messages['expedienteEspecial.descripcionAgregados']}</ui:define>
+					<h:inputTextarea value="#{expedienteMeAdd.comentarios}" cols="50" rows="2">
+               		</h:inputTextarea>
+			</s:decorate>
+
+
+	</ui:decorate>
+	</s:div>
+	<!-- end group fojasGroup -->
+
+	<!-- group expedienteInfoGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showExpedientenInfo()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+    <ui:param name="label" value="#{messages['expedienteMe.expedienteInfo']}"/>
+	<ui:param name="id" value="expedienteInfo"/>
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/expedienteInfo-inc.xhtml'}"/>	
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group expedienteInfoGroup -->
+	<!-- OVD -->
+	<s:fragment rendered="#{expedienteMeAdd.OVD}">
+		<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+		    <ui:param name="label" value="#{messages['expedienteMe.OVD']}"/>
+			<ui:param name="id" value="OVDGroup"/>
+			<s:decorate id="legajoOVD" template="/layout/edit.xhtml" >
+			  	<ui:define name="label">#{messages['expediente.OVD.legajo']}</ui:define>
+			    <h:inputText id="legajo" size="10" maxlength="9" value="#{expedienteMeAdd.legajoOVD}">
+			    </h:inputText>
+			</s:decorate>
+			<s:decorate id="anioLegajoOVD" template="/layout/edit.xhtml" >
+			  	<ui:define name="label">#{messages['expediente.OVD.aniolegajo']}</ui:define>
+			    <h:inputText id="anioLegajo" size="10" maxlength="4" value="#{expedienteMeAdd.anioLegajoOVD}">
+			    </h:inputText>
+			</s:decorate>
+			<s:decorate id="caratulaOVD" template="/layout/edit.xhtml" >
+			  	<ui:define name="label">#{messages['expediente.OVD.caratula']}</ui:define>
+			    <h:inputText id="caratula" size="30" maxlength="200" value="#{expedienteMeAdd.caratulaOVD}">
+			    </h:inputText>
+			</s:decorate>
+		</ui:decorate>
+	</s:fragment>
+	<!-- OVD -->
+	<!-- group expedienteComGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showExpedientenInfo() and not expedienteMeAdd.isPedirFojas()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+    <ui:param name="label" value="#{messages['expedienteMe.expedienteComentarios']}"/>
+	<ui:param name="id" value="expedienteComentarios"/>
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/expedienteCom-inc.xhtml'}"/>	
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group expedienteInfoGroup -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+ 		<ui:include src="/webCustom/mesaEntrada/expediente/add/include/datosRemision-inc.xhtml" />
+
+   		<ui:define name="buttons">               
+			<s:fragment rendered="#{!expedienteMeAdd.editMode}"> 
+			
+			
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button" rendered="#{not expedienteMeAdd.hasPageEspecial()}"
+						value="#{messages['button_previous']}"
+						view="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml"/>
+	            <s:button styleClass="button done main-button" rendered="#{expedienteMeAdd.hasPageEspecial()}"
+						value="#{messages['button_previous']}"
+						view="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial.xhtml"/>
+
+				<rich:spacer width="15"/>	
+		            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.asignaPorSorteo and not expedienteMeAdd.ingresoAnteriorSistema and not expedienteMeAdd.showOficinaRadicacionPrevia}"
+						value="#{messages['button_asignar']}" 
+						onclick="Richfaces.showModalPanel('waitDialog');"
+						action="#{expedienteMeAdd.doSaveFin(2,'/webCustom/mesaEntrada/expediente/add/expedienteMeAddFin.xhtml')}"/>
+						
+					<h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.showOficinaRadicacionPrevia}"
+						value="#{messages['button_finalizar']}" 
+						onclick="Richfaces.showModalPanel('waitDialog');"
+						action="#{expedienteMeAdd.doSaveFin(5,'/webCustom/mesaEntrada/expediente/add/expedienteMeAddFin.xhtml')}"/>
+						
+				<s:div style="float:right" rendered="#{s:hasPermission('MesaEntrada','ingresoDiferido') or expedienteMeAdd.ingresoAnteriorSistema}">
+		            <h:commandButton styleClass="button main-button"
+						value="#{expedienteMeAdd.ingresoAnteriorSistema ? messages['expedienteMe.ingresoAnteriorSistema.button'] : messages['expedienteMe.ingresoDiferido.button']}"
+						actionListener="#{expedienteMeAdd.onShowIngresoDiferido('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-2.xhtml')}" 
+						action="#{expedienteMeAdd.doSave2('/webCustom/mesaEntrada/expediente/add/expedienteMeIngresoDiferido.xhtml')}"/>
+				</s:div>
+				
+				<s:div style="float:right" rendered="#{s:hasPermission('MesaEntrada','ingresoRadicacionPrevia') and not expedienteMeAdd.ingresoAnteriorSistema and not expedienteMeAdd.showOficinaRadicacionPrevia}">
+		            <h:commandButton styleClass="button main-button"
+						value="#{expedienteMeAdd.ingresoACorteSuprema ?  messages['expedienteMe.ingresoCorteSuprema.button'] : messages['expedienteMe.ingresoRadicacionPrevia.button']}"
+						actionListener="#{expedienteMeAdd.onShowIngresoRadicacionPrevia('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-2.xhtml')}" 
+						action="#{expedienteMeAdd.doSave2('/webCustom/mesaEntrada/expediente/add/expedienteMeIngresoRadicacionPrevia.xhtml')}"/>
+				</s:div>								
+			</div>
+			</s:fragment>
+   			<s:fragment rendered="#{expedienteMeAdd.editMode}"> 
+	        <div class="actionButtons">
+				<s:button styleClass="button done main-button"
+					value="#{messages['button_done']}"
+					rendered="#{!expedienteMeAdd.verifyMode}"
+					view="/web/expediente/expedienteCompleto.xhtml">
+				</s:button>
+				
+				<!-- Verificacion -->	
+				<s:button styleClass="button done main-button"
+					value="#{messages['button_done']}"
+					rendered="#{expedienteMeAdd.verifyMode}"
+					view="/webCustom/mesaEntrada/expediente/verificacion/verificacionExpediente.xhtml" propagation="none">
+				</s:button>
+
+				<rich:spacer width="15"/>	
+   			       
+	            <h:commandButton styleClass="button main-button" rendered="#{not expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_previous']}"
+					action="#{expedienteMeAdd.doSave2('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}"/>
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPageEspecial()}"
+					value="#{messages['button_previous']}"
+					action="#{expedienteMeAdd.doSave2('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial.xhtml')}"/>
+
+				<rich:spacer width="15"/>	
+
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}" 
+					rendered="#{!expedienteMeAdd.verifyMode}"
+				  onclick="Richfaces.showModalPanel('waitDialog');"
+					action="#{expedienteMeAdd.doSaveFin(2,'/web/expediente/expedienteCompleto.xhtml')}"/>
+				
+				<!-- Verificacion -->	
+				<h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}" 
+					rendered="#{expedienteMeAdd.verifyMode}"
+				  onclick="Richfaces.showModalPanel('waitDialog');"
+					  actionListener="#{expedienteMeVerificacion.init()}"
+					action="#{expedienteMeAdd.doSaveFin(2,'/webCustom/mesaEntrada/expediente/verificacion/verificacionExpediente.xhtml')}">
+				</h:commandButton>
+				
+				<s:button styleClass="button main-button" style="float:right"
+					value="#{messages['expedienteMeAdd.button.mostrarExpediente']}"
+					rendered="#{expedienteMeAdd.verifyMode}"
+					view="/web/expediente/expedienteCompleto.xhtml">
+				</s:button>
+				
+				
+			</div>
+			</s:fragment>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

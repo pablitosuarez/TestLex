@@ -1,0 +1,88 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{empty expedienteMeAdd.expedienteEspecialEdit.tipoCausa ? expedienteMeAdd.normalTitle : interpolator.interpolate(expedienteMeAdd.title, expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion)}"/>
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+	<br/>
+ 
+	<!-- group MediacionGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showVinculadoMediacion()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.expedienteVinculadoMediacionGroup']}"/>
+		<ui:param name="id" value="vinculadoMediacionGroup"/>
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/expedienteMediacionSelector.xhtml'}">
+		</ui:include>
+	</ui:decorate>
+	</s:fragment>
+
+	<s:fragment rendered="#{expedienteMeAdd.showSelectorPoder()}">
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.expedientePoderGroup']}"/>
+		<ui:param name="id" value="poderGroup"/>
+		<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/expedientePoderSelector.xhtml'}">
+		</ui:include>
+	</ui:decorate>
+	</s:fragment>
+
+   	
+   		<ui:define name="collections">
+		</ui:define>
+ 
+   		<ui:define name="buttons">               
+	        <s:div id="actionButtons">
+  			<s:fragment rendered="#{!expedienteMeAdd.editMode}">          
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button" rendered="#{expedienteMeAdd.isEspecial()}"
+						value="#{messages['button_previous']}"
+						view="#{expedienteMeAdd.ingresoAnteriorSistema ? '/webCustom/mesaEntrada/expediente/add/ingresoAnteriorSistema-Menu-Especial.xhtml' : '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Menu-Especial.xhtml'}">
+						<s:conversationPropagation type="none"/>
+					</s:button>
+				<rich:spacer width="15"/>
+				<h:commandButton id="button-save" style="Xdisplay:none" styleClass="button main-button"
+						value="#{messages['expediente.title.validar']}" 
+						action="#{expedienteMeAdd.doSave0}">
+						<s:defaultAction/>
+					</h:commandButton>
+				
+				<!-- Next Button -->
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPage1()}"
+					value="#{messages['button_next']}" 
+					action="#{expedienteMeAdd.doSave0('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}"/>
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPage2() and not expedienteMeAdd.hasPage1()}"
+					value="#{messages['button_next']}" 
+					action="#{expedienteMeAdd.doSave0('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-2.xhtml')}"/>
+	            <h:commandButton styleClass="button main-button" rendered="#{expedienteMeAdd.hasPageEspecial() and not expedienteMeAdd.hasPage1() and not expedienteMeAdd.hasPage2()}"
+					value="#{messages['button_next']}" 
+					action="#{expedienteMeAdd.doSave0('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial.xhtml')}"/>
+			</div>
+			</s:fragment>
+			</s:div>
+		</ui:define>
+
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

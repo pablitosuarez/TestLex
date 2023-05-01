@@ -1,0 +1,129 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+		<s:decorate id="#{id}mrLines" template="/layout/lines/lines.xhtml">		
+			<ui:param name="label" value="#{label}" />    
+			<ui:param name="icon" value="#{icon}" />
+
+	        <div class="association" id="#{id}ListChildren">
+				<rich:dataTable value="#{editList.list}" 
+	                           var="item" 
+	                      rendered="#{not empty editList.list}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="#{id}ListTable">
+					<f:facet name="header">
+						<rich:columnGroup  rowClasses="rich-table-subheader" style="background-image:none">
+			                <rich:column styleClass="toolbaritem">
+			                    A/D
+			                </rich:column>
+							<rich:column width="500px" styleClass="toolbaritem" >
+								Apellidos
+							</rich:column>
+							<rich:column width="500px" styleClass="toolbaritem" >
+								Nombre
+							</rich:column>
+							<rich:column width="500px" styleClass="toolbaritem" >
+								P.J.
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								T.Doc
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								N.Doc
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								Sexo
+							</rich:column>
+							<rich:column styleClass="toolbaritem" rendered="#{expedienteMeAdd.showNoSaleEnCaratula()}">
+								N.S.
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+					           
+				<rich:subTable  id="editRow" var="instance" value="#{item}">
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+							<h:inputText id="#{id}actorODemandado"
+								size="1"
+								style="text-transform:uppercase; width:18px"
+								styleClass="#{instance.isError('actorODemandado')? 'errorEditField' : ''}"
+								value="#{instance.actorODemandado}"
+								converter="#{upperCaseFilteredConverter}"
+								/>			        
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+			        		<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0">
+							<h:inputText id="#{id}Apellidos"
+								size="70" maxlength="100"
+								style="text-transform:uppercase;"
+								styleClass="#{instance.isError('apellidos')? 'errorEditField' : ''}"
+								disabled="#{instance.interviniente != null}"
+								value="#{instance.apellidos}"
+								converter="#{upperCaseFilteredConverter}"
+								/>
+								<h:commandButton action="#{expedienteMeAdd.intervinienteEditList.doShowSiglaDialog(instance)}" styleClass="siglaModalButton" rendered="#{expedienteMeAdd.usaIntervinientesFrecuentes}">
+								</h:commandButton>
+								</h:panelGrid>
+			        </rich:column>
+			        <rich:column  styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+							<h:inputText id="#{id}Nombre"
+								size="26" maxlength="50"
+								style="text-transform:uppercase;"
+								styleClass="#{instance.isError('nombre')? 'errorEditField' : ''}"
+								value="#{instance.nombre}"
+								converter="#{upperCaseFilteredConverter}"
+								/>			        
+			        </rich:column>
+			        <rich:column width="20px" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+								<h:selectBooleanCheckbox value="#{instance.personaJuridica}"
+								styleClass="#{instance.isError('personaJuridica') ? 'errorEditField' : ''}">
+								</h:selectBooleanCheckbox>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+							<h:selectOneMenu style="width:60px"  id="tipoDocumentoIdentidad" 
+										value="#{instance.tipoDocumento}">
+								<s:selectItems var="lookupItem"
+											 label="#{tipoDocumentoIdentidadEnumeration.labelFor(lookupItem)}"
+											 value="#{tipoDocumentoIdentidadEnumeration.itemsMesa}"
+									noSelectionLabel="...">
+								</s:selectItems>
+								<s:convertEntity/>
+							</h:selectOneMenu>
+											        
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+							<h:inputText id="#{id}numero"
+								size="12" 
+								style="text-transform:uppercase;"
+								styleClass="#{instance.isError('documento')? 'errorEditField' : ''}"
+								value="#{instance.numero}"
+								converter="#{upperCaseFilteredConverter}"
+								/>			        
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}">
+							<h:selectOneMenu id="sex#{id}Id" style="width:95px" layout="pageDirection"
+									styleClass="#{instance.isError('sexo')? 'errorEditField' : ''}"
+									 value="#{instance.sexo}">
+									 <f:selectItems value="#{sexoCivilEnumeration.items}" />
+							</h:selectOneMenu>
+			        </rich:column>
+					<rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" rendered="#{expedienteMeAdd.showNoSaleEnCaratula()}">
+						<h:selectBooleanCheckbox value="#{instance.noSaleEnCaratula}"
+							styleClass="#{instance.isError('noSaleEnCaratula') ? 'errorEditField' : ''}">
+						</h:selectBooleanCheckbox>
+					</rich:column>
+		        </rich:subTable>
+            	</rich:dataTable>
+	        </div>
+
+		</s:decorate>	
+</ui:composition>

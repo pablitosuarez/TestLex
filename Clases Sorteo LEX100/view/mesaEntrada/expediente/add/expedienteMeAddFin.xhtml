@@ -1,0 +1,345 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	template="/layout/template.xhtml">
+
+	<ui:define name="body">
+		<h:form id="causa" enctype="multipart/form-data">
+			<ui:decorate id="form" template="/layout/editFormExpediente.xhtml">
+				<ui:param name="icon" value="edit" />
+				<ui:param name="buttonCaratula"
+					value="expediente:generarCaratulaButton" />
+				<ui:define name="title">
+
+					<span class="titleExpediente">
+						#{expedienteManager.getTitleExpediente()} </span>
+		#{expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion}
+
+		</ui:define>
+				<br />
+				
+                <s:fragment rendered="#{expedienteMeAdd.seleccionaConexidad and not empty conexidadList.byExpedienteOrigenResultList}">
+				<div style="font-size: 1.5em; font-weight: bold">
+					<h:panelGrid columns="2">
+						<h:graphicImage value="/lex100pjn/img/icon48/warning_48.png" />
+						<h:outputText value="Seleccione el expediente conexo que sentará radicación o pulse Sortear" />
+					</h:panelGrid>
+				</div>
+				<div align="right">
+				<h:commandButton styleClass="button main-button"
+					value="#{messages['expedienteMeAdd.button.sortear']}"
+					actionListener="#{expedienteMeAdd.doSortear()}" />
+                </div>
+                </s:fragment>
+				
+				<!-- group sorteo -->
+                <s:fragment rendered="#{not (expedienteMeAdd.seleccionaConexidad and not empty conexidadList.byExpedienteOrigenResultList)}">
+				<ui:decorate template="/layout/group/editGroupCollapsible.xhtml">
+					<ui:param name="label" value="Datos del Expediente" />
+					<ui:param name="id" value="sorteoGroup" />
+
+					<s:decorate id="numeroExpedienteDecoration"
+						template="/layout/edit.xhtml">
+						<ui:define name="label">Número de Expediente</ui:define>
+						<span style="font-size: 1.5em; font-weight: bold">
+							#{expedienteManager.getIdxAnaliticoFirst(expedienteMeAdd.expedienteResultado)} </span>
+					</s:decorate>
+					
+					<s:decorate id="oficinaExpedienteDecoration" rendered="#{not expedienteMeAdd.confirmacionIngresoSimplificada}" template="/layout/edit.xhtml">
+						<ui:define name="label">Oficina asignada</ui:define>
+						<s:fragment rendered="#{expedienteMeAdd.sorteandoExpediente or expedienteMeAdd.forzeRefresh}">
+							<h:graphicImage value="/lex100pjn/img/other/sorteando.gif" />
+							<s:span style="font-size:1.2em"> Sorteando...</s:span>
+						</s:fragment>
+						<s:fragment rendered="#{!expedienteMeAdd.sorteandoExpediente}">
+							<div style="font-size: 1.5em; font-weight: bold">
+								<s:fragment rendered="#{expedienteMeAdd.sorteadoOkExpediente}">
+									<s:fragment rendered="#{expedienteMeAdd.descripcionOficinaRadicacion!=null}">
+										#{expedienteMeAdd.descripcionOficinaRadicacion}
+									</s:fragment>
+								</s:fragment>
+								<s:fragment rendered="#{expedienteMeAdd.sorteadoErrorExpediente}">
+									No ha sido
+									posible sortear el expediente. El servicio de sorteo no esta
+									activo o no hay disponibles oficinas de turno para este
+									expediente.
+								</s:fragment>
+							</div>
+						</s:fragment>
+					</s:decorate>
+					<s:decorate id="fiscaliaExpedienteDecoration" template="/layout/edit.xhtml"
+							rendered="#{expedienteMeAdd.expedienteAsignado and not empty expedienteMeAdd.descripcionFiscaliaAsignada and 
+									not expedienteMeAdd.confirmacionIngresoSimplificada}">
+						<ui:define name="label">Fiscalía</ui:define>
+						<s:fragment rendered="#{not expedienteMeAdd.expedienteAsignado}">
+		             		...
+		             	</s:fragment>
+						<s:fragment rendered="#{expedienteMeAdd.expedienteAsignado}">
+							<div style="font-size: 1.5em; font-weight: bold">
+								#{expedienteMeAdd.descripcionFiscaliaAsignada}
+							</div>
+						</s:fragment>
+					</s:decorate>
+					<s:decorate id="mediadorExpedienteDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.expedienteAsignado and not empty expedienteMeAdd.descripcionMediadorAsignado and not expedienteMeAdd.confirmacionIngresoSimplificada}">
+						<ui:define name="label">Mediador</ui:define>
+						<s:fragment rendered="#{expedienteMeAdd.expedienteAsignado}">
+							<div style="font-size: 1.5em; font-weight: bold">
+								#{expedienteMeAdd.descripcionMediadorAsignado}
+							</div>
+						</s:fragment>
+					</s:decorate>
+					<s:decorate id="tipoAsignacionDecoration"
+						rendered="#{expedienteMeAdd.radicacion != null and not expedienteMeAdd.confirmacionIngresoSimplificada}"
+						template="/layout/edit.xhtml">
+						<ui:define name="label">Tipo Asignación</ui:define>
+						
+						<h:outputText
+							value="(#{expedienteMeAdd.radicacion.tipoAsignacion}) #{tipoAsignacionEnumeration.getLabel(expedienteMeAdd.radicacion.tipoAsignacion, expedienteMeAdd.tipoRadicacion)}" />
+						<h:outputText
+							rendered="#{not empty expedienteMeAdd.expedienteConexo}"
+							value=" - (#{expedienteMeAdd.expedienteConexo.numero} / #{expedienteMeAdd.expedienteConexo.anio})">
+						</h:outputText>
+					</s:decorate>
+
+				</ui:decorate>
+				</s:fragment>
+				<!-- end group sorteo -->
+
+				<ui:define name="collections">
+				</ui:define>
+
+				<ui:define name="buttons">
+					<s:div id="buttonsGroup" styleClass="actionButtons">
+	                <s:fragment rendered="#{not (expedienteMeAdd.seleccionaConexidad and not empty conexidadList.byExpedienteOrigenResultList)}">
+					
+						<h:commandButton style="display:none" styleClass="button main-button"
+							value="#{messages['expedienteMeAdd.button.refreshExpediente']}"
+							actionListener="#{expedienteMeAdd.refreshExpedienteResultado()}">
+							<s:defaultAction />
+						</h:commandButton>
+
+						<h:commandButton styleClass="button main-button" rendered="#{not expedienteMeAdd.confirmacionIngresoSimplificada}"
+							value="#{messages['expedienteMeAdd.button.mostrarExpediente']}"
+							actionListener="#{expedienteMeAdd.refreshExpedienteResultado()}"
+							disabled="#{!expedienteMeAdd.expedienteAsignado}"
+							action="/web/expediente/expedienteCompleto.xhtml" />
+
+						<h:commandButton styleClass="button" value="#{messages['expedienteMeAdd.button.imprimirCaratula']}" rendered="#{not expedienteMeAdd.confirmacionIngresoSimplificada and not expedienteManager.isMediacion(expedienteMeAdd.expedienteResultado)}"
+							actionListener="#{expedienteMeAdd.refreshExpedienteResultado()}"
+							action="#{caratulaReportManager.downloadCaratula(expedienteMeAdd.expedienteResultado)}" />
+
+						<h:commandButton styleClass="button" value="#{messages['imprimir.etiqueta.mediacion']}" rendered="#{not expedienteMeAdd.confirmacionIngresoSimplificada and expedienteManager.isMediacion(expedienteMeAdd.expedienteResultado)}"
+							actionListener="#{expedienteMeAdd.refreshExpedienteResultado()}"
+							action="#{etiquetaMediacionReportManager.downloadEtiquetaMediacion(expedienteMeAdd.expedienteResultado)}" />
+
+						<a4j:commandButton value="#{messages['expedienteMeAdd.button.mostrarDenuncia']}"
+							actionListener="#{expedienteMeAdd.doShowDenuncia()}"
+							styleClass="button" ajaxSingle="true" reRender="denunciaDialog"
+							rendered="#{expedienteManager.isPenal(expedienteMeAdd.expedienteResultado) and expedienteManager.isDenuncia(expedienteMeAdd.expedienteResultado)}" />
+
+						<h:commandButton styleClass="button main-button"
+							value="#{messages['expedienteMeAdd.button.imprimirDenuncia']}"
+							actionListener="#{expedienteMeAdd.refreshExpedienteResultado()}"
+							action="#{certificadoGenericoReportManager.downloadCertificadoDenunciaHechos(expedienteMeAdd.expedienteResultado)}"
+							rendered="#{expedienteManager.isPenal(expedienteMeAdd.expedienteResultado) and expedienteManager.isDenuncia(expedienteMeAdd.expedienteResultado)}" />
+
+						<h:commandButton  value="#{messages['expedienteMeAdd.button.constanciaSorteoSala']}"
+							styleClass="button main-button" 
+							rendered="#{(expedienteMeAdd.sorteadoOkExpediente and expedienteMeAdd.ingresoASala) and s:hasPermission('Expediente','verConstanciaSorteoSala') and not expedienteMeAdd.camaraCivilNacional}"
+							actionListener="#{constanciaSorteoReportManager.downloadConstancia('constanciaSorteoSala.jrxml', expedienteMeAdd.expedienteResultado)}" />
+							 
+						<h:commandButton styleClass="button main-button"
+							value="#{messages['expedienteMeAdd.button.ingresoTasa']}"
+							rendered="#{s:hasPermission('TasaExp','add') and camaraManager.isCamaraAdmiteTasaJusticiaEnMesa()}"
+							actionListener="#{expedienteMeAdd.ingresarTasa()}"
+							action="/web/tasaExp/tasaExpEdit.xhtml" />
+							
+						<s:button styleClass="button main-button"
+							value="#{messages['expedienteMeAdd.button.ingresoNuevoExpediente']}"
+							view="/webCustom/mesaEntrada/expediente/add/expedienteMeAddNewAction-Civil.xhtml"
+							rendered="#{not expedienteManager.isPenal(expedienteMeAdd.expedienteResultado) and oficinaManager.isMesaDeEntrada(oficinaManager.oficinaActual)}"
+							propagation="none" />
+							
+						<h:commandButton styleClass="button main-button"
+							value="#{messages['expedienteMeAdd.button.copiaNuevoExpediente']}"
+							rendered="#{not expedienteManager.isPenal(expedienteMeAdd.expedienteResultado)}"
+							action="#{expedienteMeAdd.doCopiaExpediente('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-0.xhtml', '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml', '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial.xhtml', '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial-0.xhtml')}"/>
+					</s:fragment>
+					</s:div>
+				</ui:define>
+			</ui:decorate>
+
+			<s:div id="conexidadExpGroup" styleClass="indent_lines">
+				<!-- group conexidadExpGroup -->
+				<s:decorate id="conexidadListLines"
+					template="/layout/lines/lines.xhtml"
+					rendered="#{not expedienteMeAdd.isIngresoAnteriorSistema() and expedienteMeAdd.showConexidad()}">
+					<ui:param name="label"
+						value="#{expedienteManager.isConexidadInformativa(expedienteMeAdd.expedienteResultado) ?  messages['expediente.conexidadInformativa'] : messages['expediente.conexidad']}" />
+					<ui:param name="icon" value="conexidad" />
+					<ui:param name="initialState"
+						value="#{empty conexidadList.byExpedienteOrigenResultList? 'closed':'open'}" />
+	
+					<div class="association" id="conexidadListChildren">
+						<ui:define name="emptyMessage">
+							<h:outputText
+								value="#{expedienteManager.getConexidadDeclaradaDescripcion(expedienteMeAdd.expedienteResultado)}"
+								styleClass="emptyMessage"
+								style="margin-bottom: 10px;"
+								rendered="#{expedienteMeAdd.showConexidadDeclarada() and expedienteManager.hasConexidadDeclarada(expedienteMeAdd.expedienteResultado)}" />
+	
+							<h:outputText 
+								value="#{messages['expediente.conexidadInformativa.list_none']}"
+								styleClass="emptyMessage"
+								rendered="#{empty conexidadList.byExpedienteOrigenResultList}" />
+						</ui:define>
+						<rich:dataTable
+							value="#{conexidadList.byExpedienteOrigenResultList}"
+							var="conexidad"
+							rendered="#{not empty conexidadList.byExpedienteOrigenResultList}"
+							rowClasses="rvgRowOne,rvgRowTwo" id="conexidadListTable">
+							<rich:column styleClass="rowColumn" rendered="#{!expedienteManager.isConexidadInformativa(expedienteMeAdd.expedienteResultado)}">
+								<f:facet name="header">
+									<s:link
+										styleClass="#{conexidadList.getOrderStyle('tipo', 'arrow-down', 'arrow-up', '')}"
+										value="#{messages['conexidad.tipo.shortLabel']}">
+										<f:param name="conexidadOrder"
+											value="#{conexidadList.getOrderParam('tipo')}" />
+									</s:link>
+								</f:facet>
+								<h:outputText
+									value="#{conexidadManager.getDescripcionTipo(conexidad)}" />
+								<br />
+							</rich:column>
+							<rich:column styleClass="rowColumn align-right">
+								<f:facet name="header">
+								#{messages['conexidad.orden.shortLabel']}
+							</f:facet>
+				            #{conexidad.orden}
+							<br />
+							</rich:column>
+							<rich:column styleClass="rowColumn">
+								<f:facet name="header">
+								#{messages['conexidad.expedienteRelacionado.shortLabel']}
+							</f:facet>
+								<s:fragment rendered="#{conexidad.expedienteRelacionado != null}">
+					            #{expedienteManager.getNumeroExpedienteAbreviado(conexidad.expedienteRelacionado, true)}
+							</s:fragment>
+								<br />
+							</rich:column>
+							<rich:column styleClass="rowColumn">
+								<f:facet name="header">
+								#{messages['expediente.caratula']}
+							</f:facet>
+								<s:fragment rendered="#{conexidad.expedienteRelacionado != null}">
+					            #{conexidad.expedienteRelacionado.caratula}
+							</s:fragment>
+								<br />
+							</rich:column>
+							<rich:column styleClass="rowColumn">
+								<f:facet name="header">
+	                             #{messages['oficina']}
+							</f:facet>
+								<s:fragment
+									rendered="#{conexidad.expedienteRelacionado != null}">
+					            #{expedienteManager.getDescripcionOficinaByRadicacion(conexidad.expedienteRelacionado, expedienteMeAdd.tipoRadicacionValue)}
+							</s:fragment>
+								<br />
+							</rich:column>
+							<rich:column styleClass="rowColumn">
+								<f:facet name="header">
+								#{messages['conexidad.criterios']}
+								</f:facet>
+					            #{conexidad.criteriosName}
+								<br />
+							</rich:column>
+					        <rich:column styleClass="rowColumn">
+								<f:facet name="header">
+		                             #{messages['conexidad.coincidencias.shortLabel']}
+								</f:facet>
+				    	        #{conexidad.coincidencias}
+								<br/>
+					        </rich:column>
+				        <rich:column rendered="#{expedienteMeAdd.seleccionaConexidad}">
+							<f:facet name="header">
+			            		<span/>
+							</f:facet>
+				            <h:commandLink action="#{expedienteMeAdd.doConexidadSelection(conexidad)}" 
+				            				onclick="return confirm('#{messages['expedienteMeAdd.confirmarAsignacionConexidad']}');"
+											title="#{messages['list_select']}">
+								<h:graphicImage value="/img/icon/select_right.gif"/>
+				            </h:commandLink>
+				        </rich:column>
+						</rich:dataTable>
+					</div>
+				    <ui:define name="paginator">
+						<s:decorate template="/layout/listPaginator.xhtml">
+				  			<ui:param name="paginator" value="#{conexidadList.getPaginator(conexidadList)}"/>
+				  			<ui:param name="componentName" value="conexidad"/>
+				  		</s:decorate>
+					</ui:define>
+				</s:decorate>
+				<!-- end group conexidadExpGroup -->
+			</s:div>
+			<a4j:queue size="10" />
+			<a4j:poll id="poll" interval="2000" enabled="true" ajaxSingle="true"
+				rendered="#{expedienteMeAdd.sorteandoExpediente}"
+				reRender="sorteoGroup, conexidadExpGroup, buttonsGroup"
+				actionListener="#{expedienteMeAdd.refreshExpedienteResultado()}" />
+		</h:form>
+
+		<!--  Denuncia Dialog -->
+
+		<ui:decorate template="/layout/group/groupModalDialog400.xhtml">
+			<ui:param name="dialogName" value="denuncia" />
+			<ui:param name="headerTitle"
+				value="#{messages['expedienteMasivo.dialog.modificarDenuncia.title']}" />
+			<ui:param name="entityHome" value="#{expedienteHome}" />
+			<ui:param name="renderedExpression"
+				value="#{expedienteMeAdd.showDenunciaModal}" />
+			<h:form id="denuncia" enctype="multipart/form-data">
+				<!-- group editSituacion -->
+				<ui:decorate template="/layout/group/editGroupAuto.xhtml">
+					<ui:decorate template="/layout/group/editGroupBox.xhtml">
+						<ui:define name="label">#{messages['expedienteEspecial.declaracionHecho']}</ui:define>
+						<h:inputTextarea id="expedienteEspecialDeclaracionHecho"
+							cols="120" rows="20"
+							value="#{expedienteMeAdd.expedienteResultado.expedienteEspecial.declaracionHecho}" />
+						<h:selectBooleanCheckbox
+							value="#{expedienteMeAdd.expedienteResultado.expedienteEspecial.denunciaFirmada}" />
+				#{messages['expedienteEspecial.denunciaFirmada']}
+			</ui:decorate>
+
+					<s:div style="text-align:center;">
+						<h:panelGroup>
+							<h:commandButton value="#{messages['button_save']}"
+								styleClass="button" action="#{expedienteMeAdd.doSaveDenuncia()}"
+								onclick="#{rich:component('waitDialog')}.show();" />
+
+							<a4j:commandButton value="#{messages['button_cancel']}"
+								actionListener="#{expedienteMeAdd.doHideDenuncia()}"
+								styleClass="button" ajaxSingle="true" reRender="denunciaDialog" />
+						</h:panelGroup>
+					</s:div>
+				</ui:decorate>
+			</h:form>
+		</ui:decorate>
+
+		<!--  Denuncia Dialog -->
+
+
+
+
+	</ui:define>
+
+
+</ui:composition>

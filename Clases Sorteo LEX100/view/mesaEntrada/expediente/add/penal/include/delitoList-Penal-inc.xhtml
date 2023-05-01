@@ -1,0 +1,183 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+		<s:decorate id="#{id}Lines" template="/layout/lines/lines.xhtml">		
+			<ui:param name="label" value="#{label}" />    
+			<ui:param name="icon" value="#{icon}" />
+
+	        <div class="association" id="#{id}ListChildren">
+				<a4j:region>
+				<rich:dataTable value="#{editList.list}" 
+	                           var="item" 
+	                      rendered="#{not empty editList.list}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="#{id}ListTable">
+					<f:facet name="header">
+						<rich:columnGroup  rowClasses="rich-table-subheader" style="background-image:none">
+							<rich:column styleClass="toolbaritem" style="padding:0px" width="1">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							<rich:column width="500px" styleClass="toolbaritem" >
+								#{messages['expedienteMe.delito.shortLabel']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['expedienteMe.tentativa']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['expedienteMe.enConcurso']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" width="1">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+					           
+				<rich:subTable  id="editRow" var="instance" value="#{editList.tmpInstance}" rendered="#{editList.isEditing(item)}">
+			        <rich:column width="1" styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" >
+			            <a4j:commandLink actionListener="#{editList.doSaveLine}" eventsQueue="editLine"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="#{id}ListTable">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column> 
+
+			        <rich:column width="500px" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<table cellpadding="2" cellspacing="0">
+						<tr>
+						<td>
+								<h:inputText id="#{id}Codigo" rendered="false"
+									size="6"
+									styleClass="#{instance.isError('codigo')? 'errorEditField' : ''}"
+									disabled="#{instance.delito != null}"
+									value="#{instance.codigo}"
+									/>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" >
+                		<h:inputText id="delito"
+                				size="100"
+                				  value="#{instance.delito}" 
+							  converter="delitoEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+                			onclick="#{rich:component('delitoSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>
+					<rich:suggestionbox height="400" width="400" id="delitoSuggestion" for="delito" suggestionAction="#{delitoEnumeration.autocomplete}" 
+						var="delito">
+						<h:column>
+							<h:outputText value="#{delitoEnumeration.labelFor(delito)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{delito}" target="#{delitoEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{delito}" target="#{instance.delito}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+					</td><td>
+		       	    		<h:commandLink style="margin-right:5px"
+								rendered="#{instance.delito == null}"
+			    	    	    action="#{expedienteMeAdd.lookupAddToDelitoListMultiple('/web/delito/delitoLeyesList.xhtml', '/webCustom/mesaEntrada/expediente/add/penal/expedienteMeAdd-Penal-1.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif" style="vertical-align:top"/>
+							<s:conversationPropagation type="join" />
+		       	    		</h:commandLink>
+		       	    		<a4j:commandLink style="margin-right:5px"  eventsQueue="editLine" ajaxSingle="true"
+								rendered="#{instance.delito != null}"
+			    	    	    actionListener="#{expedienteMeAdd.clearDelito()}">
+		        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+							<s:conversationPropagation type="join" />
+		       	    		</a4j:commandLink>
+						</td>
+						</tr>
+						</table>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:decorate id="tentativa#{id}Decoration" template="/layout/table/edit.xhtml" >
+							<h:selectBooleanCheckbox value="#{instance.tentativa}" />
+						</s:decorate>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:decorate id="enConcurso#{id}Decoration" template="/layout/table/edit.xhtml" >
+						
+						
+							<h:selectOneMenu value="#{instance.enConcurso}" layout="pageDirection">
+								<f:selectItem itemLabel="Seleccionar ..." itemValue=""/>
+								<f:selectItem itemLabel="54 - Ideal" itemValue="54"/>
+								<f:selectItem itemLabel="55 - Real" itemValue="55"/>
+							</h:selectOneMenu>						
+						</s:decorate>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"
+						      rendered="#{true and s:hasPermission('ExpedienteIngreso','update')}">
+			            <a4j:commandLink actionListener="#{editList.onCancelLine}" eventsQueue="editLine"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="#{id}ListTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="item" value="#{item}" rendered="#{not editList.isEditing(item)}">
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or parteSearch.hasSelectionPage()}">
+			            <a4j:commandLink action="#{editList.onEditLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{!editList.isNew(item)}"
+									   reRender="#{id}ListTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{editList.onEditLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_new']}"
+									   rendered="#{editList.isNew(item)}"
+									   reRender="#{id}ListTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}"  >
+			            <h:outputText value="#{editList.getDelitoLongDescription(item)}"/>
+			        </rich:column>
+			        <rich:column style="text-align:center" styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}"  >
+						<h:graphicImage value="/img/icon/check.png" rendered="#{item.tentativa}" />							
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}"  >
+			            <h:outputText value="#{item.enConcurso}"/>
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}"
+						      >
+			            <h:commandLink action="#{editList.onDeleteLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{!editList.isNew(item)}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="#{id}ListTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+
+		</s:decorate>	
+</ui:composition>

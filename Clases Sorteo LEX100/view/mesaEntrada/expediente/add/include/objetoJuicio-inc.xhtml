@@ -1,0 +1,124 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<!-- group objetoJuicioGroup -->
+	<s:fragment rendered="#{!expedienteMeAdd.isPermiteDescripcionObjetoJuicio()}">
+				<s:decorate id="objetoJuicioDecoration1" template="/layout/editShort.xhtml" >
+					<ui:define name="label">#{messages['expedienteMe.objetoJuicio']}</ui:define>
+					<h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" >
+                		<h:inputText id="objetoJuicio"
+                			size="120"
+                			value="#{expedienteMeAdd.objetoJuicio}"
+                			onfocus="this.select();" 
+							converter="objetoJuicioEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+                			onclick="#{rich:component('objetoJuicioSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+
+	       	    		<h:commandLink style="margin-left:5px"
+		    	    	    action="#{expedienteMeAdd.lookupObjetoJuicio('/web/objetoJuicio/objetoJuicioList.xhtml', '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}">
+	        	    	    <h:graphicImage value="/img/icon/lookup-button.gif" style="vertical-align:top"/>
+						<s:conversationPropagation type="join" />
+	       	    		</h:commandLink>
+	       	    		<a4j:commandLink style="margin-left:5px"  eventsQueue="editLine" ajaxSingle="true"
+							rendered="#{expedienteMeAdd.objetoJuicio != null}"
+							reRender="objetoJuicioDecoration1, intLines"
+		    	    	    actionListener="#{expedienteMeAdd.clearObjetoJuicio()}">
+	        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+						<s:conversationPropagation type="join" />
+	       	    		</a4j:commandLink>
+            		</h:panelGrid>
+					<rich:suggestionbox height="400" width="400" id="objetoJuicioSuggestion" for="objetoJuicio" 
+						suggestionAction="#{objetoJuicioEnumeration.autocomplete}" 
+						
+						var="objetoJuicio">
+						<h:column>
+							<h:outputText value="#{objetoJuicioEnumeration.labelFor(objetoJuicio)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="objetoJuicioDecoration1, intLines, actionButtons, objetosAbogados, tipoProcesoAdd" ajaxSingle="true" 
+ 	                    		oncomplete="jQuery('.letradoTomoClassSelector').focus()" >
+ 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{objetoJuicioEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{expedienteMeAdd.objetoJuicio}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+				</s:decorate>
+          </s:fragment>
+            		
+           <s:fragment rendered="#{expedienteMeAdd.isPermiteDescripcionObjetoJuicio()}">
+				<s:decorate id="objetoJuicioDecoration2" template="/layout/editShort.xhtml" >
+					<ui:define name="label">#{messages['expedienteMe.objetoJuicio']}</ui:define>
+					<h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" >
+                		<h:inputText id="objetoJuicio"
+                				size="120"
+                				  value="#{expedienteMeAdd.objetoJuicio}" 
+							  converter="objetoJuicioEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+                			onclick="#{rich:component('objetoJuicioSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+
+	       	    		<h:commandLink style="margin-left:5px"
+		    	    	    action="#{expedienteMeAdd.lookupObjetoJuicio('/web/objetoJuicio/objetoJuicioList.xhtml', '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}">
+	        	    	    <h:graphicImage value="/img/icon/lookup-button.gif" style="vertical-align:top"/>
+						<s:conversationPropagation type="join" />
+	       	    		</h:commandLink>
+	       	    		<a4j:commandLink style="margin-left:5px"  eventsQueue="editLine" ajaxSingle="true"
+							rendered="#{expedienteMeAdd.objetoJuicio != null}"
+							reRender="objetoJuicioDecoration2, intLines"
+		    	    	    actionListener="#{expedienteMeAdd.clearObjetoJuicio()}">
+	        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+						<s:conversationPropagation type="join" />
+	       	    		</a4j:commandLink>
+            		</h:panelGrid>
+					<rich:suggestionbox height="400" width="400" id="objetoJuicioSuggestion" for="objetoJuicio" 
+						suggestionAction="#{objetoJuicioEnumeration.autocomplete}" 						
+						var="objetoJuicio">
+						<h:column>
+							<h:outputText value="#{objetoJuicioEnumeration.labelFor(objetoJuicio)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="objetoJuicioDecoration2, intLines, actionButtons, objetosAbogados, tipoProcesoAdd" ajaxSingle="true"
+ 	                    		oncomplete="jQuery('.descripcionOJClassSelector').focus()" >
+ 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{objetoJuicioEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{expedienteMeAdd.objetoJuicio}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+				</s:decorate>
+				<s:decorate template="/layout/editShort.xhtml" rendered="#{expedienteMeAdd.isPermiteDescripcionObjetoJuicio()}">
+							<ui:define name="label">#{messages['expedienteMe.descripcionObjetoJuicio']}</ui:define>
+	                		<h:inputText id="descripcionObjetoJuicio"
+	                				styleClass="descripcionOJClassSelector"
+	                				size="120"
+	                				  value="#{expedienteMeAdd.descripcionObjetoJuicio}" >
+	                		</h:inputText>
+				</s:decorate> 
+    </s:fragment>            									
+	<!-- end group objetoJuicioGroup -->
+	
+	<!-- group tipoProceso -->
+	<s:div id="tipoProcesoAdd">
+		<s:fragment rendered="#{!expedienteMeAdd.isCamaraCorteSuprema() and !expedienteMeAdd.isPenal() and expedienteMeAdd.objetoJuicio!=null}">
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/add/include/tipoProceso-inc.xhtml'}"/>
+		</s:fragment>
+	</s:div>
+	<!-- end group tipoProceso -->	
+	
+</ui:composition>

@@ -1,0 +1,143 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+		<s:decorate id="#{id}Lines" template="/layout/lines/lines.xhtml">		
+			<ui:param name="label" value="#{label}" />    
+			<ui:param name="icon" value="#{icon}" />
+  
+	        <div class="association" id="#{id}ListChildren">
+				<a4j:region>
+				<rich:dataTable value="#{editList.list}" 
+	                           var="item" 
+	                      rendered="#{not empty editList.list}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="#{id}ListTable">
+					<f:facet name="header">
+						<rich:columnGroup  rowClasses="rich-table-subheader" style="background-image:none">
+							<rich:column styleClass="toolbaritem" style="padding:0px" width="1">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							<rich:column width="500px" styleClass="toolbaritem" >
+								#{messages['tipoMedidaDespacho.descripcion']}
+							</rich:column>
+						
+							<rich:column styleClass="toolbaritem" width="1">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>
+					           
+				<rich:subTable  id="editRow" var="instance" value="#{editList.tmpInstance}" rendered="#{editList.isEditing(item) and tipoMedidaDocumentoExpHome.editing}">
+			        <rich:column width="1" styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" >
+			            <a4j:commandLink actionListener="#{editList.doSaveLine}" eventsQueue="editLine"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="#{id}ListTable" >
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column> 
+
+			        <rich:column width="500px" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<table cellpadding="2" cellspacing="0">
+						<tr>
+						<td>
+								
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" >
+                		<h:inputText id="tipoMedida"
+                					 size="100"
+                				     value="#{instance.tipoMedida}"  converter="tipoMedidaEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+                			onclick="#{rich:component('tipoMedidaSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>
+					<rich:suggestionbox height="400" width="400" id="tipoMedidaSuggestion" for="tipoMedida" suggestionAction="#{tipoMedidaEnumeration.autocomplete}" 
+						var="tipoMedida" >
+						<h:column>
+							<h:outputText value="#{tipoMedidaEnumeration.labelFor(tipoMedida)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{tipoMedida}" target="#{tipoMedidaEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{tipoMedida}" target="#{instance.tipoMedida}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+					</td><td>
+		       	    		<a4j:commandLink style="margin-right:5px"  eventsQueue="editLine" ajaxSingle="true"
+								rendered="#{instance.descripcion != null}"
+			    	    	    actionListener="#{tipoMedidaDocumentoExpHome.clear()}">
+		        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+							<s:conversationPropagation type="join" />
+		       	    		</a4j:commandLink>
+						</td>
+						</tr>
+						</table>
+			        </rich:column>
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}">
+			            <a4j:commandLink actionListener="#{editList.onCancelLine}" eventsQueue="editLine" 
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="#{id}ListTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="item" value="#{item}" rendered="#{not editList.isEditing(item)}">
+			        <rich:column width="1" styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}">
+			            <a4j:commandLink action="#{editList.onEditLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{!editList.isNew(item)}"
+									   reRender="#{id}ListTable"
+									   disabled="#{!tipoMedidaDocumentoExpHome.editing}">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{editList.onEditLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_new']}"
+									   rendered="#{editList.isNew(item)}"
+									   reRender="#{id}ListTable"
+									   disabled="#{!tipoMedidaDocumentoExpHome.editing}">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}"  >
+			        	<h:outputText value="#{item.descripcion}"/>
+			        </rich:column>
+				    <rich:column width="1" styleClass="topAlign #{editList.isNew(item) ? 'newRowColumn' : 'rowColumn'}">
+			            <h:commandLink action="#{editList.onDeleteLine(item)}" eventsQueue="editLine"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{!editList.isNew(item)}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="#{id}ListTable"
+									   disabled="#{!tipoMedidaDocumentoExpHome.editing}">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+
+		</s:decorate>	
+</ui:composition>

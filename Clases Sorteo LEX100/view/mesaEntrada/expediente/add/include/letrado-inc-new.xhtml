@@ -1,0 +1,297 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<ui:decorate template="/layout/group/editGroupContainer.xhtml" >
+       	<ui:param name="label" value="#{label}"/>
+		<ui:param name="id" value="abogadosGroup"/>
+
+		<s:fragment rendered="true">
+
+		<s:decorate id="abogadoListLines" template="/layout/lines/lines.xhtml">		
+			<ui:param name="label" value="#{label}" />    
+			<ui:param name="icon" value="letrado" />
+			<ui:param name="initialState" value="#{empty editList.list? 'closed':'open'}" />    
+
+	        <div class="association" id="abogadoListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['expedienteMe.abogadoList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty editList.list}"/>
+		        </ui:define>
+
+				<a4j:region>
+				<rich:dataTable value="#{editList.list}" 
+	                           var="abogado" 
+	                      rendered="#{not empty editList.list}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="abogadoListTable">
+					<f:facet name="header">
+						<rich:columnGroup  rowClasses="rich-table-subheader" style="background-image:none">
+							<rich:column styleClass="toolbaritem" />
+							<rich:column styleClass="toolbaritem" style="padding:0px" width="1">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['abogado.tipoLetrado.tipo']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['letrado.tomo.shortLabel']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['letrado.folio.shortLabel']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['letrado.nombre.shortLabel']}
+							</rich:column>							
+			                <rich:column styleClass="toolbaritem">
+			                    #{messages['abogado.tipoDocumento.shortLabel']}
+			                </rich:column>
+			                <rich:column styleClass="toolbaritem">
+			                    #{messages['abogado.documento.shortLabel']}
+			                </rich:column>
+							<rich:column styleClass="toolbaritem" width="1">
+			            		<span/>
+							</rich:column>
+							<rich:column styleClass="toolbaritem" width="1">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>           
+				<rich:subTable  id="editRow" var="instance" value="#{editList.tmpInstance}" rendered="#{editList.isEditing(abogado)}">
+	       	    	<rich:column width="1" styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or abogadoSearch.hasSelectionPage()}">	
+	       	    		<h:commandLink immediate="false" 
+	       	    				title="#{messages['list_search']}"
+		    	    	    	action="#{expedienteMeAdd.lookupVFletrado(instance, '/web/vfLetrado/vfLetradoList.xhtml', retPage)}">
+	        	    	    <h:graphicImage value="/img/icon/lookup-button.gif" style="vertical-align:top"/>
+						<s:conversationPropagation type="join" />
+		       	    	</h:commandLink>
+			        </rich:column> 
+			        <rich:column width="1" styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or abogadoSearch.hasSelectionPage()}">
+			            <a4j:commandLink actionListener="#{editList.doSaveLine}" eventsQueue="editLine"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="abogadoListTable">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+					</rich:column>
+
+			        <rich:column styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" 
+			        			 rendered="#{!oficinaManager.isElectoral(oficinaManager.instance().getOficinaActual())}">
+						<s:decorate id="tipoLetradoDecoration" template="/layout/table/edit.xhtml" >
+								<h:selectOneMenu id="tipoLetrado"
+											 value="#{instance.tipoLetrado}">
+									<f:selectItem itemLabel="P" itemValue="P"/>
+									<f:selectItem itemLabel="A" itemValue="A"/>
+									<f:selectItem itemLabel="D" itemValue="D"/>
+									<f:selectItem itemLabel="G" itemValue="G"/>
+									
+						        	<rich:toolTip for="tipoLetrado">
+						        		#{messages['abogado.tipoLetrado.tipo.tooltip']}
+						        	</rich:toolTip>
+
+								</h:selectOneMenu>
+						</s:decorate>
+			        </rich:column>			        			        
+
+			        <rich:column styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" 
+			        			 rendered="#{oficinaManager.isElectoral(oficinaManager.instance().getOficinaActual())}">
+						<s:decorate id="tipoLetradoElectoralDecoration" template="/layout/table/edit.xhtml" >
+								<h:selectOneMenu id="tipoLetradoElectoral"
+											 value="#{instance.tipoLetrado}">
+									<f:selectItem itemLabel="P" itemValue="P"/>
+									<f:selectItem itemLabel="A" itemValue="A"/>
+									<f:selectItem itemLabel="D" itemValue="D"/>
+									<f:selectItem itemLabel="E" itemValue="E"/>
+									<f:selectItem itemLabel="G" itemValue="G"/>
+									
+						        	<rich:toolTip for="tipoLetradoElectoral">
+						        		#{messages['abogado.tipoLetrado.tipo.tooltip.electoral']}
+						        	</rich:toolTip>
+
+								</h:selectOneMenu>
+						</s:decorate>
+			        </rich:column>			        			        
+
+			        <rich:column styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:decorate id="tomoDecoration" template="/layout/table/edit.xhtml" >
+										<h:inputText id="letradoTomo"
+												size="4"
+											styleClass="#{instance.isError('tomoFolio')? 'errorEditField' : ''}"
+												disabled="#{instance.vfletrado != null}"
+												  value="#{instance.tomo}"/>
+						</s:decorate>
+			        </rich:column>
+
+			        <rich:column styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:decorate id="folioDecoration" template="/layout/table/edit.xhtml" >
+							<h:inputText id="letradoFolio"
+									size="4"
+									styleClass="#{instance.isError('tomoFolio') ? 'errorEditField' : ''}"
+									disabled="#{instance.vfletrado != null}"
+									  value="#{instance.folio}"
+									/>
+		       	    	</s:decorate>
+			        </rich:column>
+			        
+			        <rich:column styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:decorate id="vfletradoDecoration" template="/layout/table/edit.xhtml" >
+						<table cellpadding="0" cellspacing="0">
+						<tr><td>
+							<h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" >
+		                		<h:inputText id="vfLetrado"
+		                				size="65"
+		                				  value="#{instance.vfletrado}" 
+									  converter="#{vfLetradoEnumerationConverter}">
+		                		</h:inputText>
+		                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+		                			onclick="#{rich:component('vfLetradoSuggestion')}.callSuggestion(true)"
+		                    		alt="" />
+		            		</h:panelGrid>
+							<rich:suggestionbox height="400" width="400" id="vfLetradoSuggestion" for="vfLetrado" suggestionAction="#{vfLetradoEnumeration.autocomplete}" 
+								var="vfLetrado">
+								<h:column>
+									<h:outputText value="#{vfLetradoEnumeration.labelFor(vfLetrado)}"/>
+								</h:column>
+		 	                    <a4j:support event="onselect" reRender="capaBotonesList, vfletradoDecoration, tomoDecoration, folioDecoration, tipoDocumentoDecoration, matriculaDecoration" ajaxSingle="true">
+		 	                    	<f:setPropertyActionListener value="#{vfLetrado}" target="#{vfLetradoEnumeration.selected}" >
+		 	                    		<s:convertEntity/>
+		 	                    	</f:setPropertyActionListener>
+		 	                    	<f:setPropertyActionListener value="#{vfLetrado}" target="#{instance.vfletrado}" >
+		 	                    		<s:convertEntity/>
+		 	                    	</f:setPropertyActionListener>
+		 	                    </a4j:support>
+							</rich:suggestionbox>
+						</td><td>
+						</td></tr>
+						</table>
+						</s:decorate>
+			        </rich:column>
+			        
+			        <rich:column styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:decorate id="tipoDocumentoDecoration" template="/layout/table/edit.xhtml" >
+								<h:selectOneMenu id="tipoDocumentoLetrado"
+											styleClass="#{instance.isError('tipoDocumento') ? 'errorEditField' : ''}"
+ 											disabled="false"
+											 value="#{instance.tipoDocumento}">
+									<f:selectItems value="#{tipoDocumentoLetradoEnumeration.getItems(messages['lookup_select'])}" />
+								</h:selectOneMenu>
+						</s:decorate>
+			        </rich:column>			        			        
+
+			        <rich:column styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+			            <s:decorate id="matriculaDecoration" template="/layout/table/edit.xhtml" >
+										<h:inputText id="letradoDocumento"
+												size="20"
+										styleClass="#{instance.isError('documento') ? 'errorEditField' : ''}"
+ 											disabled="false"
+											value="#{instance.documento}"/>
+            			</s:decorate>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"
+						      rendered="#{true and s:hasPermission('ExpedienteIngreso','update')}">
+						<s:div id="capaBotonesList">
+				            <a4j:commandLink style="margin-right:5px" actionListener="#{editList.searchVfLetrado()}"  eventsQueue="editProperty" 
+				            	reRender="capaBotonesList, vfletradoDecoration, tomoDecoration, folioDecoration, tipoDocumentoDecoration, matriculaDecoration"
+								rendered="#{instance.vfletrado == null}">
+								<h:graphicImage value="/lex100pjn/img/icon/edit_16-4.png" style="vertical-align:top"/>
+								<s:conversationPropagation type="join"/>
+							</a4j:commandLink>      	  
+							 <a4j:commandLink style="margin-right:5px"  eventsQueue="editProperty" ajaxSingle="true" 
+							 	reRender="capaBotonesList, vfletradoDecoration, tomoDecoration, folioDecoration, tipoDocumentoDecoration, matriculaDecoration"
+								rendered="#{instance.vfletrado != null}"
+								actionListener="#{editList.clearVFletrado()}">
+								<h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+								<s:conversationPropagation type="join" />
+							</a4j:commandLink>
+						</s:div> 
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{editList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"
+						      rendered="#{true and s:hasPermission('ExpedienteIngreso','update')}">
+			            <a4j:commandLink actionListener="#{editList.onCancelLine}" eventsQueue="editLine"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="abogadoListTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="abogado" value="#{abogado}" rendered="#{not editList.isEditing(abogado)}">
+					<rich:column width="1" styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or abogadoSearch.hasSelectionPage()}"/>
+			        <rich:column width="1" styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or abogadoSearch.hasSelectionPage()}">
+			            <a4j:commandLink action="#{editList.onEditLine(abogado)}" eventsQueue="editLine"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{!editList.isNew(abogado)}"
+									   reRender="abogadoListTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{editList.onEditLine(abogado)}" eventsQueue="editLine"
+										  title="#{messages['list_new']}"
+									   rendered="#{editList.isNew(abogado)}"
+									   reRender="abogadoListTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:fragment rendered="#{abogado.tipoLetrado != null}">
+
+			            #{abogado.tipoLetrado}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"  >
+			            #{abogado.tomo}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"  >
+			            #{abogado.folio}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"  >
+			            #{abogado.nombre} 
+			            <s:fragment rendered="#{abogado.inhabilitado}"> (Inhabilitado)</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"  >
+			            #{abogado.tipoDocumentoLabel}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"  >
+			            #{abogado.documento}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"  >
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{editList.isNew(abogado) ? 'newRowColumn' : 'rowColumn'}"
+						      rendered="#{true and s:hasPermission('ExpedienteIngreso','update')}">
+			            <h:commandLink action="#{editList.onDeleteLine(abogado)}" eventsQueue="editLine"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{!editList.isNew(abogado) and s:hasPermission('ExpedienteIngreso','update')}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="abogadoListTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+
+		</s:decorate>
+		</s:fragment>
+	</ui:decorate>
+</ui:composition>

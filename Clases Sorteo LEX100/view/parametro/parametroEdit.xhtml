@@ -1,0 +1,165 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="parametro" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{parametroHome.managed ? messages['parametro.edit'] : messages['parametro.add']}" />    
+		<ui:param name="description" value="#{messages['parametro.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+			<s:decorate id="camaraDecoration" template="/layout/edit.xhtml" rendered="#{empty sessionState.globalCamara}">
+					<ui:define name="label">#{messages['parametro.camara']}</ui:define>
+					<h:selectOneMenu id="camara"
+							  rendered="#{parametroHome.hasEditPermission('Parametro','add','update')}"
+								 value="#{parametroHome.instance.camara}">
+						<s:selectItems var="lookupItem"
+									 label="#{camaraEnumeration.labelFor(lookupItem)}"
+									 value="#{camaraEnumeration.items}"
+							noSelectionLabel="#{messages['parametro.camara.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="camaraDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{camaraEnumeration.labelFor(parametroHome.instance.camara)}"
+						   rendered="#{!parametroHome.hasEditPermission('Parametro','add','update')}" />
+ 
+			</s:decorate>
+            <s:decorate id="nameDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametro.name']}</ui:define>
+	                <h:inputText id="name" 
+	                       required="true"
+					       disabled="#{!parametroHome.hasEditPermission('Parametro','add','update')}"
+	                           size="98"
+	                      maxlength="100"
+	                          value="#{parametroHome.instance.name}">
+	                    <a4j:support event="onblur" reRender="nameDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="labelDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametro.label']}</ui:define>
+	                <h:inputText id="label" 
+					       disabled="#{!parametroHome.hasEditPermission('Parametro','add','update')}"
+	                           size="98"
+	                      maxlength="100"
+	                          value="#{parametroHome.instance.label}">
+	                    <a4j:support event="onblur" reRender="labelDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="typeDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametro.type']}</ui:define>
+					<h:selectOneMenu id="type"
+					disabled="#{!parametroHome.hasEditPermission('Parametro','add','update')}"
+						      value="#{parametroHome.instance.type}">
+						<f:selectItems value="#{tipoDatoEnumeration.getItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="typeDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="multipleDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametro.multiple']}</ui:define>
+	                <h:selectBooleanCheckbox id="multiple"
+					       	           disabled="#{!parametroHome.hasEditPermission('Parametro','add','update')}"
+	                                      value="#{parametroHome.instance.multiple}"/>
+            </s:decorate>
+            <s:decorate id="lengthDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametro.length']}</ui:define>
+	                <h:inputText id="length"
+					       disabled="#{!parametroHome.hasEditPermission('Parametro','add','update')}"
+	                          value="#{parametroHome.instance.length}">
+	                    <a4j:support event="onblur" reRender="lengthDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="precisionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametro.precision']}</ui:define>
+	                <h:inputText id="precision"
+					       disabled="#{!parametroHome.hasEditPermission('Parametro','add','update')}"
+	                          value="#{parametroHome.instance.precision}">
+	                    <a4j:support event="onblur" reRender="precisionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="parametersDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['parametro.parameters']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputTextarea id="parameters"
+	                               cols="98"
+	                               rows="2"
+					       	 disabled="#{!parametroHome.hasEditPermission('Parametro','add','update')}"
+	                              value="#{parametroHome.instance.parameters}">
+	                    <a4j:support event="onblur" reRender="parametersDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputTextarea>
+	                </div>
+                              
+            </s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{parametroHome.doCancel}"
+						view="#{parametroSearch.getReturnPage('/web/parametro/parametroList.xhtml')}"
+						rendered="#{parametroHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{parametroHome.doAdd(parametroSearch.getReturnPage('/web/parametro/parametroList.xhtml'))}"
+					rendered="#{!parametroHome.managed and s:hasPermission('Parametro','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{parametroHome.doUpdate(parametroSearch.getReturnPage('/web/parametro/parametroList.xhtml'))}"
+						rendered="#{parametroHome.managed and s:hasPermission('Parametro','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{parametroHome.doCancel}"
+						view="#{parametroSearch.getReturnPage('/web/parametro/parametroList.xhtml')}"
+						rendered="#{!parametroHome.managed}"/>
+					<rich:spacer width="15" rendered="#{parametroHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{parametroHome.doDelete(parametroSearch.getReturnPage('/web/parametro/parametroList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{parametroHome.managed and s:hasPermission('Parametro','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

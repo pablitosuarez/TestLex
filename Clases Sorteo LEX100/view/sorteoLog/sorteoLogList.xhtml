@@ -1,0 +1,293 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('SorteoLog','read')}">
+		<ui:param name="icon" value="sorteo" />    
+		<ui:param name="title" value="#{messages['sorteoLog.list']}" />    
+
+    	<ui:define name="reportsLinks">
+				<s:link view="/web/sorteoLog/sorteoLogPDF.xhtml"
+					rendered="#{not empty sorteoLogList.resultList}"
+					  target="_blank"
+					  title="#{messages['link_list_pdf']}"
+				  styleClass="linkPdf" style="float:left">
+				</s:link>
+				<s:link view="/web/sorteoLog/sorteoLogXLS.xhtml"
+					rendered="#{not empty sorteoLogList.resultList}"
+					  target="_blank"
+					  title="#{messages['link_list_xls']}"
+				  styleClass="linkExcel" style="float:left">
+				</s:link>
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{sorteoLogList}"/>
+
+			<s:decorate id="codigoSorteoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.codigoSorteo']}</ui:define>
+	                <h:inputText id="codigoSorteoFilter" 
+	                           size="35"
+	                          value="#{sorteoLogSearch.codigoSorteo}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="rubroFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.rubro']}</ui:define>
+	                <h:inputText id="rubroFilter" 
+	                           size="10"
+	                          value="#{sorteoLogSearch.rubro}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="usuarioFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.usuario']}</ui:define>
+	                <h:inputText id="usuarioFilter" 
+	                           size="40"
+	                          value="#{sorteoLogSearch.usuario}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="claveExpedienteFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.claveExpediente']}</ui:define>
+	                <h:inputText id="claveExpedienteFilter" 
+	                           size="40"
+	                          value="#{sorteoLogSearch.claveExpediente}">
+	                </h:inputText>
+			</s:decorate>
+			<s:decorate id="oficinaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.oficina']}</ui:define>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0">
+                		<h:inputText value="#{sorteoLogSearch.oficina}" id="oficinaFilter"
+	                		size="80"
+                			converter="oficinaEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+                			onclick="#{rich:component('oficinaFilterSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="400" width="400" id="oficinaFilterSuggestion" for="oficinaFilter" suggestionAction="#{oficinaEnumeration.autocompleteByCamara}" 
+						var="lookupItem">
+						<h:column>
+							<h:outputText value="#{oficinaEnumeration.labelFor(lookupItem)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="oficinaFilterDecoration" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{lookupItem}" target="#{oficinaEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{lookupItem}" target="#{sorteoLogSearch.oficina}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+			</s:decorate>
+			<s:decorate id="fromFechaSorteoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.fromFechaSorteo']}</ui:define>
+					<rich:calendar id="fromFechaSorteoFilter" 
+					enableManualInput="true"					
+								value="#{sorteoLogSearch.fromFechaSorteo}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="toFechaSorteoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.toFechaSorteo']}</ui:define>
+					<rich:calendar id="toFechaSorteoFilter" 
+					enableManualInput="true"					
+								value="#{sorteoLogSearch.toFechaSorteo}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="showDetailsFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['sorteoLog.showDetails']}</ui:define>
+			    	<h:selectBooleanCheckbox id="showDetailsFilter" value="#{sorteoLogSearch.showDetails}"/>
+			</s:decorate>
+			
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['sorteoLog.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty sorteoLogList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="sorteoLogList">
+			    <rich:dataTable id="sorteoLogTable" 
+			                var="item"
+			              value="#{sorteoLogList.resultList}" 
+                       rendered="#{not empty sorteoLogList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('SorteoLog','update') or sorteoLogSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoLogList.getOrderStyle('fechaSorteo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoLog.fechaSorteo.shortLabel']}">
+				                    <f:param name="sorteoLogOrder" value="#{sorteoLogList.getOrderParam('fechaSorteo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoLogList.getOrderStyle('codigoSorteo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoLog.codigoSorteo.shortLabel']}">
+				                    <f:param name="sorteoLogOrder" value="#{sorteoLogList.getOrderParam('codigoSorteo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" >
+				                <s:link styleClass="#{sorteoLogList.getOrderStyle('codigoTipoCambioAsignacion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoLog.codigoTipoCambioAsignacion.shortLabel']}">
+				                    <f:param name="sorteoLogOrder" value="#{sorteoLogList.getOrderParam('codigoTipoCambioAsignacion')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoLogList.getOrderStyle('rubro', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoLog.rubro.shortLabel']}">
+				                    <f:param name="sorteoLogOrder" value="#{sorteoLogList.getOrderParam('rubro')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoLogList.getOrderStyle('rangoMinimos', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoLog.rangoMinimos.shortLabel']}">
+				                    <f:param name="sorteoLogOrder" value="#{sorteoLogList.getOrderParam('rangoMinimos')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{sorteoLogList.getOrderStyle('usuario', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['sorteoLog.usuario.shortLabel']}">
+				                    <f:param name="sorteoLogOrder" value="#{sorteoLogList.getOrderParam('usuario')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+				                <s:link styleClass="#{sorteoLogList.getOrderStyle('expediente.id', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['sorteoLog.expediente.shortLabel']}">
+			    	                <f:param name="sorteoLogOrder" value="#{sorteoLogList.getOrderParam('expediente.id')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['sorteoLog.oficina.shortLabel']}
+							</rich:column>
+							
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['sorteoLog.cargaTrabajo.shortLabel']}
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+					<rich:subTable  id="normalRow" var="item" value="#{item}" rendered="#{true}">
+					
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('SorteoLog','update') or sorteoLogSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{sorteoLogList.doSelection(item, '/web/sorteoLog/sorteoLog.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!sorteoLogSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}"  >
+			            <h:outputText value="#{item.fechaSorteo}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm:ss.SSS"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}"  >
+
+			            #{item.codigoSorteo}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}">
+
+			            #{item.codigoTipoCambioAsignacion}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}"  >
+
+			            #{item.rubro}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right #{sorteoLogHome.getStyle(item)}"  >
+			            #{item.rangoMinimos}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}"  >
+
+			            #{item.usuario}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}"  >
+			            #{expedienteManager.getIdxAnaliticoFirst(item.expediente)}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}"  >
+						<s:fragment rendered="#{item.oficina != null}">
+			            #{item.oficina.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        
+			        <rich:column styleClass="rowColumn #{sorteoLogHome.getStyle(item)}"  >
+						<s:fragment rendered="#{item.cargaTrabajo != null}">
+			            #{item.cargaTrabajo}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        </rich:subTable>
+			        
+			        <rich:subTable  id="detailRow" var="item" value="#{item}" rendered="#{sorteoLogSearch.showDetails}">
+			        <rich:column styleClass="rowColumn rowBck2"  colspan="9">
+						<s:fragment rendered="#{item.informacionSorteo != null}">
+			            <pre>#{item.informacionSorteo}</pre>
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        </rich:subTable>
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{sorteoLogList.getPaginator(sorteoLogList)}"/>
+	  			<ui:param name="componentName" value="sorteoLog"/>
+	  		</s:decorate>
+		</ui:define>
+	
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{sorteoLogSearch.hasReturnPage()}" 
+		        			  view="#{sorteoLogSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['sorteoLog.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/sorteoLog/sorteoLogList.jrxml" />
+		<ui:param name="reportList" value="#{sorteoLogList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

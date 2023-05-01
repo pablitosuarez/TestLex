@@ -1,0 +1,127 @@
+ <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+                                            
+                      
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+
+
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml">
+		<ui:param name="icon" value="list" />    
+		<ui:param name="title" value="#{messages['site.page.listadoAsignaciones']}" />  
+	
+	<h:form>
+	<div style="margin:25px;margin-top:0px">
+
+		<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       		<ui:param name="label" value="Filtros"/>
+       		<ui:param name="id" value="filtros"/>
+
+		 	<s:decorate id="desdeFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['consultaIntervinienteExp.desde']}</ui:define>
+					<rich:calendar id="desdeFechaFilter" 
+					enableManualInput="true" showWeeksBar="false"					
+								value="#{listadoAsignacionesSearch.fechaModificacionDesde}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="HastaFechaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['consultaIntervinienteExp.hasta']}</ui:define>
+					<rich:calendar id="hastaFechaFilter" 
+					enableManualInput="true" showWeeksBar="false"					
+								value="#{listadoAsignacionesSearch.fechaModificacionHasta}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+			</s:decorate>
+			<!--  <s:decorate id="oficinaActualDecoration" template="/layout/editQuery.xhtml">
+				 <ui:define name="label">Dependencia</ui:define>
+				 <h:selectOneMenu value="#{expedienteSearch.oficinaActual}"  style="max-width:100%">
+				 	<s:selectItems value="#{oficinaManager.getOficinasAsociadas(sessionState.globalOficina)}"
+				 		var="oficina" label="#{oficina.descripcion}" noSelectionLabel="#{messages['expediente.filter.oficinaActualSelection']}" />
+				 	<s:convertEntity/>
+				 </h:selectOneMenu>
+            </s:decorate> -->
+		</ui:decorate>
+
+
+		<div style="margin-left:25px">
+		<div style="margin-left:20px">
+		 <h:commandButton value="Mostrar Listado"
+					styleClass="button main-button"
+					onclick="#{rich:component('waitDialog')}.show();"
+		    		oncomplete="#{rich:component('waitDialog')}.hide();" 
+					action="#{listadoAsignacionesList.generarListadoAsignaciones()}" />						
+		
+		</div>
+		</div>		
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['expediente.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty listadoAsignacionesList.listadoAsignaciones}"/>
+		</ui:define>
+
+<s:decorate rendered="#{not empty listadoAsignacionesList.listadoAsignaciones}">		
+		<rich:dataTable id="listaAsignacionesTable" 
+			                var="item"
+			              value="#{listadoAsignacionesList.listadoAsignaciones}">	
+					<rich:column styleClass="toolbaritem"  width="1">
+		        		<f:facet name="header">
+							OFICINA
+						</f:facet>
+						<s:fragment>
+			            	<h:outputText value="#{item[0].descripcion}" style="color:#000000;" />
+						</s:fragment>
+					</rich:column>
+					<rich:column styleClass="toolbaritem"  width="1">
+		        		<f:facet name="header">
+							TOTALES
+						</f:facet>
+						<s:fragment>
+			            	<h:outputText value="#{item[1]}" style="color:#000000;" />
+						</s:fragment>
+					</rich:column>
+		</rich:dataTable>
+<br />
+</s:decorate>
+<s:decorate rendered="#{not empty listadoAsignacionesList.listadoAsignaciones}">
+	<h:panelGrid  id="otrosDatos" columns="2" border="1" cellspacing="0" cellpadding ="5" rowClasses="rowBck7, oddRow" headerClass="header">
+			
+			<h:outputLabel value="TOTAL: " />
+			<h:outputText value="#{listadoAsignacionesList.getTotalAsignaciones()}" 
+			  style="color:#000000;" />
+			  
+			<h:outputLabel value="PROMEDIO: " />
+			<h:outputText value="#{listadoAsignacionesList.getPromedioAsignaciones()}" 
+			style="color:#000000;" />
+
+			<h:outputLabel value="MENOR: "  />
+			<h:outputText value="#{listadoAsignacionesList.getMenorValor()}" 
+			style="color:#000000;" />
+
+			<h:outputLabel value="DIF. PROMEDIO AL MENOR: " />
+			<h:outputText value="#{listadoAsignacionesList.getMenorAlPromedio()} %" 
+			style="color:#000000;" />
+
+			<h:outputLabel value="MAYOR: " />
+			<h:outputText value="#{listadoAsignacionesList.getMayorValor()}" 
+			style="color:#000000;" />
+
+			<h:outputLabel value="DIF. PROMEDIO AL MAYOR: " />
+			<h:outputText value="#{listadoAsignacionesList.getMayorAlPromedio()} %" 
+			style="color:#000000;" />
+
+	</h:panelGrid>
+	</s:decorate>
+</div>
+	
+
+	
+	</h:form>
+</s:decorate>
+</ui:define> 
+</ui:composition>

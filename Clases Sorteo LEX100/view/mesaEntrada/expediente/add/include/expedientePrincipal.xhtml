@@ -1,0 +1,47 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<s:decorate id="expedientePrincipalDecoration" template="/layout/editBlock.xhtml" >
+		    <ui:define name="label">#{messages['expedienteEspecial.expedientePrincipal']}</ui:define>
+		    <ui:param name="required" value="true"/>
+     		<h:panelGrid id="numeroSearch" columns="4" style="color:#000;margin-left:80px;margin-top:5px" cellpadding="0" cellspacing="0">
+                <h:inputText id="numeroFilter" class="numeroExpediente" 
+                			readonly="#{false and not empty expedienteMeAdd.expedientePrincipal}"
+						   size="10"
+						   maxlength="9"
+						valueChangeListener="#{expedienteMeAdd.onChangeNumeroExpedientePrincipal}"
+                          value="#{expedienteMeAdd.numeroExpedientePrincipal}">
+                </h:inputText>
+                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+	     			<h:outputLabel value="/" />
+                </h:panelGroup>
+                <h:inputText id="anioFilter" class="anioExpediente"
+                		  style="margin-right:5px"
+                	   readonly="#{false and not empty expedienteMeAdd.expedientePrincipal}"
+                		   size="5"
+					  maxlength="4"
+			valueChangeListener="#{expedienteMeAdd.onChangeAnioExpedientePrincipal}"
+                          value="#{expedienteMeAdd.anioExpedientePrincipal}">
+                </h:inputText>
+				<s:link style="margin-right:5px"
+					action="#{expedienteMeAdd.lookupExpedienteOrigen('/web/expediente/expedienteSelectionList.xhtml', siteController.currentPage.target)}">
+					<h:graphicImage value="/img/icon/lookup-button.gif"/>
+					<s:conversationPropagation type="join" />
+				</s:link>
+            </h:panelGrid>
+	</s:decorate>
+	<s:div styleClass="rounded bigShadow caratula" rendered="#{not empty expedienteMeAdd.expedientePrincipal}">
+		#{expedienteMeAdd.expedientePrincipal.caratula}
+	</s:div>
+	<br/>
+</ui:composition>

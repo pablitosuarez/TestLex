@@ -1,0 +1,48 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+		 <s:decorate id="fojasDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['paseExp.fojas']}</ui:define>
+	                <h:inputText id="fojas"
+	                          value="#{paseInfo.fojas}">
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="paquetesDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['paseExp.paquetes']}</ui:define>
+	                <h:inputText id="paquetes"
+	                          value="#{paseInfo.paquetes}">
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="cuerposDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['paseExp.cuerpos']}</ui:define>
+	                <h:inputText id="cuerpos"
+	                          value="#{paseInfo.cuerpos}">
+	                </h:inputText>
+            </s:decorate>
+             <s:decorate id="agregadosDecoration" template="/layout/edit.xhtml">
+                	<ui:define name="label">#{messages['paseExp.agregados']}</ui:define>
+	                <h:inputText id="agregados"
+	                          value="#{paseInfo.agregados}">
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="comentariosDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['paseExp.comentarios']}</ui:define>
+	                 <h:inputTextarea id="comentarios"
+	                               cols="98"
+	                               rows="2"
+	                              value="#{paseInfo.comentarios}">
+	                     <f:validateLength maximum="200" />
+	                </h:inputTextarea>
+            </s:decorate>
+           
+	
+
+</ui:composition>

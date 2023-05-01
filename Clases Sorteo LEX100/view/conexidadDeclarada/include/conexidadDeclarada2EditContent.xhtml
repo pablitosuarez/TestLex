@@ -1,0 +1,87 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+	<s:div id="datosConexidad" >
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+		<ui:decorate template="/layout/grid/gridForm.xhtml">			
+
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="1">
+            <s:decorate id="numeroExpedienteConexoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['conexidad.expediente.numeroAnio']}</ui:define>
+		                <h:inputText id="camaraExpedienteConexo" style="text-transform:uppercase;"
+								   size="4"
+								   maxlength="3"
+		                          value="#{conexidadDeclarada.abreviaturaCamaraExpedienteConexo}">
+		                <a4j:support event="onblur" reRender="camaraExpedienteConexo" ajaxSingle="true" eventsQueue="editProperty"/>
+		                </h:inputText>
+		                <s:span  style="padding:0 5px; font-size:1.2em" >
+		                /
+		                </s:span>		                
+
+		                <h:inputText id="numeroExpedienteConexo"
+		                		size="10"
+		                		maxlength="9"
+		                          value="#{conexidadDeclarada.numeroExpedienteConexo}">
+	                    <a4j:support event="onblur" reRender="numeroExpedienteConexo" ajaxSingle="true" eventsQueue="editProperty"/>
+		                </h:inputText>
+		                <s:span  style="padding:0 5px; font-size:1.2em">
+		                /
+		                </s:span>
+		                <h:inputText id="anioExpedienteConexo"
+		                		 size="5"
+		                          value="#{conexidadDeclarada.anioExpedienteConexo}">
+	                    <a4j:support event="onblur" reRender="anioExpedienteConexo" ajaxSingle="true" eventsQueue="editProperty"/>
+		                </h:inputText>
+
+						<rich:spacer width="10px"/>
+
+	       	    		<a4j:commandLink style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+		    	    	    actionListener="#{manager.updateAndCheckConexidadDeclarada2()}" title="#{messages['expediente.title.validar']}"
+		    	    	    reRender="numeroExpedienteConexoDecoration, caratulaConexoDecoration, oficinaConexidadDecoration, oficinaActualDecoration">
+	        	    	    <h:graphicImage value="/img/icon/check.png" style="vertical-align:top"/>
+	       	    		</a4j:commandLink>
+
+	       	    		<a4j:commandLink style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+		    	    	    actionListener="#{manager.resetConexidadDeclarada2()}" title="#{messages['conexidad.expediente.title.borrar']}"
+		    	    	    reRender="numeroExpedienteConexoDecoration, caratulaConexoDecoration, oficinaConexidadDecoration">
+	        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+	       	    		</a4j:commandLink>
+
+					
+            </s:decorate>
+		</td>
+		</tr>
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="2">
+			<s:div  id="caratulaConexoDecoration" >
+			<s:decorate template="/layout/editQuery.xhtml" >
+				<h:outputText value="#{conexidadDeclarada.expedienteConexo.caratula}" rendered="#{not empty conexidadDeclarada.expedienteConexo}" />
+				<br/>
+			</s:decorate>
+			</s:div>
+		</td>
+		</tr>
+		<tr class="grideditrow" >
+		<td class="grideditcolumn" colspan="2">
+			<s:decorate id="oficinaConexidadDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidad.radicacion']}</ui:define>
+		
+				<h:outputText value="#{conexidadDeclarada.oficina.descripcion}" rendered="#{not empty conexidadDeclarada.oficina}" />
+				<br/>
+			</s:decorate>
+		</td>
+		</tr>
+		</ui:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+	</s:div>
+</ui:composition>

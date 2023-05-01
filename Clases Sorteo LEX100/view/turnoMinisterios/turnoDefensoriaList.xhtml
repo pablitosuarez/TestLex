@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+			 	
+	<ui:include src="/web/turnoMinisterios/turnoMinisteriosList.xhtml">
+		<ui:param name="icon" value="turnoDefensoria" />
+		<ui:param name="title" value="#{messages['turnoDefensoria.list']}" />
+		<ui:param name="tipoOficinaTurnoPermiso" value="TurnoDefensoria" />
+		<ui:param name="returnPage" value="/web/turnoMinisterios/turnoDefensoriaList.xhtml" />
+		<ui:param name="oficinaName" value="#{messages['defensoria']}" />
+	</ui:include>
+	
+</ui:composition>

@@ -1,0 +1,130 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+	<table style="width:100%">
+	<tr><td style="vertical-align:top">
+	<!-- group aseDefFisGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showAseDefFis()}">
+	<ui:decorate template="/layout/group/editGroupBox.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.aseDefFisGroup']}"/>
+		<ui:param name="id" value="aseDefFisGroup"/>
+		<ui:param name="initialState" value="closed"/>
+
+            <s:decorate id="asesoriaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.asesoria']}</ui:define>
+	                <h:inputText id="asesoria"
+	                		size="5"
+	                          value="#{expedienteMeAdd.otrosDatos.asesoria}">
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="defensoriaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.defensoria']}</ui:define>
+	                <h:inputText id="defensoria"
+	                		size="5"
+	                          value="#{expedienteMeAdd.otrosDatos.defensoria}">
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="fiscaliaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.fiscalia']}</ui:define>
+	                <h:inputText id="fiscalia"
+	                		size="5"
+	                          value="#{expedienteMeAdd.otrosDatos.fiscalia}">
+	                </h:inputText>
+            </s:decorate>
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group aseDefFisGroup -->
+
+	</td><td style="vertical-align:top">
+	
+	<!-- group seguridadSocialGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showOtrosDatosSS()}">
+		<ui:decorate template="/layout/grid/gridForm.xhtml">			
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="1">
+ 			<s:decorate id="resolucionAdministrativaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.resolucionAdministrativa']}</ui:define>
+	                <h:selectBooleanCheckbox id="resolucionAdministrativa"
+	                                      value="#{expedienteMeAdd.otrosDatos.resolucionAdministrativa}"/>
+            </s:decorate>
+		</td>
+		<td class="grideditcolumn" colspan="1">
+            <s:decorate id="adjuntaCopiaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.adjuntaCopia']}</ui:define>
+	                <h:selectBooleanCheckbox id="adjuntaCopia"
+	                                      value="#{expedienteMeAdd.otrosDatos.adjuntaCopia}"/>
+            </s:decorate>
+		</td>
+		</tr>
+		</ui:decorate>
+	</s:fragment>
+	<!-- end group seguridadSocialGroup -->
+
+	</td><td style="vertical-align:top">
+
+	<!-- group manifestacionGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showManifestacionDe()}">
+	<ui:decorate template="/layout/group/editGroupBox.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.manifestacionGroup']}"/>
+		<ui:param name="id" value="manifestacionGroup"/>
+		<ui:param name="initialState" value="closed"/>
+
+            <s:decorate id="medidaPrecautoriaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.medidaPrecautoria']}</ui:define>
+	                <h:selectBooleanCheckbox id="medidaPrecautoria"
+	                                      value="#{expedienteMeAdd.otrosDatos.medidaPrecautoria}"/>
+            </s:decorate>
+            <s:decorate id="medidaPreliminarDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.medidaPreliminar']}</ui:define>
+	                <h:selectBooleanCheckbox id="medidaPreliminar"
+	                                      value="#{expedienteMeAdd.otrosDatos.medidaPreliminar}"/>
+            </s:decorate>
+            <s:decorate id="pruebaAnticipadaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.pruebaAnticipada']}</ui:define>
+	                <h:selectBooleanCheckbox id="pruebaAnticipada"
+	                                      value="#{expedienteMeAdd.otrosDatos.pruebaAnticipada}"/>
+            </s:decorate>
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group manifestacionGroup -->
+
+	</td><td style="vertical-align:top">
+
+	<!-- group tasaGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showTasaJusticia()}">
+	<ui:decorate template="/layout/group/editGroupBox.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.tasaGroup']}"/>
+		<ui:param name="id" value="tasaGroup"/>
+		<ui:param name="initialState" value="closed"/>
+	
+            <s:decorate id="abonarTasaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.abonarTasa']}</ui:define>
+	                <h:selectBooleanCheckbox id="abonarTasa"
+	                                      value="#{expedienteMeAdd.otrosDatos.abonarTasa}"/>
+            </s:decorate>
+            <s:decorate id="exentoTasaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.exentoTasa']}</ui:define>
+	                <h:selectBooleanCheckbox id="exentoTasa"
+	                                      value="#{expedienteMeAdd.otrosDatos.exentoTasa}"/>
+            </s:decorate>
+            <s:decorate id="noAlcanzadoTasaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.noAlcanzadoTasa']}</ui:define>
+	                <h:selectBooleanCheckbox id="noAlcanzadoTasa"
+	                                      value="#{expedienteMeAdd.otrosDatos.noAlcanzadoTasa}"/>
+            </s:decorate>
+            <s:decorate id="pagoDiferidoTasaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteMe.pagoDiferidoTasa']}</ui:define>
+	                <h:selectBooleanCheckbox id="pagoDiferidoTasa"
+	                                      value="#{expedienteMeAdd.otrosDatos.pagoDiferidoTasa}"/>
+            </s:decorate>
+	</ui:decorate>
+	</s:fragment>
+	<!-- end group tasaGroup -->
+	</td></tr></table>
+	
+</ui:composition>

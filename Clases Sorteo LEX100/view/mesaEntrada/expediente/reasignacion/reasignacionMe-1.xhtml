@@ -1,0 +1,729 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="reasignacionMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="#{expedienteMeReasignacion.icon}"/>    
+		<ui:param name="title" value="#{expedienteMeReasignacion.title}"/>
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+	<br/>
+
+	<!-- Expediente  -->
+	<s:decorate id="expedienteDecoration" template="/layout/edit.xhtml" >
+		    <ui:define name="label">#{messages['expedienteMeReasignacion.expedienteNumAnio']}</ui:define>
+		    <ui:param name="required" value="true"/>
+     		<h:panelGrid id="numeroSearch" columns="7" style="color:#000;" cellpadding="0" cellspacing="0">
+                <s:span rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+	                <h:inputText id="camaraFilter"
+	                			readonly="true"
+	                			disabled="true"
+							   size="4"
+	                          value="#{expedienteManager.getPrefijoCamaraExpediente(expedienteMeReasignacion.reasignacionEdit.expediente)}">
+	                </h:inputText>
+	                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+		     			<h:outputText value="/" />
+	                </h:panelGroup>
+				</s:span>                
+                <h:inputText id="numeroFilter" class="numeroExpediente" 
+                			readonly="#{false and not empty expedienteMeReasignacion.reasignacionEdit.expediente}"
+						   size="10"
+						   maxlength="9"
+                          value="#{expedienteMeReasignacion.reasignacionEdit.numeroExpediente}">
+                </h:inputText>
+                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+	     			<h:outputLabel value="/" />
+                </h:panelGroup>
+                <h:inputText id="anioFilter" class="anioExpediente"
+                		  style="margin-right:5px"
+                	   readonly="#{false and not empty expedienteMeReasignacion.reasignacionEdit.expediente}"
+                		   size="5"
+					  maxlength="4"
+                          value="#{expedienteMeReasignacion.reasignacionEdit.anioExpediente}">
+                </h:inputText>
+                <s:span rendered="#{not empty expedienteMeReasignacion.codigoSubexpediente}">
+	                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+		     			<h:outputLabel value="/" />
+	                </h:panelGroup>
+	                <h:inputText id="codigoSubexpedienteFilter"
+	                 			style="margin-right:5px"
+	                			readonly="true"
+	                			disabled="true"
+							   size="4"
+	                          value="#{expedienteMeReasignacion.codigoSubexpediente}">
+	                </h:inputText>
+				</s:span>                
+				<h:commandLink style="margin-right:5px" inmediate="true"  eventsQueue="editProperty" ajaxSingle="true"
+    	    	    actionListener="#{expedienteMeReasignacion.updateExpediente()}" title="#{messages['expediente.title.seleccionar']}">
+       	    	    <h:graphicImage value="/img/icon/check.png" style="vertical-align:top"/>
+					<s:conversationPropagation type="join" />
+      	    	</h:commandLink>
+				<h:commandLink inmediate="true" style="margin-right:5px" immediate="true"
+					title="#{messages['expediente.title.buscar']}"
+					action="#{expedienteMeReasignacion.lookupExpediente('/web/expediente/expedienteSelectionList.xhtml', siteController.currentPage.target)}">
+					<h:graphicImage value="/img/icon/lookup-button.gif"/>
+					<s:conversationPropagation type="join" />
+				</h:commandLink>
+				
+            </h:panelGrid>
+	</s:decorate>
+	
+	<s:div id="familiaExpedientes">
+	<s:fragment rendered="#{empty expedienteMeReasignacion.reasignacionEdit.expediente and not empty expedienteMeReasignacion.familiaExpedientes and expedienteMeReasignacion.familiaExpedientes.size() > 1}">
+		<s:decorate id="expedientesFamiliaDecoration" template="/layout/edit.xhtml" >
+			<ui:define name="label">#{messages['expedienteMeReasignacion.seleccioneExpediente']}</ui:define>
+		    <ui:param name="required" value="true"/>
+	    	<div style="font-size:1.2em;font-weight:bold">
+			<ui:repeat var="expedienteFamilia" value="#{expedienteMeReasignacion.familiaExpedientes}">
+				<h:commandLink value="#{expedienteManager.getIdxAnaliticoFirst(expedienteFamilia)} #{expedienteManager.getCaratulaResumida(expedienteFamilia.caratula, 120)}" 
+								action="#{expedienteMeReasignacion.doSelectExpediente(expedienteFamilia)}"
+							   title="#{expedienteManager.getIdxAnaliticoFirst(expedienteFamilia)}}"
+ 							   /> 
+				<br/>
+			</ui:repeat>
+			</div>
+	    </s:decorate>
+	</s:fragment>
+	</s:div>
+	
+	<s:div id="divCaratula">
+	<s:div  rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+		<s:div styleClass="rounded bigShadow caratula">
+		#{expedienteMeReasignacion.reasignacionEdit.expediente.caratula}
+		</s:div>
+		<br/>
+        <s:decorate id="oficinaExpedienteDecoration" template="/layout/edit.xhtml" rendered="#{not expedienteMeReasignacion.mostrarRadicacionesActuales}">
+        	<ui:define name="label">#{expedienteMeReasignacion.labelOficinaActualRadicacion}</ui:define>
+            <div style="font-size:1.5em;font-weight:bold">
+            	#{expedienteMeReasignacion.descripcionOficinaActualRadicacion}
+             </div>
+       </s:decorate>
+		<s:decorate id="oficinasRadicacionDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.mostrarRadicacionesActuales}">
+			<ui:define name="label">#{messages['expedienteMeAsignacion.oficinasRadicacion']}</ui:define>
+			<ui:repeat var="oficinaAsignacion" value="#{expedienteMeReasignacion.radicacionesActuales}">
+			<div style="font-size:1.5em;font-weight:bold">
+				#{tipoRadicacionEnumeration.getLabel(oficinaAsignacion.tipoRadicacion)} -
+				#{expedienteMeReasignacion.getDescripcionRadicacion(oficinaAsignacion)}
+			</div>
+			</ui:repeat>
+	    </s:decorate>
+		<br/>
+        <s:decorate id="tipoCausaActualDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.mostrarTipoCausaActual}">
+        	<ui:define name="label">#{messages['expedienteMeReasignacion.tipoCausaActual']}</ui:define>
+            <div style="font-size:1.5em;font-weight:bold;">
+            	#{expedienteMeReasignacion.descripcionTipoCausaActual}
+             </div>
+			<br/>
+       </s:decorate>
+		<s:decorate id="objetoJuicioActualDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.mostrarObjetoJuicioActual}">
+			<ui:define name="label">#{messages['incompetencia.objetoJuicio.actual']}</ui:define>
+		    <div style="font-size:1.5em;font-weight:bold">
+		      	#{expedienteMeReasignacion.reasignacionEdit.expediente.objetoJuicioPrincipal.descripcionCompleta}
+		    </div>
+		</s:decorate>
+
+		<s:decorate id="selectorRecursoDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.mostrarTipoRecursoActual and expedienteMeReasignacion.multiplesRecursosASeleccionar}">
+			    <ui:define name="label">#{messages['expedienteMeReasignacion.seleccioneRecurso']}</ui:define>
+				<h:selectOneRadio value="#{expedienteMeReasignacion.recursoEdit.recursoSorteo}" required="true" layout="pageDirection">
+					<s:selectItems value="#{expedienteMeReasignacion.listaRecursosASeleccionar}"
+						var="recurso" label="#{expedienteMeReasignacion.getTitleByRecurso(recurso)}">
+					</s:selectItems>
+					<a4j:support event="onclick" ajaxSingle="true" reRender="tipoRecursoDecoration, fojasArea"/>
+					<s:convertEntity/>
+				</h:selectOneRadio>		    
+		</s:decorate>
+
+		<s:fragment	rendered="#{expedienteMeReasignacion.mostrarTipoRecursoActual}">
+			<s:decorate id="tipoRecursoDecoration"
+				template="/layout/edit.xhtml">
+				<ui:define name="label">#{messages['recursoExp.tipoRecurso']}</ui:define>
+				<h:outputText
+					value="#{tipoRecursoEnumeration.labelFor(expedienteMeReasignacion.recursoEdit.recursoSorteo.tipoRecurso)}" />
+			</s:decorate>
+			<s:decorate id="descripcionDecoration"
+				template="/layout/edit.xhtml">
+				<ui:define name="label">#{messages['recursoExp.descripcion']}</ui:define>
+				<div class="inputTextarea_wrap">
+					<h:inputTextarea id="descripcion" cols="100" rows="2"
+						value="#{expedienteMeReasignacion.recursoEdit.recursoSorteo.descripcion}">
+						<a4j:support event="onblur" reRender="descripcionDecoration"
+							ajaxSingle="true" eventsQueue="editProperty" />
+					</h:inputTextarea>
+				</div>
+			</s:decorate>
+		</s:fragment>
+
+	
+		<!-- group fojasCuerposAgregadosRecurso -->
+		<s:div id="fojasArea"
+			rendered="#{expedienteMeReasignacion.showFojasRecurso()}">
+			<ui:include
+				src="/webCustom/mesaEntrada/expediente/asignacion/include/fojasRecursoSorteo.xhtml">
+				<ui:param name="recursoEdit"
+					value="#{expedienteMeReasignacion.recursoEdit}" />
+			</ui:include>
+		</s:div>
+		<!-- end group fojasCuerposAgregadosRecurso -->
+		
+		<!-- group fojasCuerposAgregadosExpediente -->
+		<s:div id="fojasExpedienteArea"
+			rendered="#{!expedienteMeReasignacion.showFojasRecurso()}">
+			<ui:include
+				src="/webCustom/mesaEntrada/expediente/asignacion/include/fojasExpedienteSorteo.xhtml">
+				<ui:param name="expedienteEdit"
+					value="#{expedienteMeReasignacion.expediente}" />
+			</ui:include>
+		</s:div>
+		<!-- end group fojasCuerposAgregadosExpediente -->
+	</s:div>
+	</s:div>
+	
+	<s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+		<h:outputText style="font-weight:bold;font-size:1.2em;" 
+			value="#{messages['expedienteMeReasignacion.datosReasignacion']}" />
+		<rich:separator lineType="solid" />
+		<rich:spacer height="10px"/>
+	</s:fragment>
+
+	<s:fragment rendered="#{expedienteMeReasignacion.showTiposReasignacion()}">
+	<s:decorate id="tipoDecoration" template="/layout/edit.xhtml" rendered="#{!expedienteMeReasignacion.isTipoRadicacionTribunalOral()}">
+		    <ui:define name="label">#{messages['expedienteMeReasignacion.tipo']}</ui:define>
+		    <ui:param name="required" value="true"/>
+			<h:selectOneRadio value="#{expedienteMeReasignacion.reasignacionEdit.tipoReasignacion}" layout="pageDirection" rendered="#{!camaraManager.isCamaraActualCivilCABA()}"
+							  valueChangeListener="#{expedienteMeReasignacion.tipoReasignacionChanged}">
+				<s:selectItems value="#{expedienteMeReasignacion.tiposReasignacion}" var="item" label="#{messages[item.label]}"	/>
+				<s:convertEnum/>	
+				<a4j:support event="onclick" ajaxSingle="true" reRender="datosReasignacion" eventsQueue="editProperty"/>							
+			</h:selectOneRadio>
+			<h:selectOneMenu value="#{expedienteMeReasignacion.reasignacionEdit.tipoReasignacion}" rendered="#{camaraManager.isCamaraActualCivilCABA()}"
+							valueChangeListener="#{expedienteMeReasignacion.tipoReasignacionChanged}">
+				<s:selectItems value="#{expedienteMeReasignacion.tiposReasignacion}" 
+					var="item" label="#{item.value} - #{messages[item.label]}"	
+					noSelectionLabel="#{messages['expedienteMeReasignacion.tipo.select']}" />								
+				<s:convertEnum/>	
+				<a4j:support event="onchange" ajaxSingle="true" reRender="radicacionesFamilia, datosReasignacion" eventsQueue="editProperty"/>							
+			</h:selectOneMenu>
+			
+     </s:decorate>
+	<s:decorate id="tipoToDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.isTipoRadicacionTribunalOral()}">
+		    <ui:define name="label">#{messages['expedienteMeReasignacion.tipo']}</ui:define>
+		    <ui:param name="required" value="true"/>
+			<h:selectOneRadio value="#{expedienteMeReasignacion.reasignacionEdit.tipoReasignacionTribulaOral}" layout="pageDirection">
+				<s:selectItems value="#{expedienteMeReasignacion.tiposReasignacion}" var="item" label="#{messages[item.label]}"	/>
+				<s:convertEnum/>	
+				<a4j:support event="onclick" ajaxSingle="true" reRender="datosReasignacion" eventsQueue="editProperty"/>							
+			</h:selectOneRadio>
+     </s:decorate>
+     
+	<s:div id="radicacionesFamilia">
+	<s:fragment rendered="#{expedienteMeReasignacion.isBuscaConexidadFamilia() and expedienteMeReasignacion.reasignacionEdit.mostrarSelectorDeFamilia}">
+	<ui:include src="#{'/webCustom/mesaEntrada/expediente/include/radicacionesFamilia-inc.xhtml'}">
+		<ui:param name="controller" value="#{expedienteMeReasignacion}"/>
+	</ui:include>	
+	</s:fragment>
+	</s:div>
+     
+	</s:fragment>	
+	 <s:div id="datosReasignacion">
+		<s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.mostrarSelectorTipoCausa}">
+			<s:decorate id="tipoCausaDecoration" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['expedienteMeReasignacion.tipoCausa']}</ui:define>
+				<h:selectOneMenu id="tipoCausa"
+					  valueChangeListener="#{expedienteMeReasignacion.tipoCausaChanged}"
+				      value="#{expedienteMeReasignacion.reasignacionEdit.tipoCausa}">
+					<s:selectItems var="lookupItem"
+							 label="#{tipoCausaEnumeration.labelFullFor(lookupItem)}"
+							 value="#{expedienteMeReasignacion.tipoCausaList}"
+					noSelectionLabel="#{messages['expedienteMeReasignacion.tipoCausa.normal']}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" ajaxSingle="true" reRender="datosReasignacion" />
+				</h:selectOneMenu>
+				
+			</s:decorate>
+		</s:fragment>	
+		
+		<s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.mostrarSelectorTipoCausa and expedienteMeReasignacion.reasignacionEdit.tipoCausaFat and expedienteMeReasignacion.omitirSorteoComercialHabilitado}">
+			<s:decorate id="asignarOficinaDestinoManualDecoration" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['expedienteMeReasignacion.omitirSorteoDefinirOficinaDestino']}</ui:define>
+				<h:selectBooleanCheckbox id="asignarOficinaDestinoManual" value="#{expedienteMeReasignacion.reasignacionEdit.omitirSorteoComercial}">
+					<a4j:support event="onclick" reRender="datosReasignacion" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectBooleanCheckbox>
+			</s:decorate>
+		</s:fragment>
+			
+		<s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.mostrarSelectorObjetoJuicio}">
+			<ui:include src="#{'/webCustom/mesaEntrada/expediente/reasignacion/include/objetoJuicio-inc.xhtml'}"/>
+		</s:fragment>
+			
+		<s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.mostrarSelectorTipoRecurso}">
+			<s:decorate id="tiposRecursoDecoration" template="/layout/edit.xhtml">
+			<ui:param name="required" value="true"/>
+			<ui:define name="label">#{messages['expediente.tipoRecurso']}</ui:define>
+			<h:selectOneMenu id="tipoRecurso"
+				  valueChangeListener="#{expedienteMeReasignacion.onChangeTipoRecurso}"
+					value="#{expedienteMeReasignacion.recursoEdit.tipoRecurso}">
+				<s:selectItems var="lookupItem"
+					label="#{tipoRecursoEnumeration.labelFor(lookupItem)}"
+					noSelectionLabel="#{messages['drop_list_select']}"
+					value="#{expedienteMeReasignacion.getTiposRecurso()}">
+				</s:selectItems>
+				<s:convertEntity/>
+				<a4j:support event="onchanged" reRender="tiposRecursoDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+			</h:selectOneMenu>
+		</s:decorate>
+		</s:fragment>	
+	
+		<!-- group conexidadDeclaradaGroup -->
+		<s:fragment rendered="#{expedienteMeReasignacion.showConexidadDeclarada() and not camaraManager.isCamaraActualCOM()}">
+		<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+		      	<ui:param name="label" value="#{messages['expedienteMe.conexidadDeclaradaGroup']}"/>
+			<ui:param name="id" value="conexidadDeclaradaGroup"/>
+		
+			<ui:include src="#{'/web/conexidadDeclarada/include/conexidadDeclaradaEditContent.xhtml'}">
+				<ui:param name="conexidadDeclarada" value="#{expedienteMeReasignacion.conexidadDeclarada}"/>
+				<ui:param name="manager" value="#{expedienteMeReasignacion}"/>
+			</ui:include>
+		
+		</ui:decorate>
+		</s:fragment>
+		<!-- end group conexidadDeclaradaGroup -->
+
+		<s:fragment rendered="#{expedienteMeReasignacion.expediente != null and not empty expedienteMeReasignacion.vocaliasSalaActuales and expedienteMeReasignacion.showSelectorVocalias()}">
+		
+			<s:decorate template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['expedienteMeReasignacion.integracionTotal']}</ui:define>
+				<h:selectBooleanCheckbox value="#{expedienteMeReasignacion.integracionTotal}" >
+					<a4j:support event="onclick" ajaxSingle="true" reRender="selectorVocaliasDiv"/>
+				</h:selectBooleanCheckbox>	
+			</s:decorate>
+			
+			<s:div id="selectorVocaliasDiv">
+			<s:decorate id="selectorVocaliasDecoration" template="/layout/edit.xhtml" rendered="#{!expedienteMeReasignacion.integracionTotal}">
+				<ui:define name="label">#{messages['expedienteMeReasignacion.vocaliaSalaInhibir']}</ui:define>
+				<h:selectOneRadio value="#{expedienteMeReasignacion.indiceVocaliaSeleccionada}" layout="pageDirection" required="true">
+					<f:selectItems value="#{expedienteMeReasignacion.vocaliasARecusar}" />
+				</h:selectOneRadio>
+			</s:decorate>
+			</s:div>	
+
+		<s:decorate id="vocaliasSorteoListLines" template="/layout/lines/lines.xhtml">		
+			<ui:param name="label" value="#{messages['expedienteMeReasignacion.vocaliasSorteo']}" />    
+			<ui:param name="icon" value="vocal" />
+
+	        <div class="association" id="vocaliasSorteoListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['expedienteMeReasignacion.vocaliasSorteo.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteo}"/>
+		        </ui:define>
+
+				<rich:dataTable value="#{expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteo}"
+	                           var="vocalia" 
+	                      rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteo}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="vocaliaListTable">
+			    	<rich:column  width="1" styleClass="rowColumn" >
+			    		<!-- ATOS COMERCIAL Fecha: 26-06-2014 Desarrollador:  Luis Suarez -->
+			    		<f:facet name="header">
+					           <a4j:region id="selectAllVocales">
+						           	<h:selectBooleanCheckbox value="#{expedienteMeReasignacion.selectAll}" rendered="#{camaraManager.isCamaraActualCOM()}">
+						        		<a4j:support event="onclick" ajaxSingle="true" reRender="vocaliaListTable"/>
+						        	</h:selectBooleanCheckbox>
+					        	</a4j:region>
+			    		</f:facet>
+			    		
+			    		<h:selectBooleanCheckbox value="#{expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteoSelectionMap[vocalia]}" 
+			    			disabled="#{(expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteoInhibidasMap[vocalia] or
+			    					    expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteoRecusadasMap[vocalia]) 
+			    					    and not camaraManager.isCamaraActualCOM()}">
+			    			<a4j:support event="onclick" ajaxSingle="true"/>
+			    		</h:selectBooleanCheckbox>
+			    	</rich:column>
+			        <rich:column id="vocaliaColumn" styleClass="rowColumn" >
+						<f:facet name="header">
+							#{messages['expedienteMeReasignacion.vocaliasSorteo.vocalia']}
+						</f:facet>
+						
+			            #{vocalia.descripcion}
+			        </rich:column>
+			        <rich:column styleClass="rowColumn" >
+						<f:facet name="header">
+								#{messages['expedienteMeReasignacion.vocaliasSorteo.titular']}
+						</f:facet>
+						<s:fragment rendered="#{not empty expedienteMeReasignacion.getTitularVocalia(vocalia)}">
+						#{expedienteMeReasignacion.getTitularVocalia(vocalia)}
+						</s:fragment>
+						<s:fragment rendered="#{empty expedienteMeReasignacion.getTitularVocalia(vocalia)}">
+						(<i>#{messages['expedienteMeReasignacion.vocaliasSorteo.vacante']}</i>)
+						</s:fragment>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center" width="1" >
+						<f:facet name="header">
+								#{messages['expedienteMeReasignacion.vocaliasSorteo.excRec']}
+						</f:facet>
+						<s:fragment rendered="#{expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteoRecusadasMap[vocalia]}">
+							<h:graphicImage value="/img/icon/check.png" />
+						</s:fragment>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center" width="1" >
+						<f:facet name="header">
+								#{messages['expedienteMeReasignacion.vocaliasSorteo.inhibido']}
+						</f:facet>
+						<s:fragment rendered="#{expedienteMeReasignacion.reasignacionEdit.vocaliasSalaSorteoInhibidasMap[vocalia]}">
+							<h:graphicImage value="/img/icon/check.png" />
+						</s:fragment>
+			        </rich:column>
+			   </rich:dataTable>
+
+		    </div>
+			
+		</s:decorate>    
+
+
+		</s:fragment>
+
+
+
+	<s:fragment rendered="#{expedienteMeReasignacion.showOrigen()}">
+		<ui:decorate template="/layout/group/editGroupContainer.xhtml">
+			<s:decorate id="dependenciaOrigenDecoration" template="/layout/edit.xhtml" rendered="#{!camaraManager.isCamaraActualCOM()}">
+					<ui:define name="label">#{messages['expedienteEspecial.dependenciaOrigen']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" >
+                		<h:inputText id="dependencia"
+                				  value="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.dependencia}" 
+                				  size="100"
+							  converter="dependenciaOrigenEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+                			onclick="#{rich:component('dependenciaSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="400" width="400" id="dependenciaSuggestion" for="dependencia" suggestionAction="#{expedienteMeAdd.dependenciaOrigenAutocomplete}" 
+						var="dependencia">
+						<h:column>
+							<h:outputText value="#{dependenciaOrigenEnumeration.labelFor(dependencia)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="dependenciaOrigenDecoration" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{dependencia}" target="#{dependenciaOrigenEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{dependencia}" target="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.dependencia}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+					<h:outputText value="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.otraDependencia}" />
+			</s:decorate>
+
+
+			<!-- sumario origen  -->
+			<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" columnClasses="topAlign, topALign">
+			<s:decorate id="fechaInformacionDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.showFechaInformacion()}">
+                	<ui:define name="label">#{expedienteMeAdd.fechaInformacionLabel}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<rich:calendar id="fechaInformacion" showWeeksBar="false"
+									 enableManualInput="true"
+								 value="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.fechaInformacion}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="fechaInformacionDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="fechaInformacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+			<s:decorate id="numeroDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{expedienteMeAdd.numeroExpedienteOrigenLabel}</ui:define>
+					<ui:param name="required" value="true"/>
+					<s:fragment rendered = "#{expedienteMeReasignacion.showNumeroCodigo()}" >
+						<h:inputText id="numeroCodigo"	                
+		                		size="2" maxlength="2"  
+		                		converter="#{upperCaseConverter}"             		
+		                          value="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.numeroCodigo}">
+						<a4j:support event="onchange" reRender="numeroDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+		                </h:inputText>
+						<span display="inline-block" width="10px"></span>
+					</s:fragment>
+	                <h:inputText id="numero"	                
+	                		size="25"
+	                		converter="#{upperCaseConverter}"
+	                          value="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.numero}">
+					<a4j:support event="onchange" reRender="numeroDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            </h:panelGrid>
+			<s:decorate id="juezExhortanteDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.showJuezExortante()}">
+                	<ui:define name="label">#{messages['expedienteEspecial.juezExhortante']}</ui:define>
+					<ui:param name="required" value="true"/>
+	                <h:inputText id="juezExhortante"
+	                		size="50"
+	                		converter="#{upperCaseConverter}"
+	                          value="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.juezExhortante}">
+	                </h:inputText>
+            </s:decorate>
+            
+			<s:decorate id="caratulaOrigenDecoration" rendered="#{expedienteMeReasignacion.showCaratulaOrigen()}" template="/layout/editBlock.xhtml" >
+                	<ui:define name="label">#{messages['expedienteEspecial.caratulaOrigen']}</ui:define>
+					<ui:param name="required" value="true"/>
+					<h:inputTextarea id="caratulaOrigen"
+                              cols="98"
+                              converter="#{upperCaseConverter}"
+                              rows="2"
+	                          value="#{expedienteMeReasignacion.reasignacionEdit.expedienteEspecialEdit.caratulaOrigen}">
+	                </h:inputTextarea>
+            </s:decorate>
+            
+		</ui:decorate>
+	</s:fragment>
+	<!-- end group origen -->
+
+
+		<s:decorate id="oficinaDestinoAsignadaDecoration" template="/layout/editQuery.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.reasignacionEdit.showOficinaDestino}">
+		    <ui:define name="label">#{messages['expedienteMeReasignacion.oficinaDestino']}</ui:define>
+            <div style="font-size:1.5em;font-weight:bold">
+            	#{expedienteMeReasignacion.reasignacionEdit.oficinaDestino.descripcion}
+			</div>		
+		</s:decorate>
+
+		<s:decorate id="fijarRadicacionDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.reasignacionEdit.fijarRadicacionPermitida}">
+			<ui:define name="label">#{messages['expedienteMeAsignacion.radicacionPrevia']}</ui:define>
+			<h:selectBooleanCheckbox id="fijarRadicacion"
+				value="#{expedienteMeReasignacion.reasignacionEdit.fijarRadicacion}">
+        		<a4j:support event="onclick" ajaxSingle="true"  reRender="destinoAsignacion"/>
+			</h:selectBooleanCheckbox>					
+		</s:decorate> 
+		
+		<s:div id="destinoAsignacion">
+		<s:decorate id="destinoAsignacionFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteManager.isPenal(expedienteMeReasignacion.reasignacionEdit.expediente) and expedienteMeReasignacion.showSelectorDestinos() and expedienteMeReasignacion.reasignacionEdit.showSelectorDeOficinas()}">
+			<h:selectOneRadio value="#{expedienteMeReasignacion.destinoAsignacion}" layout="lineDirection" valueChangeListener="#{expedienteMeReasignacion.onChangeDestinoAsignacion}">
+				<f:selectItems value="#{destinoAsignacionEnumeration.items}" />
+				<a4j:support event="onclick" ajaxSingle="true" reRender="datosReasignacion" eventsQueue="editProperty"/>							
+			</h:selectOneRadio>
+		</s:decorate>
+		
+
+		<s:decorate id="oficinaDestinoFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{destinoAsignacionEnumeration.isCamaraActual(expedienteMeReasignacion.destinoAsignacion) and not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.reasignacionEdit.showSelectorDeOficinas()}">
+		    <ui:define name="label">#{messages['expedienteMeReasignacion.oficinaDestino']}</ui:define>
+				<h:selectOneMenu id="oficinaDestino" 
+							 value="#{expedienteMeReasignacion.reasignacionEdit.oficinaDestino}">
+					<s:selectItems var="lookupItem" noSelectionLabel="#{(expedienteMeReasignacion.oficinasDestino.size() > 1)? messages['expedienteMeReasignacion.oficinaDestino.lookup_select'] : ''}"
+								 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+								 value="#{expedienteMeReasignacion.oficinasDestino}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="datosReasignacion" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneMenu>
+				<rich:spacer width="10px"></rich:spacer>
+				<h:selectBooleanCheckbox id="verTodasOficinas" value="#{expedienteMeReasignacion.reasignacionEdit.verTodasOficinasDestino}" >
+					<a4j:support event="onclick" reRender="oficinaDestinoFilterDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectBooleanCheckbox>
+				#{messages['expedienteMeReasignacion.verTodas']}
+		</s:decorate>
+		
+		<s:decorate id="oficinaDestinoOtrasCamarasDecoration" template="/layout/editQuery.xhtml" rendered="#{destinoAsignacionEnumeration.isOtraCamara(expedienteMeReasignacion.destinoAsignacion) and not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.reasignacionEdit.showSelectorDeOficinas()}">
+					<ui:define name="label">#{messages['expedienteMeReasignacion.oficinaDestino']}</ui:define>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0">
+                		<h:inputText id="oficinaDestinoOtrasCamaras" size="110" required="true"
+                				  value="#{expedienteMeReasignacion.reasignacionEdit.oficinaDestino}" 
+							  converter="oficinaDestinoOtrasCamarasEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+                			onclick="#{rich:component('oficinaDestinoOtrasCamarasSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="450" width="550" id="oficinaDestinoOtrasCamarasSuggestion" for="oficinaDestinoOtrasCamaras" suggestionAction="#{expedienteMeReasignacion.autocompleteOtrasOficinas}" 
+						var="oficina">
+						<h:column>
+							<h:outputText value="#{oficinaDestinoOtrasCamarasEnumeration.labelFor(oficina)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="oficinaDestinoOtrasCamarasDecoration" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{oficina}" target="#{oficinaDestinoOtrasCamarasEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{oficina}" target="#{expedienteMeReasignacion.reasignacionEdit.oficinaDestino}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+		</s:decorate>
+		</s:div>
+		
+		<s:decorate id="sorteoMediadorDecoration" template="/layout/edit.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.isTipoSorteoMediador()}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.sortearMediador']}</ui:define>
+		    <h:selectBooleanCheckbox id="soretearMediador"
+		                           value="#{expedienteMeReasignacion.reasignacionEdit.sortearMediador}">
+				<a4j:support event="onclick" ajaxSingle="true" reRender="selectorMediador" eventsQueue="editProperty"/>
+			</h:selectBooleanCheckbox>	
+			
+		</s:decorate>
+		
+		
+		<s:div id="selectorMediador">
+		<s:decorate id="mediadorDecoration" template="/layout/edit.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente and expedienteMeReasignacion.reasignacionEdit.showSelectorDeMediador()}">
+			<ui:define name="label">#{messages['expedienteMe.ingresoRadicacionPrevia.mediador']}</ui:define>
+			<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" >
+              		<h:inputText id="mediador"
+              				size="60"
+              				  value="#{expedienteMeReasignacion.reasignacionEdit.mediadorDestino}" 
+					  converter="mediadorEnumerationConverter">
+              		</h:inputText>
+              		<h:graphicImage value="/img/icon/combo_arrow.png" 
+              			onclick="#{rich:component('mediadorSuggestion')}.callSuggestion(true)"
+                  		alt="" />
+          		</h:panelGrid>				    
+			<rich:suggestionbox height="400" width="400" id="mediadorSuggestion" for="mediador" suggestionAction="#{mediadorEnumeration.autocomplete}" 
+				var="mediador">
+				<h:column>
+					<h:outputText value="#{mediadorEnumeration.labelFor(mediador)}"/>
+				</h:column>
+                    <a4j:support event="onselect" reRender="mediadorDecoration" ajaxSingle="true">
+                    	<f:setPropertyActionListener value="#{mediador}" target="#{mediadorEnumeration.selected}" >
+                    		<s:convertEntity/>
+                    	</f:setPropertyActionListener>
+                    	<f:setPropertyActionListener value="#{mediador}" target="#{expedienteMeReasignacion.reasignacionEdit.mediadorDestino}" >
+                    		<s:convertEntity/>
+                    	</f:setPropertyActionListener>
+                    </a4j:support>
+			</rich:suggestionbox>
+		</s:decorate>
+		</s:div>
+		
+		
+		
+		<s:fragment rendered="#{oficinaManager.inMesaEntradaCamara() or s:hasPermission('MesaEntrada','reasignacionTribunalOral')}">
+		<s:decorate id="omitirSorteoReasignacion" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.showOmitirSorteo()}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.siNoConexidad']}</ui:define>
+		     <h:selectBooleanCheckbox id="omitirSorteo" rendered="false"
+		                           value="#{expedienteMeReasignacion.reasignacionEdit.omitirSorteo}">
+				<a4j:support event="onclick" ajaxSingle="true" reRender="omitirSorteoReasignacion" eventsQueue="editProperty"/>
+			</h:selectBooleanCheckbox>							
+			<h:selectOneRadio value="#{expedienteMeReasignacion.reasignacionEdit.omitirSorteo}" layout="pageDirection">
+				<f:selectItem itemLabel="#{messages['expedienteMeReasignacion.mantenerRadicacion']}" itemValue="true"/>
+				<f:selectItem itemLabel="#{messages['expedienteMeReasignacion.sortearNuevaRadicacion']}" itemValue="false"/>
+				<a4j:support event="onclick" ajaxSingle="true" reRender="omitirSorteoReasignacion"/>
+			</h:selectOneRadio>
+		</s:decorate>
+		                           
+		<s:div id="infoSorteo">
+		<s:decorate id="excluirOficinaOrigenReasignacion" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.showExcluirOficinaOrigen()}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.excluirOficinaOrigen']}</ui:define>
+		     <h:selectBooleanCheckbox id="excluirOficinaOrigen"
+		                           value="#{expedienteMeReasignacion.excluirOficinaOrigen}">
+				<a4j:support event="onclick" ajaxSingle="true" reRender="radicacionesFamilia, datosReasignacion" eventsQueue="editProperty"/>
+			</h:selectBooleanCheckbox>							
+		                           
+		</s:decorate>
+		
+		<!-- ATOS COMERCIAL Fecha: 18-06-2014 Desarrollador:  Luis Suarez -->
+		<s:decorate id="excluirOtrasOficinas" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.excluirOficinas and not camaraManager.isCamaraActualCOM()}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.excluirOtrasOficinas']}</ui:define>
+		    	<table><tr><td style="vertical-align:top">
+				<s:link
+					action="#{expedienteMeReasignacion.excluirOficinas('/web/oficinaSorteo/oficinaSorteoList.xhtml', siteController.currentPage.target)}">
+					<h:graphicImage value="/img/icon/lookup-button.gif"/>
+					<s:conversationPropagation type="join" />
+				</s:link>
+				</td><td style="padding-left:10px">
+				<s:fragment rendered="#{not empty expedienteMeReasignacion.excludeOficinas}">
+				<ui:repeat var="oficinaSorteo" value="#{expedienteMeReasignacion.excludeOficinas}">
+					<s:div style="font-size:1.5em;font-weight:bold">#{oficinaSorteo.oficina.descripcion}</s:div>
+				</ui:repeat>
+				</s:fragment>
+				</td>
+				</tr>		
+				</table>		
+		</s:decorate>
+		</s:div>
+		</s:fragment>
+		
+		
+		<s:decorate id="tipoAsignacionCodificadoDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeReasignacion.reasignacionEdit.showSelectorTipoAsignacionCodificado}">
+		    	<ui:define name="label">#{messages['expedienteMeReasignacion.seleccionarTipoAsignacionCodificado']}</ui:define>
+			<h:selectOneMenu value="#{expedienteMeReasignacion.reasignacionEdit.tipoAsignacionCodificada}" required="true">
+				<s:selectItems value="#{tipoAsignacionCodificadaEnumeration.getItemsByCategoria(expedienteMeReasignacion.reasignacionEdit.categoriaTipoAsignacion)}"
+					var="item" label="#{item.descriptionExpression}"
+					noSelectionLabel="#{messages['Entity.lookup_select']}"/>
+				<s:convertEntity/>
+			</h:selectOneMenu>
+		</s:decorate> 
+		 
+		<s:decorate id="observacionesDecoration" template="/layout/edit.xhtml" rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+			    <ui:define name="label">#{messages['expedienteMeReasignacion.observaciones']}</ui:define>
+		            <h:inputText id="observaciones"
+		            		   size="100"
+		            		   maxlength="150"
+		                      value="#{expedienteMeReasignacion.reasignacionEdit.observaciones}">
+		            </h:inputText>
+		</s:decorate>
+	<!-- group competencia -->
+	
+		<s:fragment rendered="#{expedienteMeReasignacion.showCompetencias() and not empty expedienteMeReasignacion.reasignacionEdit.expediente and not expedienteMeReasignacion.reasignacionEdit.hasCompetenciaDestino()}">
+			<h2 class="icon materia">
+		   		#{messages['expedienteMeAdd.competencia']}
+		    </h2>
+			<s:decorate id="competenciaDecoration" template="/layout/editBlock.xhtml" >
+					<h:selectOneRadio id="competencia" layout="lineDirection"
+					  valueChangeListener="#{expedienteMeReasignacion.onChangeCompetencia}"
+								 value="#{expedienteMeReasignacion.reasignacionEdit.competencia}">
+						<s:selectItems var="lookupItem"
+									 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+									 value="#{expedienteMeReasignacion.competenciasSorteo}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="competenciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneRadio>
+			</s:decorate>
+		</s:fragment>	
+		</s:div>	
+ 
+  	<!-- end group Expediente Principal -->
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+ 
+		<s:fragment rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}">
+ 			<ui:include src="/web/remesaExpediente/include/selecccionRemesasPorUsuarioInc.xhtml" />
+		</s:fragment>
+		 
+   		<ui:define name="buttons">               
+	        <s:div id="actionButtons" styleclass="actionButtons">
+			
+		            <h:commandButton id="button-save" styleClass="button main-button"
+						value="#{messages['expediente.title.validar']}" 
+						action="#{expedienteMeReasignacion.doSave1}">
+						<s:defaultAction/>
+					</h:commandButton>
+
+		            <h:commandButton styleClass="button main-button"
+		             	rendered="#{not empty expedienteMeReasignacion.reasignacionEdit.expediente}"
+		             	onclick="Richfaces.showModalPanel('waitDialog');"
+						value="#{messages['button_finalizar']}" 
+						action="#{expedienteMeReasignacion.doSaveFin(1, '/webCustom/mesaEntrada/expediente/reasignacion/reasignacionMeFin.xhtml')}"/>
+
+
+			</s:div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+	<!-- ATOS COMERCIAL Fecha: 26-06-2014 Desarrollador:  Luis Suarez -->
+	<a4j:status onstart="#{rich:component('waitDialog')}.show()" onstop="#{rich:component('waitDialog')}.hide()" for="selectAllVocales"/>
+	</ui:define>
+</ui:composition>

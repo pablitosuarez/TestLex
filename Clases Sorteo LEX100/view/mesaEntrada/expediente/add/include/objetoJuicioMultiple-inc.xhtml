@@ -1,0 +1,153 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<ui:decorate template="/layout/group/editGroupContainer.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteMe.objetoJuiciosGroup']}"/>
+		<ui:param name="id" value="objetoJuiciosGroup"/>
+
+		<s:fragment rendered="true">
+
+		<s:decorate id="objetoJuicioListLines" template="/layout/lines/lines.xhtml">		
+			<ui:param name="label" value="#{messages['expedienteMe.objetoReclamoList']}" />    
+			<ui:param name="icon" value="objetoJuicio" />
+			<ui:param name="initialState" value="#{empty expedienteMeAdd.objetoJuicioEditList.list? 'closed':'open'}" />    
+
+	        <div class="association" id="objetoJuicioListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['expedienteMe.objetoJuicioList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty expedienteMeAdd.objetoJuicioEditList.list}"/>
+		        </ui:define>
+
+				<a4j:region>
+				<rich:dataTable value="#{expedienteMeAdd.objetoJuicioEditList.list}" 
+	                           var="objetoJuicio" 
+	                      rendered="#{not empty expedienteMeAdd.objetoJuicioEditList.list}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="objetoJuicioListTable">
+					<f:facet name="header">
+						<rich:columnGroup  rowClasses="rich-table-subheader" style="background-image:none">
+							<rich:column styleClass="toolbaritem" />
+							<rich:column styleClass="toolbaritem" style="padding:0px" width="1">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['expedienteMe.objetoReclamo']}
+							</rich:column>
+							<rich:column styleClass="toolbaritem" width="1">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>           
+				<rich:subTable  id="editRow" var="instance" value="#{expedienteMeAdd.objetoJuicioEditList.tmpInstance}" rendered="#{expedienteMeAdd.isObjetoJuicioEditable() and expedienteMeAdd.objetoJuicioEditList.isEditing(objetoJuicio)}">
+	       	    	<rich:column width="1" styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or objetoJuicioSearch.hasSelectionPage()}">	
+		       	    	<h:commandLink immediate="false" 
+		       	    			title="#{messages['list_search']}"
+			    	    	    action="#{expedienteMeAdd.lookupObjetoMultipleJuicio('/web/objetoJuicio/objetoJuicioList.xhtml', '/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml', instance)}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif" style="vertical-align:top"/>
+							<s:conversationPropagation type="join" />
+		       	    	</h:commandLink>
+			        </rich:column> 
+			        <rich:column width="1" styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or objetoJuicioSearch.hasSelectionPage()}">
+			            <a4j:commandLink actionListener="#{expedienteMeAdd.doSaveLineMultipleObjetojuicio}" eventsQueue="editLine"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="objetoJuicioListTable, intLines, actionButtons, objetosAbogados">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+					</rich:column>
+			        
+			        <rich:column styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"  >
+						<s:decorate id="objetoJuicioMultipleDecoration" template="/layout/table/edit.xhtml" >
+						
+							<h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" >
+	                		<h:inputText id="objetoJuicio"
+	                				size="120"
+	                				  value="#{instance.objetoJuicio}" 
+								  converter="objetoJuicioEnumerationConverter">
+	                		</h:inputText>
+	                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+	                			onclick="#{rich:component('objetoJuicioMultipleSuggestion')}.callSuggestion(true)"
+	                    		alt="" />
+		            		</h:panelGrid>
+							<rich:suggestionbox height="400" width="400" id="objetoJuicioMultipleSuggestion" for="objetoJuicio" suggestionAction="#{objetoJuicioEnumeration.autocomplete}" 
+								var="objetoJuicio">
+								<h:column>
+									<h:outputText value="#{objetoJuicioEnumeration.labelFor(objetoJuicio)}"/>
+								</h:column>
+		 	                    <a4j:support event="onselect"  ajaxSingle="true">
+		 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{objetoJuicioEnumeration.selected}" >
+		 	                    		<s:convertEntity/>
+		 	                    	</f:setPropertyActionListener>
+		 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{instance.objetoJuicio}" >
+		 	                    		<s:convertEntity/>
+		 	                    	</f:setPropertyActionListener>
+		 	                    </a4j:support>
+							</rich:suggestionbox>
+						
+						</s:decorate>
+			        </rich:column>
+
+			        <rich:column width="1" styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(instance) ? 'newRowColumn' : 'rowColumn'}"
+						      rendered="#{true and s:hasPermission('ExpedienteIngreso','update')}">
+			            <a4j:commandLink actionListener="#{expedienteMeAdd.objetoJuicioEditList.onCancelLine}" eventsQueue="editLine"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="objetoJuicioListTable, intLines, actionButtons, objetosAbogados">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="objetoJuicio" value="#{objetoJuicio}" rendered="#{not expedienteMeAdd.isObjetoJuicioEditable() or not expedienteMeAdd.objetoJuicioEditList.isEditing(objetoJuicio)}">
+					<rich:column width="1" styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(objetoJuicio) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or objetoJuicioSearch.hasSelectionPage()}"/>
+			        <rich:column width="1" styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(objetoJuicio) ? 'newRowColumn' : 'rowColumn'}" rendered="#{s:hasPermission('ExpedienteIngreso','update') or objetoJuicioSearch.hasSelectionPage()}">
+			            <a4j:commandLink action="#{expedienteMeAdd.objetoJuicioEditList.onEditLine(objetoJuicio)}" eventsQueue="editLine"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{expedienteMeAdd.isObjetoJuicioEditable() and !expedienteMeAdd.objetoJuicioEditList.isNew(objetoJuicio)}"
+									   reRender="objetoJuicioListTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{expedienteMeAdd.objetoJuicioEditList.onEditLine(objetoJuicio)}" eventsQueue="editLine"
+										  title="#{messages['list_new']}"
+									   rendered="#{expedienteMeAdd.isObjetoJuicioEditable() and expedienteMeAdd.objetoJuicioEditList.isNew(objetoJuicio)}"
+									   reRender="objetoJuicioListTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(objetoJuicio) ? 'newRowColumn' : 'rowColumn'}"  >
+			            #{objetoJuicioEnumeration.labelFor(objetoJuicio.objetoJuicio)}
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{expedienteMeAdd.objetoJuicioEditList.isNew(objetoJuicio) ? 'newRowColumn' : 'rowColumn'}"
+						      rendered="#{true and s:hasPermission('ExpedienteIngreso','update')}">
+			            <h:commandLink action="#{expedienteMeAdd.onDeleteLineMultipleObjetojuicio(objetoJuicio)}" eventsQueue="editLine"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{expedienteMeAdd.isObjetoJuicioEditable() and !expedienteMeAdd.objetoJuicioEditList.isNew(objetoJuicio) and s:hasPermission('ExpedienteIngreso','update')}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="objetoJuicioListTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+
+		</s:decorate>
+		</s:fragment>
+	</ui:decorate>
+</ui:composition>

@@ -1,0 +1,32 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+		<ui:decorate template="/layout/grid/gridForm.xhtml">			
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="1">
+			<s:decorate id="expedienteInfoDecoration" template="/layout/editQuery.xhtml">
+			    <ui:define name="label">#{messages['expedienteInfo.valor']}</ui:define>		
+				<h:inputTextarea id="expedienteInfoValor"
+                               cols="98"
+                               rows="3"
+                               disabled="#{camaraManager.isCamaraActualCOM()}"
+                               converter="#{upperCaseConverter}"
+                              value="#{expedienteMeAdd.expedienteInfoValor}">
+                   <a4j:support event="onchange" reRender="expedienteInfoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+                </h:inputTextarea>
+			</s:decorate>
+		</td>
+		</tr>
+		</ui:decorate>
+		
+	</ui:decorate>
+	<!-- end group default -->
+</ui:composition>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns="http://jboss.com/products/seam/pages"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.0.xsd"
+      no-conversation-view-id="/webCustom/objetoJuicio/objetoJuicioList.xhtml"
+      login-required="true">
+   
+   <begin-conversation join="true" flush-mode="MANUAL"/>
+   
+
+   <param name="criterioCnxFirstResult" value="#{criterioCnxList.firstResult}"/>
+   <param name="criterioCnxOrder" value="#{criterioCnxList.order}"/>
+
+
+	<restrict>#{s:hasPermission('ObjetoJuicio','access')}</restrict>
+</page>

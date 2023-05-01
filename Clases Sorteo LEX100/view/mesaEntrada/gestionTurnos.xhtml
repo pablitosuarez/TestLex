@@ -1,0 +1,109 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="gestionDeTurnos" enctype="multipart/form-data">
+    
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{messages['gestionTurnos']}" />
+		<ui:param name="description" value="#{messages['gestionTurnos.comment']}" />
+		
+		<s:decorate id="camaraDecoration" template="/layout/edit.xhtml" rendered="#{empty sessionState.globalCamara}">
+				<ui:define name="label">#{messages['gestionTurnos.camara']}</ui:define>
+				<h:selectOneMenu id="camara"
+							required="true"
+							style="width:500px"
+							 value="#{gestionTurnos.camara}">
+					<s:selectItems var="lookupItem"
+								 label="#{camaraEnumeration.labelFor(lookupItem)}"
+								 value="#{camaraEnumeration.items}"
+						noSelectionLabel="#{messages['gestionTurnos.camara.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="camaraDecoration,oficinas" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneMenu>
+		</s:decorate>
+		
+		<s:decorate id="tipoOficinaDecoration" template="/layout/edit.xhtml">
+				<ui:define name="label">#{messages['gestionTurnos.tipoOficina']}</ui:define>
+				<h:selectOneMenu id="tipoOficina"
+							required="true"
+							style="width:500px"
+							 value="#{gestionTurnos.tipoOficina}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoOficinaEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoOficinaEnumeration.items}"
+						noSelectionLabel="#{messages['gestionTurnos.tipoOficina.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="tipoOficinaDecoration,oficinas" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneMenu>
+		</s:decorate>
+		
+		<s:decorate id="tipoTurnoDecoration" template="/layout/edit.xhtml">
+				<ui:define name="label">#{messages['gestionTurnos.tipoTurno']}</ui:define>
+				<h:selectOneMenu id="tipoTurno"
+							required="true"
+							style="width:500px"
+							 value="#{gestionTurnos.tipoTurno}">
+					<s:selectItems var="lookupItem"
+								 label="#{tipoTurnoEnumeration.labelFor(lookupItem)}"
+								 value="#{tipoTurnoEnumeration.items}"
+						noSelectionLabel="#{messages['gestionTurnos.tipoTurno.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+					<a4j:support event="onchange" reRender="tipoTurnoDecoration,oficinas" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneMenu>
+		</s:decorate>
+		
+		<s:div id="oficinas">
+			<s:div rendered="#{gestionTurnos.camara != null and gestionTurnos.tipoOficina != null and gestionTurnos.tipoTurno != null}">
+			<s:decorate id="codOficinaDecoration" template="/layout/edit.xhtml">
+					<ui:define name="label">#{messages['gestionTurnos.codOficina']}</ui:define>    
+				    <h:inputText id="codOficina" size="3"
+					              maxlength="3"
+					              value="#{gestionTurnos.codOficina}">
+					</h:inputText>
+					<a4j:commandButton id="addOficinaButton" action="#{gestionTurnos.addOficina()}" value="#{messages['button_add']}" reRender="codOficinaDecoration,oficinasSeleccionadas" focus="codOficina" eventsQueue="editProperty" styleClass="button main-button" >
+					<s:defaultAction/>
+					</a4j:commandButton>
+			</s:decorate>
+	    
+			<a4j:outputPanel id="oficinasSeleccionadas">
+			<div style="width:100%;height:243px;overflow:auto;">
+	            <a4j:repeat value="#{gestionTurnos.listaOficinaFacade}" var="item">
+	            <div style="width:98%;border:1px solid silver;height:15px;margin:3px;padding:5px;position:relative;#{item.style()}">
+	            	<h:outputText value="#{item.label()}" />
+	            	<a4j:commandLink actionListener="#{gestionTurnos.deleteOficina(item)}" reRender="oficinasSeleccionadas" eventsQueue="editProperty" style="position:absolute; right:5px; top:7">
+	            		<span class="line_delete"/>
+	            	</a4j:commandLink>
+	            </div>
+	            </a4j:repeat>
+		    </div>
+		    </a4j:outputPanel>
+	        <s:div id="actionButtons" styleClass="actionButtons">
+		    	<h:commandButton action="#{gestionTurnos.saveOficinas()}" value="#{messages['gestionTurnos.button.asignar']}" styleClass="button main-button" />
+		    </s:div>
+		    </s:div>
+		</s:div>	    
+	    
+	</ui:decorate>    
+	    
+    </h:form>
+
+</ui:define>
+
+
+</ui:composition>

@@ -1,0 +1,93 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+<s:div id="datosMediacion" >
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+		<ui:decorate template="/layout/group/editGroupAuto.xhtml">			
+
+           <s:decorate id="numeroPoderDecoration" template="/layout/edit.xhtml" >
+               	<ui:define name="label">#{messages['poder.numeroAnio']}</ui:define>
+	                <h:inputText id="numeroPoder"
+	                		size="10"
+	                		maxlength="9"
+	                          value="#{expedienteMeAdd.numeroPoder}">
+	                </h:inputText>
+	                <s:span  style="padding:0 5px; font-size:1.2em">
+	                /
+	                </s:span>
+	                <h:inputText id="anioPoder"
+	                		 size="5"
+	                          value="#{expedienteMeAdd.anioPoder}">
+	                </h:inputText>
+
+					<rich:spacer width="10px"/>
+
+       	    		<h:commandLink  style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+	    	    	    actionListener="#{expedienteMeAdd.updatePoder()}" title="#{messages['expediente.title.validar']}">
+	    	    	    
+        	    	    <h:graphicImage value="/img/icon/check.png" style="vertical-align:top"/>
+       	    		</h:commandLink >
+
+       	    		<h:commandLink  style="margin-right:5px" eventsQueue="editProperty" ajaxSingle="true"
+	    	    	    actionListener="#{expedienteMeAdd.resetPoder()}" title="#{messages['poder.expediente.title.borrar']}">
+	    	    	    
+        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+       	    		</h:commandLink>
+			
+					<h:commandLink inmediate="true" style="margin-right:5px"
+						title="#{messages['poder.title.buscar']}"
+						action="#{expedienteMeAdd.lookupPoder('/web/poder/poderList.xhtml', siteController.currentPage.target)}">
+						<h:graphicImage value="/img/icon/lookup-button.gif"/>
+						<s:conversationPropagation type="join" />
+					</h:commandLink>
+			
+           </s:decorate>
+			
+			<s:fragment rendered="#{not empty expedienteMeAdd.poder}"> 
+
+				<s:decorate id="fechaDecoration" template="/layout/edit.xhtml" >
+		            <ui:define name="label">
+			    		<h:outputText rendered="#{not empty expedienteMeAdd.poder}" value="#{expedienteMeAdd.poder.numeroAnio}"/>
+			    	</ui:define>
+			    	<h:outputText value="#{expedienteMeAdd.poder.fechaOtorgamiento}">
+						<s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy"/>
+					</h:outputText>
+				</s:decorate>
+				<s:decorate id="poderDecoration" template="/layout/edit.xhtml" >
+					<h:outputText value="#{expedienteMeAdd.poder.nombre}" />
+					<h:outputText value="#{expedienteMeAdd.poder.codTipoDocumento} #{expedienteMeAdd.poder.numeroDocumento}" style="padding:0 5px;"/>
+				</s:decorate>
+				<s:fragment rendered="#{not empty expedienteMeAdd.poder.representacionPoderList}"> 
+					<s:decorate id="representacionDecoration" template="/layout/edit.xhtml" >
+						<ui:repeat var="representacion" value="#{expedienteMeAdd.poder.representacionPoderList}" >
+					    	<h:outputText value="#{tipoRepresentacionEnumeration.getLabel(representacion.tipoRepresentacion)}"/>
+					    	<h:outputText value="#{representacion.enRepresentacion}" style="padding:0 5px;"/>
+					    </ui:repeat>
+				    </s:decorate>
+				</s:fragment>
+				<s:fragment rendered="#{not empty expedienteMeAdd.poder.direccionCompleta}"> 
+					<s:decorate id="direccionPoderDecoration" template="/layout/edit.xhtml" >
+						<h:outputText value="#{expedienteMeAdd.poder.direccionCompleta}" />
+					</s:decorate>
+				</s:fragment>
+			</s:fragment>
+		
+		</ui:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+	</s:div>
+
+</ui:composition>

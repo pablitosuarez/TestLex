@@ -1,0 +1,76 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<e:workbook xmlns:e="http://jboss.com/products/seam/excel"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+ 	xmlns:f="http://java.sun.com/jsf/core">
+
+	<e:worksheet var="sorteoLog" value="#{sorteoLogList.allResults}">
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Codigo Sorteo"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.codigoSorteo ? sorteoLog.codigoSorteo : ''}" />
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Rubro"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.rubro ? sorteoLog.rubro : ''}" />
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Rubro Asignacion"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.rubroAsignacion ? sorteoLog.rubroAsignacion : ''}" />
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Rango Minimos"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.rangoMinimos ? sorteoLog.rangoMinimos : ''}" />
+		</e:column>
+		<e:column style="xls-column-autosize: true; xls-vertical-alignment: top; xls-force-type: general; xls-wrap:true">
+			<f:facet name="header">
+				<e:cell value="Informacion Sorteo"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.informacionSorteo ? sorteoLog.informacionSorteo : ''}" />
+		</e:column>
+		<e:column style="xls-column-autosize: true; xls-format-mask:dd-MM-yyyy HH:mm:ss.000">
+			<f:facet name="header">
+				<e:cell value="Fecha Sorteo"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.fechaSorteo ? sorteoLog.fechaSorteo : ''}" >
+			</e:cell>
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Usuario"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.usuario ? sorteoLog.usuario : ''}" />
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Expediente"/>
+			</f:facet>
+			<e:cell value="#{expedienteManager.getIdxAnalitico(sorteoLog.expediente)}" />
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Oficina Resultado"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.oficina ? sorteoLog.oficina.descripcion : ''} " />
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Carga de Trabajo"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.cargaTrabajo ? sorteoLog.cargaTrabajo : ''}" />
+		</e:column>
+		<e:column>
+			<f:facet name="header">
+				<e:cell value="Tipo Cambio Asignación"/>
+			</f:facet>
+			<e:cell value="#{not empty sorteoLog.codigoTipoCambioAsignacion ? sorteoLog.codigoTipoCambioAsignacion : ''}" />
+		</e:column>
+	</e:worksheet>		
+</e:workbook>

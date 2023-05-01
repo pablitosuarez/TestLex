@@ -1,0 +1,98 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<ui:decorate template="/layout/grid/gridForm.xhtml">			
+        <s:decorate id="tratamientoIncidentalDecoration" template="/layout/edit.xhtml" >
+           	<ui:define name="label">#{messages['expedienteMe.tratamientoIncidental']}</ui:define>
+			<h:selectBooleanCheckbox value="#{expedienteMeAdd.expedienteEspecialEdit.tratamientoIncidental}" >
+				<a4j:support event="onclick" ajaxSingle="true" reRender="tratamientoIncidentalDecoration, tipoIncidenteDiv"/>
+			</h:selectBooleanCheckbox>			
+		</s:decorate>
+	</ui:decorate>
+
+	<s:div id="tipoIncidenteDiv">
+	<s:decorate id="tipoIncidenteDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.expedienteEspecialEdit.tratamientoIncidental}">
+			<ui:define name="label">#{messages['expedienteMe.tipoIncidente']}</ui:define>
+			<ui:param name="required" value="true"/>
+			<h:selectOneMenu id="tipoIncidente"
+					  value="#{expedienteMeAdd.expedienteEspecialEdit.tipoSubexpediente}">
+				<s:selectItems var="lookupItem"
+							 label="#{tipoSubexpedienteEnumeration.labelFor(lookupItem)}"
+							 value="#{expedienteMeAdd.tiposSubexpediente}"
+					noSelectionLabel="#{messages['cuaderno.tipoSubexpediente.lookup_select']}">
+				</s:selectItems>
+				<s:convertEntity/>
+			</h:selectOneMenu>
+	</s:decorate>
+	<s:decorate id="intervinientesList"	template="/layout/lines/collection.xhtml" rendered="#{expedienteMeAdd.expedienteEspecialEdit.tratamientoIncidental}">
+			<ui:param name="label" value="#{messages['altaCuaderno.intervinientesList']}" />    
+			<ui:param name="icon" value="intervinienteExp" />
+
+	        <div class="association" id="intervinientesListChildren">
+        
+			<ui:define name="emptyMessage">        
+	            <h:outputText value="#{messages['altaCuaderno.intervinientesList.list_none']}" styleClass="emptyMessage" 
+	                       rendered="#{empty expedienteMeAdd.intervinienteEditList.intervinientesValidos}"/>
+	        </ui:define>
+
+				<rich:dataTable value="#{expedienteMeAdd.intervinienteEditList.intervinientesValidos}" 
+	                           var="intervinienteEdit" 
+	                      rendered="#{not empty expedienteMeAdd.intervinienteEditList.intervinientesValidos}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="intervinienteEditListTable">
+			        <rich:column width="1" styleClass="" >
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+						<h:selectBooleanCheckbox value="#{intervinienteEdit.selected}" >
+						</h:selectBooleanCheckbox>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+                             #{messages['intervinienteExp.tipoInterviniente.shortLabel']}
+						</f:facet>
+						<s:fragment rendered="#{intervinienteEdit.tipoInterviniente != null}">
+			            #{intervinienteEdit.tipoInterviniente.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+                             #{messages['intervinienteExp.interviniente.shortLabel']}
+						</f:facet>
+			            #{intervinienteEdit.nombreCompleto}
+						<br/>
+			        </rich:column>
+            	</rich:dataTable>
+
+			</div>	        
+    		<ui:define name="lowButtons">
+		        <s:div styleClass="lowButtons">
+		            <h:commandButton actionListener="#{intervinienteEditList.doSeleccionarTodosIntervinientes()}"
+		                 immediate="true"
+			            		id="marcarTodosIntervinientes" styleClass="button"
+							 value="#{messages['altaCuaderno.marcarTodos']}">
+		            </h:commandButton>
+		            <h:commandButton actionListener="#{intervinienteEditList.doDeseleccionarTodosIntervinientes()}"
+		                 immediate="true"
+			            		id="desmarcarTodosIntervinientes" styleClass="button"
+							 value="#{messages['altaCuaderno.desmarcarTodos']}">
+		            </h:commandButton>
+		        </s:div>
+		    </ui:define>
+
+
+		</s:decorate> 
+	</s:div>
+		
+</ui:composition>

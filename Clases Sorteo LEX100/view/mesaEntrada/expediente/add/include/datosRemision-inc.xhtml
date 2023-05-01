@@ -1,0 +1,32 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<s:fragment rendered="#{expedienteMeAdd.showIngresoUrgente() or (configuracionMateriaManager.isUsaRemisionesPorUsuario(sessionState.globalCamara) and !expedienteMeAdd.editMode)}">
+
+		<div class="thick-grey-border rounded" style="margin-top:10px;margin-bottom:10px;">
+	 		<s:fragment rendered="#{configuracionMateriaManager.isUsaRemisionesPorUsuario(sessionState.globalCamara) and !expedienteMeAdd.editMode}">
+				<h:selectBooleanCheckbox id="remisionesPorUsuario" value="#{sessionState.remisionesPorUsuario}" />
+					#{messages['expedienteMe.remisionesPorUsuario']}
+				<rich:spacer width="20px"></rich:spacer>
+			</s:fragment>
+			<s:fragment rendered="#{expedienteMeAdd.showIngresoUrgente()}">
+			      <h:selectBooleanCheckbox id="ingresoUrgente" value="#{expedienteMeAdd.ingresoUrgente}" > 
+				<a4j:support event="onclick" ajaxSingle="true" />
+			      </h:selectBooleanCheckbox>
+			      #{messages['expediente.ingresoUrgente']}
+			</s:fragment>	
+		</div>
+	</s:fragment>	
+
+
+</ui:composition>

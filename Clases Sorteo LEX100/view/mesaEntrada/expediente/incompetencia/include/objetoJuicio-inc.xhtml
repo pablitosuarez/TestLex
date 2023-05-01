@@ -1,0 +1,101 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<!-- group objetoJuicioGroup -->
+				<s:div id="temaDecoration" >
+					<s:decorate template="/layout/edit.xhtml">
+							<ui:define name="label">#{messages['objetoJuicio.tema']}</ui:define>
+							<h:selectOneMenu id="tema"
+										 value="#{expedienteMeReasignacion.tema}">
+								<s:selectItems var="lookupItem"
+											 label="#{temaEnumeration.labelFor(lookupItem)}"
+											 value="#{expedienteMeReasignacion.temas}">
+								</s:selectItems>
+								<s:convertEntity/>
+								<a4j:support event="onchange" reRender="temaDecoration, objetoJuicioControl" ajaxSingle="true" eventsQueue="editProperty"/>
+							</h:selectOneMenu>
+					</s:decorate> 
+				</s:div>
+
+				<s:div id="objetoJuicioControl">
+					<s:decorate id="objetoJuicioDecoration" template="/layout/edit.xhtml" >
+						<ui:define name="label">#{messages['incompetencia.objetoJuicio.nuevo']}</ui:define>
+						<h:panelGrid columns="4" border="0" cellpadding="0" cellspacing="0" >
+	                		<h:inputText id="objetoJuicio"
+	                				size="100"
+	                				  value="#{expedienteMeReasignacion.objetoJuicioNuevo}" 
+								  converter="objetoJuicioEnumerationConverter">
+	                		</h:inputText>
+	                		<h:graphicImage value="/img/icon/combo_arrow_std.png" 
+	                			onclick="#{rich:component('objetoJuicioSuggestion')}.callSuggestion(true)"
+	                    		alt="" />
+	
+		       	    		<h:commandLink style="margin-left:5px"
+			    	    	    action="#{expedienteMeReasignacion.lookupObjetoJuicio('/web/objetoJuicio/objetoJuicioList.xhtml', '/webCustom/mesaEntrada/expediente/incompetencia/incompetencia.xhtml')}">
+		        	    	    <h:graphicImage value="/img/icon/lookup-button.gif" style="vertical-align:top"/>
+							<s:conversationPropagation type="join" />
+		       	    		</h:commandLink>
+		       	    		<a4j:commandLink style="margin-left:5px"  eventsQueue="editLine" ajaxSingle="true"
+								rendered="#{expedienteMeReasignacion.objetoJuicioNuevo != null}"
+								reRender="objetoJuicioDecoration, parametrosObjetoJuicio, intLines"
+			    	    	    actionListener="#{expedienteMeReasignacion.clearObjetoJuicio()}">
+		        	    	    <h:graphicImage value="/img/icon/clear.gif" style="vertical-align:top"/>
+							<s:conversationPropagation type="join" />
+		       	    		</a4j:commandLink>
+	            		</h:panelGrid>
+						<rich:suggestionbox height="400" width="400" id="objetoJuicioSuggestion" for="objetoJuicio" suggestionAction="#{objetoJuicioEnumeration.autocomplete}" 
+							var="objetoJuicio">
+							<h:column>
+								<h:outputText value="#{objetoJuicioEnumeration.labelFor(objetoJuicio)}"/>
+							</h:column>
+	 	                    <a4j:support event="onselect" reRender="objetoJuicioDecoration, parametrosObjetoJuicio, intLines, actionButtons, objetosAbogados, tipoProcesoIncompetencia" ajaxSingle="true">
+	 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{objetoJuicioEnumeration.selected}" >
+	 	                    		<s:convertEntity/>
+	 	                    	</f:setPropertyActionListener>
+	 	                    	<f:setPropertyActionListener value="#{objetoJuicio}" target="#{expedienteMeReasignacion.objetoJuicioNuevo}" >
+	 	                    		<s:convertEntity/>
+	 	                    	</f:setPropertyActionListener>
+	 	                    	<f:setPropertyActionListener value="#{objetoJuicio.tipoProceso}" target="#{expedienteMeReasignacion.tipoProcesoNuevo}" >
+	 	                    		<s:convertEntity/>
+	 	                    	</f:setPropertyActionListener>
+	 	                    </a4j:support>
+						</rich:suggestionbox>
+					</s:decorate>
+				</s:div>
+	<!-- end group objetoJuicioGroup -->
+	
+	<!-- group tipoProceso -->
+	<s:div id="tipoProcesoIncompetencia">
+		<s:fragment	rendered="#{!expedienteMeReasignacion.isPenal() and expedienteMeReasignacion.objetoJuicioNuevo != null}">
+			<ui:include	src="#{'/webCustom/mesaEntrada/expediente/incompetencia/include/tipoProceso-inc.xhtml'}" />
+		</s:fragment>
+	</s:div>
+	<!-- end group tipoProceso -->
+	
+	<!-- group parametroGroup -->
+	<s:div id="parametrosObjetoJuicio">
+		<s:fragment rendered="#{expedienteMeReasignacion.showParametros()}">
+			<ui:decorate template="/layout/group/editGroupCollapsible.xhtml">
+		       	<ui:param name="label" value="#{messages['expedienteMe.parametersGroup']}"/>
+				<ui:param name="id" value="parametersGroup"/>
+				
+				<ui:decorate template="/webComponent/dataSheet/include/dataSheetEditorGroup.xhtml"  >
+					<ui:param name="items" value="#{expedienteMeReasignacion.getParametrosAsPropertyList()}" />   
+					<ui:param name="modoMasivo" value="#{false}"/>
+				</ui:decorate>		
+		
+			</ui:decorate>
+		</s:fragment>
+	</s:div>	
+	<!-- end group parametroGroup -->
+</ui:composition>

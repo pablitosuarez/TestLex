@@ -1,0 +1,70 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+			    xmlns:c="http://java.sun.com/jstl/core"		
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{interpolator.interpolate(expedienteMeAdd.title, camaraManager.getAbreviatura(sessionState.globalCamara))}" />    
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+		<br/>
+	
+		<s:div id="tiposCausa" styleClass="list indent" >
+		<h:panelGrid columns="2" style="width:100%" rendered="#{(not empty expedienteMeAdd.materia and materiaEnumeration.isNoPenal(expedienteMeAdd.materia)) or camaraManager.isCamaraActualCorteSuprema()}">
+   			<c:forEach items="#{expedienteMeAdd.tiposCausaEspecial}" var="tipo">
+	     	<h:panelGroup style="display: block;" >
+				<h2 class="icon expediente" style="border-bottom:0px; font-weight:bold">
+					<h:commandLink id="but0_#{tipo.id}" value="#{tipo.codigo} - #{tipo.descripcion}" rendered="#{expedienteMeAdd.startAtPage0(tipo)}"
+						actionListener="#{expedienteMeAdd.selectTipoCausa(tipo.id)}"
+						action="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-0.xhtml">
+					</h:commandLink>
+					<h:commandLink id="but1_#{tipo.id}" value="#{tipo.codigo} - #{tipo.descripcion}" rendered="#{expedienteMeAdd.startAtPage1(tipo)}"
+						actionListener="#{expedienteMeAdd.selectTipoCausa(tipo.id)}"
+						action="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml">
+					</h:commandLink>
+					<h:commandLink id="but2_#{tipo.id}" value="#{tipo.codigo} - #{tipo.descripcion}" rendered="#{expedienteMeAdd.startAtPageEspecial(tipo)}"
+						actionListener="#{expedienteMeAdd.selectTipoCausa(tipo.id)}"
+						action="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial.xhtml">
+					</h:commandLink>
+					<h:commandLink id="but3_#{tipo.id}" value="#{tipo.codigo} - #{tipo.descripcion}" rendered="#{expedienteMeAdd.startAtPageEspecial0(tipo)}"
+						actionListener="#{expedienteMeAdd.selectTipoCausa(tipo.id)}"
+						action="/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-Especial-0.xhtml">
+					</h:commandLink>
+				</h2>
+   			</h:panelGroup>
+   			</c:forEach>
+   		</h:panelGrid>
+		</s:div>
+
+
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

@@ -1,0 +1,190 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<script type='text/javascript' src="#{facesContext.externalContext.requestContextPath}/js/codigoExpediente.js"/>
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{empty expedienteMeAdd.expedienteEspecialEdit.tipoCausa ? expedienteMeAdd.normalTitle : interpolator.interpolate(expedienteMeAdd.ingresoDiferidoTitle, expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion)}"/>
+		<ui:param name="description" value="#{messages['expedienteMe.ingresoDiferido.comment']}" />
+		<br/>
+
+	<!-- Numero y año Expediente -->
+		<s:decorate id="expedienteDecoration" template="/layout/editComment.xhtml" >
+		    <ui:define name="label">#{messages['expedienteMe.ingresoDiferido.expedienteNumAnio']}</ui:define>
+		    <ui:param name="required" value="true"/>
+     		<h:panelGrid id="numeroExpediente" columns="3" style="color:#000;" cellpadding="0" cellspacing="0">
+                <h:inputText id="numero" class="numeroExpediente"
+	                	   size="7"
+	                  maxlength="6"
+                          value="#{expedienteMeAdd.ingresoDiferidoEdit.numeroExpediente}">
+                </h:inputText>
+                <h:panelGroup style="padding:0 5px;font-size:1.5em">
+	     			<h:outputLabel value="/" />
+                </h:panelGroup>
+                <h:inputText id="anio" class="anioExpediente"
+							   size="4"
+						  maxlength="4"
+                          value="#{expedienteMeAdd.ingresoDiferidoEdit.anioExpediente}">
+                </h:inputText>
+            </h:panelGrid>
+		    <ui:define name="comment">#{messages['expedienteMe.ingresoDiferido.expedienteNumAnio.comment']}</ui:define>
+		</s:decorate>
+
+		<s:decorate id="oficinaDestinoDecoration" template="/layout/edit.xhtml" >
+		    <ui:define name="label">#{messages['expedienteMe.ingresoDiferido.oficinaDestino']}</ui:define>
+			    <ui:param name="required" value="true"/>
+				<s:fragment rendered="#{expedienteMeAdd.ingresoDiferidoEdit.showSelectorDeOficinas}">
+					<h:selectOneMenu id="oficinaDestino" 
+								 value="#{expedienteMeAdd.ingresoDiferidoEdit.oficinaDestino}">
+						<s:selectItems var="lookupItem"
+									 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+									 value="#{expedienteMeAdd.oficinasDestinoIngresoDiferido}"
+							noSelectionLabel="#{messages['expedienteMeAdd.ingresoDiferido.oficinaDestino.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+					</h:selectOneMenu>
+					<s:fragment rendered="#{expedienteMeAdd.showVerTodasOficinasDestino()}">					
+						<rich:spacer width="10px"></rich:spacer>
+						<h:selectBooleanCheckbox id="verTodasOficinas" value="#{expedienteMeAdd.verTodasOficinasDestino}" >
+							<a4j:support event="onclick" reRender="oficinaDestinoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+						</h:selectBooleanCheckbox>
+						#{messages['expedienteMe.ingresoDiferido.verTodas']}
+					</s:fragment>
+				</s:fragment>
+				
+				<s:fragment rendered="#{not expedienteMeAdd.ingresoDiferidoEdit.showSelectorDeOficinas and not empty expedienteMeAdd.ingresoDiferidoEdit.oficinaDestino}">
+	             	<div style="font-size:1.5em;font-weight:bold">
+	             	#{expedienteMeAdd.ingresoDiferidoEdit.oficinaDestino.descripcion}
+	             	</div>
+	             </s:fragment>
+		</s:decorate>
+		
+        <s:decorate id="tipoAsignacionDecoration" template="/layout/edit.xhtml" >
+           	<ui:define name="label">#{messages['expedienteMe.ingresoDiferido.tipoAsignacion']}</ui:define>
+           	<ui:param name="required" value="true"/>
+			<h:selectOneMenu id="tipoAsignacion"
+				      value="#{expedienteMeAdd.ingresoDiferidoEdit.tipoAsignacion}">
+				<f:selectItems value="#{tipoAsignacionEnumeration.getItemsIngresoDiferido(expedienteMeAdd)}" />
+				<a4j:support event="onchange" reRender="tipoAsignacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+			</h:selectOneMenu>
+        </s:decorate>
+		
+		<s:decorate id="fechaIngresoDecoration" template="/layout/edit.xhtml">
+                 <ui:define name="label">#{messages['expedienteMe.ingresoDiferido.fechaIngreso']}</ui:define>
+		   		 <ui:define name="comment">#{messages['expedienteMe.ingresoDiferido.fechaIngreso.comment']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<rich:calendar id="fechaIngreso" showWeeksBar="false"
+									 enableManualInput="true"
+								 value="#{expedienteMeAdd.ingresoDiferidoEdit.fechaIngreso}" datePattern="dd/MM/yyyy" inputSize="10">
+					</rich:calendar>
+         </s:decorate>
+
+		<s:fragment rendered="#{expedienteMeAdd.ingresoAnteriorSistema}">
+		<ui:decorate template="/layout/group/editGroupSeparator.xhtml" rendered="#{expedienteMeAdd.ingresoAnteriorSistema}">
+	       	<ui:param name="label" value="#{messages['expedienteMe.ingresoDiferido.otrasRadicacionesGroup']}"/>
+			<ui:param name="id" value="otrasRadicacionesGroup"/>
+			
+			<s:decorate id="radicacionJuzgadoDecoration" rendered="#{not expedienteMeAdd.isIngresoAJuzgado()}" template="/layout/edit.xhtml" >
+			    <ui:define name="label">#{messages['expedienteMe.ingresoDiferido.juzgado']}</ui:define>
+					<h:selectOneMenu id="juzgado" rendered="#{not oficinaManager.inJuzgado()}"
+								 value="#{expedienteMeAdd.ingresoDiferidoEdit.juzgado}">
+						<s:selectItems var="lookupItem"
+									 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+									 value="#{expedienteMeAdd.juzgados}"
+							noSelectionLabel="#{messages['expedienteMeAdd.ingresoDiferido.oficinaDestino.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+					</h:selectOneMenu>
+					<s:fragment rendered="#{oficinaManager.inJuzgado() and not empty expedienteMeAdd.ingresoDiferidoEdit.juzgado}">
+		             	<div style="font-size:1.5em;font-weight:bold">
+		             	#{expedienteMeAdd.ingresoDiferidoEdit.juzgado.descripcion}
+		             	</div>
+		             </s:fragment>
+			</s:decorate>
+	
+			<s:decorate id="radicacionSalaDecoration" rendered="#{not expedienteMeAdd.isIngresoASala()}" template="/layout/edit.xhtml" >
+			    <ui:define name="label">#{messages['expedienteMe.ingresoDiferido.sala']}</ui:define>
+					<h:selectOneMenu id="sala" rendered="#{not oficinaManager.inSalaDeCamara()}"
+								 value="#{expedienteMeAdd.ingresoDiferidoEdit.sala}">
+						<s:selectItems var="lookupItem"
+									 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+									 value="#{expedienteMeAdd.salas}"
+							noSelectionLabel="#{messages['expedienteMeAdd.ingresoDiferido.oficinaDestino.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+					</h:selectOneMenu>
+					<s:fragment rendered="#{oficinaManager.inSalaDeCamara() and not empty expedienteMeAdd.ingresoDiferidoEdit.sala}">
+		             	<div style="font-size:1.5em;font-weight:bold">
+		             	#{expedienteMeAdd.ingresoDiferidoEdit.sala.descripcion}
+		             	</div>
+		             </s:fragment>
+			</s:decorate>
+			<s:decorate id="radicacionTODecoration" rendered="#{not expedienteMeAdd.isIngresoATO() and expedienteMeAdd.isPenal()}" template="/layout/edit.xhtml" >
+			    <ui:define name="label">#{messages['expedienteMe.ingresoDiferido.tribunalOral']}</ui:define>
+					<h:selectOneMenu id="tribunalOral" rendered="#{not oficinaManager.inTribunalOral()}"
+								 value="#{expedienteMeAdd.ingresoDiferidoEdit.tribunalOral}">
+						<s:selectItems var="lookupItem"
+									 label="#{oficinaDestinoEnumeration.labelFor(lookupItem)}"
+									 value="#{expedienteMeAdd.tribunalesOrales}"
+							noSelectionLabel="#{messages['expedienteMeAdd.ingresoDiferido.oficinaDestino.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+					</h:selectOneMenu>
+					<s:fragment rendered="#{oficinaManager.inTribunalOral() and not empty expedienteMeAdd.ingresoDiferidoEdit.tribunalOral}">
+		             	<div style="font-size:1.5em;font-weight:bold">
+		             	#{expedienteMeAdd.ingresoDiferidoEdit.tribunalOral.descripcion}
+		             	</div>
+		             </s:fragment>
+			</s:decorate>
+		</ui:decorate>
+		</s:fragment>		
+		<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+		</div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+ 
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+			
+		            <h:commandButton id="button_previous" styleClass="button main-button"
+						value="#{messages['button_previous']}" 
+						action="#{expedienteMeAdd.doCancelIngresoDiferido()}">
+						<s:defaultAction/>
+					</h:commandButton>
+
+					<h:commandButton styleClass="button main-button"
+						value="#{messages['button_finalizar']}" 
+						onclick="Richfaces.showModalPanel('waitDialog');"
+						action="#{expedienteMeAdd.doSaveFin(4,'/webCustom/mesaEntrada/expediente/add/expedienteMeAddFin.xhtml')}"/>
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>
+		

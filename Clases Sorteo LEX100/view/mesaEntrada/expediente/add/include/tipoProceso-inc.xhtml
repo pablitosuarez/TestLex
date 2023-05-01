@@ -1,0 +1,27 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<!-- group tipoProcesoGroup -->
+	<s:decorate template="/layout/editQueryShort2.xhtml">
+		<ui:define name="label">#{messages['expediente.tipoProceso']}</ui:define>
+		<h:selectOneMenu id="tipoProceso" style="width:250px"
+			value="#{expedienteMeAdd.tipoProceso}">
+			<s:selectItems var="lookupItem"
+				label="#{tipoProcesoEnumeration.labelFor(lookupItem)}"
+				value="#{expedienteMeAdd.getTiposProceso()}"
+				noSelectionLabel="#{messages['expediente.tipoProceso.lookup_select']}">
+			</s:selectItems>
+			<s:convertEntity />
+			<a4j:support event="onchange" reRender="intLines" />				
+		</h:selectOneMenu>
+	</s:decorate>
+	<!-- end group tipoProcesoGroup -->
+	
+</ui:composition>
+            

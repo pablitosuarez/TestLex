@@ -1,0 +1,42 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+<s:div id="datosMediacion" >
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+           <s:decorate id="tipoMinisterioPublicoDecoration" template="/layout/edit.xhtml" >
+               	<ui:define name="label">#{messages['expedienteEspecial.tipoMinisterioPublico']}</ui:define>
+				<h:selectOneRadio id="tipoMinisterioPublico"
+							  layout="pageDirection" 
+					      value="#{expedienteMeAdd.ministerioPublicoEdit.tipoMinisterioPublico}">
+					<f:selectItems value="#{tipoMinisterioPublicoCivilEnumeration.getItems()}" />
+				</h:selectOneRadio>
+				
+           </s:decorate>
+           
+           
+            <s:decorate id="fiscaliaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expedienteEspecial.numeroMinisterioPublico']}</ui:define>
+	                <h:inputText id="fiscalia"
+	                		size="5"
+	                          value="#{expedienteMeAdd.ministerioPublicoEdit.numero}">
+	                </h:inputText>
+            </s:decorate>
+           
+	</ui:decorate>
+
+	</s:div>
+
+</ui:composition>

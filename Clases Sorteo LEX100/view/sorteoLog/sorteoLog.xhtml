@@ -1,0 +1,101 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+    
+	<h:form>
+	<ui:decorate id="form" template="/layout/form.xhtml">
+		<ui:param name="icon" value="sorteo" />    
+		<ui:param name="title" value="#{messages['sorteoLog']}" />    
+		<ui:param name="description" value="#{messages['sorteoLog.comment']}" />
+
+		<!-- group default -->
+        <ui:decorate template="/layout/group/groupAuto.xhtml">
+		<ui:param name="id" value="default"/>
+
+    	    <s:decorate id="codigoSorteo" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoLog.codigoSorteo']}</ui:define>
+
+			            #{sorteoLogHome.instance.codigoSorteo}
+	        </s:decorate>
+    	    <s:decorate id="rubro" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoLog.rubro']}</ui:define>
+
+			            #{sorteoLogHome.instance.rubro}
+	        </s:decorate>
+    	    <s:decorate id="rangoMinimos" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoLog.rangoMinimos']}</ui:define>
+			            #{sorteoLogHome.instance.rangoMinimos}
+	        </s:decorate>
+    	    <s:decorate id="fechaSorteo" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoLog.fechaSorteo']}</ui:define>
+			            <h:outputText value="#{sorteoLogHome.instance.fechaSorteo}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm:ss.SSS"/>
+			            </h:outputText>
+	        </s:decorate>
+    	    <s:decorate id="usuario" template="/layout/display.xhtml" >
+            	<ui:define name="label">#{messages['sorteoLog.usuario']}</ui:define>
+
+			            #{sorteoLogHome.instance.usuario}
+	        </s:decorate>
+
+			<s:decorate id="expediente" template="/layout/display.xhtml" >
+				<ui:define name="label">#{messages['sorteoLog.expediente']}</ui:define>
+				<h:outputText value="#{messages['sorteoLog.expediente.lookup_none']}" 
+		    		rendered="#{sorteoLogHome.instance.expediente == null}"/>
+						<s:fragment rendered="#{sorteoLogHome.instance.expediente != null}">
+
+			            #{sorteoLogHome.instance.expediente.descriptionExpression}
+						</s:fragment>
+			</s:decorate>
+
+			<s:decorate id="oficina" template="/layout/display.xhtml" >
+				<ui:define name="label">#{messages['sorteoLog.oficina']}</ui:define>
+				<h:outputText value="#{messages['sorteoLog.oficina.lookup_none']}" 
+		    		rendered="#{sorteoLogHome.instance.oficina == null}"/>
+						<s:fragment rendered="#{sorteoLogHome.instance.oficina != null}">
+			            #{sorteoLogHome.instance.oficina.descripcion}
+						</s:fragment>
+			</s:decorate>
+    	    <s:decorate id="informacionSorteo" template="/layout/displayBlock.xhtml" >
+            	<ui:define name="label">#{messages['sorteoLog.informacionSorteo']}</ui:define>
+            	<pre><br/>
+            	<h:outputText value="#{sorteoLogHome.instance.informacionSorteo}"/>
+            	</pre>
+	        </s:decorate>
+		</ui:decorate>
+		<!-- end group default -->		
+
+    	<ui:define name="collections">
+		</ui:define>
+	
+        <div style="clear:both"/>
+        
+    	<ui:define name="buttons">
+	    	<div class="actionButtons">      
+	    	    <s:button styleClass="button done main-button " 
+	    	    	  action="#{sorteoLogSearch.done()}"
+						view="#{sorteoLogSearch.getReturnPage('/web/sorteoLog/sorteoLogList.xhtml')}"
+					   value="#{messages['button_done']}"/>
+					<rich:spacer width="15"/>	
+
+		    </div>
+		</ui:define>
+	</ui:decorate>
+	</h:form>
+
+	<div class="indent_lines">
+	</div>
+	   
+</ui:define>
+
+</ui:composition>

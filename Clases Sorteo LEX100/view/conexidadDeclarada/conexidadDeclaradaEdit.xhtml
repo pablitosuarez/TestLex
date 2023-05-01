@@ -1,0 +1,107 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="conexidadDeclarada" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editFormExpediente.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{conexidadDeclaradaHome.managed ? messages['conexidadDeclarada.edit'] : messages['conexidadDeclarada.add']}" />    
+		<ui:param name="description" value="#{messages['conexidadDeclarada.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+		<ui:include src="#{'/web/conexidadDeclarada/include/conexidadDeclaradaEditContent.xhtml'}">
+			<ui:param name="manager" value="#{conexidadDeclaradaHome}"/>
+			<ui:param name="conexidadDeclarada" value="#{conexidadDeclaradaHome.instance}"/>
+		</ui:include>
+
+		<ui:decorate template="/layout/grid/gridForm.xhtml">			
+		<tr class="grideditrow">
+		<td class="grideditcolumn" colspan="1">
+			<s:decorate id="cambiaRadicacionDecoration" template="/layout/edit.xhtml" rendered="#{not conexidadDeclaradaHome.isConexidadDenunciadaSala() and s:hasPermission('MesaEntrada','reasignacionJuzgado')}">
+				<ui:define name="label">#{messages['conexidadDeclarada.cambiarRadicacion']}</ui:define>
+				<h:selectOneRadio id="cambiaRadicacion"
+							 layout="pageDirection" 
+							  value="#{conexidadDeclaradaHome.cambiaRadicacion}">
+					<f:selectItems value="#{conexidadDeclaradaHome.cambiaRadicacionItems}" />
+					<a4j:support event="onclick" reRender="cambiaRadicacionDecoration, actionButtons" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneRadio>
+			</s:decorate>
+		</td>
+		</tr>
+		</ui:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <s:div id="actionButtons" styleClass="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{conexidadDeclaradaHome.doCancel}"
+						view="/web/expediente/expedienteCompleto.xhtml"
+						rendered="#{conexidadDeclaradaHome.managed}"/>
+				<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{conexidadDeclaradaHome.doCancel}"
+						view="/web/expediente/expedienteCompleto.xhtml"
+						rendered="#{!conexidadDeclaradaHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{conexidadDeclaradaHome.doAdd(conexidadDeclaradaSearch.getReturnPage('/web/expediente/expedienteCompleto.xhtml'))}"
+					rendered="#{cambiaRadicacionEnumeration.isNoCambiar(conexidadDeclaradaHome.cambiaRadicacion) and !conexidadDeclaradaHome.managed and s:hasPermission('ConexidadDeclarada','add')}"/>  
+		                          			  
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}" 
+					action="#{conexidadDeclaradaHome.doUpdate(conexidadDeclaradaSearch.getReturnPage('/web/expediente/expedienteCompleto.xhtml'))}"
+					rendered="#{cambiaRadicacionEnumeration.isNoCambiar(conexidadDeclaradaHome.cambiaRadicacion) and conexidadDeclaradaHome.managed and s:hasPermission('ConexidadDeclarada','update')}"/>
+						
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_asignar']}" 
+					action="#{conexidadDeclaradaHome.asignar('/webCustom/mesaEntrada/expediente/reasignacion/reasignacionMeFin.xhtml')}"
+					rendered="#{cambiaRadicacionEnumeration.isAsignar(conexidadDeclaradaHome.cambiaRadicacion) and s:hasPermission('MesaEntrada','reasignacionJuzgado')}"/>
+
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_sortear']}" 
+					action="#{conexidadDeclaradaHome.sortear('/webCustom/mesaEntrada/expediente/reasignacion/reasignacionMeFin.xhtml')}"
+					rendered="#{cambiaRadicacionEnumeration.isSortear(conexidadDeclaradaHome.cambiaRadicacion) and s:hasPermission('MesaEntrada','reasignacionJuzgado')}"/>
+
+			</s:div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

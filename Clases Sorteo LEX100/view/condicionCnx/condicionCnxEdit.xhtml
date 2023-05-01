@@ -1,0 +1,116 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="condicionCnx" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{condicionCnxHome.managed ? messages['condicionCnx.edit'] : messages['condicionCnx.add']}" />    
+		<ui:param name="description" value="#{messages['condicionCnx.comment']}" />
+
+   		<ui:define name="formHeader">
+	        <div class="formHeader">
+
+			<s:decorate id="criterioCnx" template="/layout/edit.xhtml" >
+				<ui:define name="label">#{messages['condicionCnx.criterioCnx']}</ui:define>
+				<h:outputText value="#{messages['condicionCnx.criterioCnx.lookup_none']}" 
+		    		rendered="#{condicionCnxHome.instance.criterioCnx == null}"/>
+						<s:fragment rendered="#{condicionCnxHome.instance.criterioCnx != null}">
+			            #{condicionCnxHome.instance.criterioCnx.nombre}
+						</s:fragment>
+			</s:decorate>
+			</div>
+		</ui:define>	<!--  end formHeader -->
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="parametroDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['condicionCnx.parametro']}</ui:define>
+					<h:selectOneMenu id="parametro"
+	                       required="true"
+					disabled="#{!condicionCnxHome.hasEditPermission('CondicionCnx','add','update')}"
+						      value="#{condicionCnxHome.instance.parametro}">
+						<f:selectItems value="#{condicionCnxHome.getParametrosSelectItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="parametroDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="tipoComparacionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['condicionCnx.tipoComparacion']}</ui:define>
+					<h:selectOneMenu id="tipoComparacion"
+	                       required="true"
+					disabled="#{!condicionCnxHome.hasEditPermission('CondicionCnx','add','update')}"
+						      value="#{condicionCnxHome.instance.tipoComparacion}">
+						<f:selectItems value="#{tipoComparacionEnumeration.getItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="tipoComparacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{condicionCnxHome.doCancel}"
+						view="#{condicionCnxSearch.getReturnPage('/web/condicionCnx/condicionCnxList.xhtml')}"
+						rendered="#{condicionCnxHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{condicionCnxHome.doAdd(condicionCnxSearch.getReturnPage('/web/condicionCnx/condicionCnxList.xhtml'))}"
+					rendered="#{!condicionCnxHome.managed and s:hasPermission('CondicionCnx','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{condicionCnxHome.doUpdate(condicionCnxSearch.getReturnPage('/web/condicionCnx/condicionCnxList.xhtml'))}"
+						rendered="#{condicionCnxHome.managed and s:hasPermission('CondicionCnx','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{condicionCnxHome.doCancel}"
+						view="#{condicionCnxSearch.getReturnPage('/web/condicionCnx/condicionCnxList.xhtml')}"
+						rendered="#{!condicionCnxHome.managed}"/>
+					<rich:spacer width="15" rendered="#{condicionCnxHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{condicionCnxHome.doDelete(condicionCnxSearch.getReturnPage('/web/condicionCnx/condicionCnxList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{condicionCnxHome.managed and s:hasPermission('CondicionCnx','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

@@ -1,0 +1,88 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+	<!-- group recursoGroup -->
+	<s:fragment rendered="#{expedienteMeAdd.showTipoRecurso()}">
+		<s:decorate id="tipoRecursoDecoration" template="/layout/edit.xhtml">
+			<ui:param name="required" value="true"/>
+			<ui:define name="label">#{messages['expediente.tipoRecurso']}</ui:define>
+			<h:selectOneMenu id="tipoSubexpediente"
+					value="#{expedienteMeAdd.recursoEdit.tipoRecurso}">
+				<s:selectItems var="lookupItem"
+					label="#{tipoRecursoEnumeration.labelFor(lookupItem)}"
+					value="#{expedienteMeAdd.getAvailableTiposRecurso()}"
+					noSelectionLabel="#{messages['expediente.tipoRecurso.lookup_select']}">
+				</s:selectItems>
+				
+				<s:convertEntity/>
+				<a4j:support event="onchange" reRender="tipoRecursoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+			</h:selectOneMenu>
+		</s:decorate>
+        <s:decorate id="fechaPresentacionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['recursoExp.fechaPresentacion.alta']}</ui:define>
+					<rich:calendar id="fechaPresentacion" 
+	                       required="true" showWeeksBar="false"
+					 enableManualInput="true"					
+								 value="#{expedienteMeAdd.recursoEdit.fechaPresentacion}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="fechaPresentacionDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="fechaPresentacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+         </s:decorate>	   
+		<s:decorate id="descripcionDecoration" template="/layout/edit.xhtml" >
+			<ui:define name="label">#{messages['recursoExp.descripcion']}</ui:define>
+					<div class="inputTextarea_wrap">
+		                <h:inputTextarea id="descripcion"
+		                               cols="98"
+		                               rows="2"
+		                              value="#{expedienteMeAdd.recursoEdit.observaciones}">
+		                </h:inputTextarea>
+	                </div>
+		</s:decorate>
+		<s:decorate id="resolucionApelacionDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.showResolucionApelada()}">
+			<ui:define name="label">#{messages['recursoExp.resolucionApelacion']}</ui:define>
+			<div class="inputTextarea_wrap">
+				<h:inputTextarea id="resolucionApelacion"
+							cols="100"
+							rows="2"
+                       		value="#{expedienteMeAdd.recursoEdit.resolucionApelacion}">
+             		<a4j:support event="onblur" reRender="resolucionApelacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:inputTextarea>
+			</div>			                              
+		</s:decorate>
+		<s:decorate id="tipoResolucionApeladaDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.showResolucionApelada()}">
+		    <ui:define name="label">#{messages['recursoExp.tipoResolucionApelada']}</ui:define>
+			<h:selectOneMenu id="tipoResolucionApelada"
+				      value="#{expedienteMeAdd.recursoEdit.tipoResolucionApelada}">
+				<f:selectItems value="#{tipoResolucionApeladaEnumeration.getItems(messages['lookup_select'])}" />
+			</h:selectOneMenu>
+		</s:decorate>
+		
+		<s:decorate id="detenidosDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.isPenal()}">
+			<ui:define name="label">#{messages['expedienteEspecial.detenidos']}</ui:define>
+			<h:selectBooleanCheckbox id="detenidos"
+				value="#{expedienteMeAdd.recursoEdit.detenidos}"/>
+		</s:decorate>
+
+		<s:decorate id="regimenProcesalDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.isPenal()}">
+				<ui:define name="label">#{messages['expedienteEspecial.regimenProcesal']}</ui:define>
+				<h:selectOneRadio id="regimenProcesal"
+								  layout="pageDirection" 
+						      value="#{expedienteMeAdd.recursoEdit.regimenProcesal}">
+				<f:selectItems value="#{regimenProcesalEnumeration.items}" />
+				<a4j:support event="onclick" reRender="regimenProcesalDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+				</h:selectOneRadio>
+		</s:decorate>
+	</s:fragment>							
+	<!-- end group recursoGroup -->
+	
+</ui:composition>

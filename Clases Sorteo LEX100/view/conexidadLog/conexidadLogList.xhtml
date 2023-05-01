@@ -1,0 +1,269 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml" rendered="#{s:hasPermission('ConexidadLog','read')}">
+		<ui:param name="icon" value="conexidad" />    
+		<ui:param name="title" value="#{messages['conexidadLog.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(conexidadLogList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{conexidadLogList}"/>
+
+			<s:decorate id="camaraFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{empty sessionState.globalCamara}">
+			    <ui:define name="label">#{messages['conexidadLog.camara']}</ui:define>
+				<h:selectOneMenu id="camaraFilter"
+					      value="#{conexidadLogSearch.camara}">
+					<s:selectItems var="lookupItem"
+								 label="#{camaraEnumeration.labelFor(lookupItem)}"
+								 value="#{camaraEnumeration.items}"
+						noSelectionLabel="#{messages['conexidadLog.camara.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="fromFechaComienzoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.fromFechaComienzo']}</ui:define>
+					<rich:calendar id="fromFechaComienzoFilter"  defaultTime="00:00"
+					enableManualInput="true"					
+								value="#{conexidadLogSearch.fromFechaComienzo}" datePattern="dd/MM/yyyy HH:mm" inputSize="16">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="toFechaComienzoFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.toFechaComienzo']}</ui:define>
+					<rich:calendar id="toFechaComienzoFilter" defaultTime="23:59"
+					enableManualInput="true"					
+								value="#{conexidadLogSearch.toFechaComienzo}" datePattern="dd/MM/yyyy HH:mm" inputSize="16">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="fromFechaFinFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.fromFechaFin']}</ui:define>
+					<rich:calendar id="fromFechaFinFilter"  defaultTime="00:00"
+					enableManualInput="true"					
+								value="#{conexidadLogSearch.fromFechaFin}" datePattern="dd/MM/yyyy HH:mm" inputSize="16">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="toFechaFinFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.toFechaFin']}</ui:define>
+					<rich:calendar id="toFechaFinFilter"  defaultTime="23:59"
+					enableManualInput="true"					
+								value="#{conexidadLogSearch.toFechaFin}" datePattern="dd/MM/yyyy HH:mm" inputSize="16">
+					</rich:calendar>
+			</s:decorate>
+			<s:decorate id="minIntervaloFilterDecoration" template="/layout/editQueryComment.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.minIntervalo']}</ui:define>
+	                <h:inputText id="minIntervaloFilter"
+	                          value="#{conexidadLogSearch.minIntervaloSeg}">
+	                </h:inputText>
+			    <ui:define name="comment">#{messages['conexidadLog.minIntervalo.comment']}</ui:define>
+			</s:decorate>
+			<s:decorate id="numeroExpedienteFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.expedienteNumeroAnio']}</ui:define>
+			    	<h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+	                <h:inputText id="numeroFilter" class="numeroExpediente2"
+	                		  size="10"
+							   maxlength="9"
+	                       onkeydown="numeroExpedienteKeydown(event,'2')" 
+		                       onkeyup="numeroExpedienteKeyup(event,'2')" 
+	                          value="#{conexidadLogSearch.numeroExpediente}">
+	                </h:inputText>
+	                <div style="padding:0 5px">/</div>
+	                <h:inputText id="anioFilter" class="anioExpediente2"
+	                		  size="5"
+						   maxlength="4"
+	                      onkeydown="numericOnly(event)"
+	                          value="#{conexidadLogSearch.anioExpediente}">
+	                </h:inputText>
+	                </h:panelGrid>
+			</s:decorate>
+			<s:decorate id="claveExpedienteFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.claveExpediente']}</ui:define>
+	                <h:inputText id="claveExpedienteFilter" 
+	                           size="40"
+	                          value="#{conexidadLogSearch.claveExpediente}">
+	                </h:inputText>
+			</s:decorate>
+			
+			<s:decorate id="tipoRadicacionFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.tipoRadicacion']}</ui:define>
+				<h:selectOneMenu id="tipoRadicacionFilter"
+					      value="#{conexidadLogSearch.tipoRadicacion}">
+					<f:selectItems value="#{tipoRadicacionEnumeration.getItems(messages['lookup_select'])}" />
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="showDetailsFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['conexidadLog.showDetails']}</ui:define>
+			    	<h:selectBooleanCheckbox id="showDetailsFilter" value="#{conexidadLogSearch.showDetails}"/>
+			</s:decorate>
+			
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['conexidadLog.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty conexidadLogList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="conexidadLogList">
+			    <rich:dataTable id="conexidadLogTable" 
+			                var="item"
+			              value="#{conexidadLogList.resultList}" 
+                       rendered="#{not empty conexidadLogList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" rendered="#{s:hasPermission('ConexidadLog','read') or conexidadLogSearch.hasSelectionPage()}">
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{conexidadLogList.getOrderStyle('fechaComienzo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['conexidadLog.fechaComienzo.shortLabel']}">
+				                    <f:param name="conexidadLogOrder" value="#{conexidadLogList.getOrderParam('fechaComienzo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{conexidadLogList.getOrderStyle('fechaFin', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['conexidadLog.fechaFin.shortLabel']}">
+				                    <f:param name="conexidadLogOrder" value="#{conexidadLogList.getOrderParam('fechaFin')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{conexidadLogList.getOrderStyle('intervalo', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['conexidadLog.intervalo.shortLabel']}">
+				                    <f:param name="conexidadLogOrder" value="#{conexidadLogList.getOrderParam('intervalo')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" rendered="#{empty sessionState.globalCamara}" >
+								#{messages['conexidadLog.camara.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+				                <s:link styleClass="#{conexidadLogList.getOrderStyle('expediente.id', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['conexidadLog.expediente.shortLabel']}">
+			    	                <f:param name="conexidadLogOrder" value="#{conexidadLogList.getOrderParam('expediente.id')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{conexidadLogList.getOrderStyle('tipoRadicacion', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['conexidadLog.tipoRadicacion.shortLabel']}">
+				                    <f:param name="conexidadLogOrder" value="#{conexidadLogList.getOrderParam('tipoRadicacion')}"/>
+				                </s:link>
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+					
+					<rich:subTable  id="normalRow" var="item" value="#{item}" rendered="#{true}">
+					
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('ConexidadLog','read') or conexidadLogSearch.hasSelectionPage()}">
+			            <h:commandLink action="#{conexidadLogList.doSelection(item, '/web/conexidadLog/conexidadLog.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!conexidadLogSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{item.fechaComienzo}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm:ss"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{item.fechaFin}">
+			                <s:convertDateTime type="both" dateStyle="short" pattern="dd/MM/yyyy HH:mm:ss"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.intervaloSeg}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn" rendered="#{empty sessionState.globalCamara}" >
+						<s:fragment rendered="#{item.camara != null}">
+
+			            #{item.camara.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+			            #{expedienteManager.getIdxAnaliticoFirst(item.expediente)}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{tipoRadicacionEnumeration.getLabel(item.tipoRadicacion)}"/>
+						<br/>
+			        </rich:column>
+
+					</rich:subTable>
+					
+					<rich:subTable  id="detailRow" var="item" value="#{item}" rendered="#{conexidadLogSearch.showDetails}">
+			        <rich:column styleClass="rowColumn rowBck2"  colspan="9">
+						<s:fragment rendered="#{item.informacionConexidad != null}">
+			            <pre>#{item.informacionConexidad}</pre>
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        </rich:subTable>
+
+					
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{conexidadLogList.getPaginator(conexidadLogList)}"/>
+	  			<ui:param name="componentName" value="conexidadLog"/>
+	  		</s:decorate>
+		</ui:define>
+	
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{conexidadLogSearch.hasReturnPage()}" 
+		        			  view="#{conexidadLogSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['conexidadLog.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/conexidadLog/conexidadLogList.jrxml" />
+		<ui:param name="reportList" value="#{conexidadLogList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

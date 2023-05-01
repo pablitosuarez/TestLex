@@ -1,0 +1,223 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+<ui:define name="body">
+	<s:decorate id="list" template="/layout/lines/list.xhtml">
+		<ui:param name="icon" value="turnoFiscalia" />    
+		<ui:param name="title" value="#{messages['turnoFiscaliaSala.list']}" />    
+
+    	<ui:define name="reportsLinks">
+    			<a4j:commandLink title="#{messages['jasperReport.executeReportButton']}"
+    				styleClass="linkReport" style="float:left"
+    				onclick="#{rich:component('waitDialog')}.show();"
+    				oncomplete="#{rich:component('waitDialog')}.hide();" 
+    				reRender="executeJasperDialogDiv"
+    				actionListener="#{jasperReportManager.doShowDialog(turnoFiscaliaSalaList.resultCount)}" />
+    	</ui:define>
+    	<ui:define name="filters">
+		<s:decorate template="/layout/filters.xhtml">
+			<ui:param name="list" value="#{turnoFiscaliaSalaList}"/>
+
+			<s:decorate id="competenciaFilterDecoration" template="/layout/editQuery.xhtml" >
+			    <ui:define name="label">#{messages['turnoFiscaliaSala.competencia']}</ui:define>
+				<h:selectOneMenu id="competenciaFilter"
+					      value="#{turnoFiscaliaSalaSearch.competencia}">
+					<s:selectItems var="lookupItem"
+								 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+								 value="#{competenciaEnumeration.items}"
+						noSelectionLabel="#{messages['turnoFiscaliaSala.competencia.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+			<s:decorate id="camaraFilterDecoration" template="/layout/editQuery.xhtml" rendered="#{empty sessionState.globalObjects.camara}">
+			    <ui:define name="label">#{messages['turnoFiscaliaSala.camara']}</ui:define>
+				<h:selectOneMenu id="camaraFilter"
+					      value="#{turnoFiscaliaSalaSearch.camara}">
+					<s:selectItems var="lookupItem"
+								 label="#{camaraEnumeration.labelFor(lookupItem)}"
+								 value="#{camaraEnumeration.items}"
+						noSelectionLabel="#{messages['turnoFiscaliaSala.camara.lookup_select']}">
+					</s:selectItems>
+					<s:convertEntity/>
+				</h:selectOneMenu>
+			</s:decorate>
+		</s:decorate>
+		</ui:define>
+		<ui:define name="emptyMessage">
+		    <h:outputText value="#{messages['turnoFiscaliaSala.list_none']}" styleClass="emptyMessage"
+	               rendered="#{empty turnoFiscaliaSalaList.resultList}"/>
+		</ui:define>
+		<h:form>
+		
+		    <div class="results" id="turnoFiscaliaSalaList">
+			    <rich:dataTable id="turnoFiscaliaSalaTable" 
+			                var="item"
+			              value="#{turnoFiscaliaSalaList.resultList}" 
+                       rendered="#{not empty turnoFiscaliaSalaList.resultList}">
+					<f:facet name="header">
+						<rich:columnGroup>
+							<rich:column styleClass="toolbaritem" >
+			            		<span/>
+							</rich:column>
+							
+							
+	
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoFiscaliaSalaList.getOrderStyle('fechaDesde', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['turnoFiscaliaSala.fechaDesde.shortLabel']}">
+				                    <f:param name="turnoFiscaliaSalaOrder" value="#{turnoFiscaliaSalaList.getOrderParam('fechaDesde')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoFiscaliaSalaList.getOrderStyle('codFiscaliaPrimera', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['turnoFiscaliaSala.codFiscaliaPrimera.shortLabel']}">
+				                    <f:param name="turnoFiscaliaSalaOrder" value="#{turnoFiscaliaSalaList.getOrderParam('codFiscaliaPrimera')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"   >
+				                <s:link styleClass="#{turnoFiscaliaSalaList.getOrderStyle('codFiscaliaSegunda', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['turnoFiscaliaSala.codFiscaliaSegunda.shortLabel']}">
+				                    <f:param name="turnoFiscaliaSalaOrder" value="#{turnoFiscaliaSalaList.getOrderParam('codFiscaliaSegunda')}"/>
+				                </s:link>
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem"  >
+								#{messages['turnoFiscaliaSala.competencia.shortLabel']}
+							</rich:column>
+
+							<rich:column styleClass="toolbaritem" rendered="#{empty sessionState.globalObjects.camara}" >
+								#{messages['turnoFiscaliaSala.camara.shortLabel']}
+							</rich:column>
+
+						</rich:columnGroup>
+					</f:facet>
+			        <rich:column width="1" styleClass="" >
+			            <h:commandLink action="#{turnoFiscaliaSalaList.doSelection(item, '/web/turnoFiscaliaSala/turnoFiscaliaSalaEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!turnoFiscaliaSalaSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			
+			        <rich:column styleClass="rowColumn"  >
+			            <h:outputText value="#{item.fechaDesde}">
+			                <s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy"/>
+			            </h:outputText>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.codFiscaliaPrimera}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn align-right"  >
+			            #{item.codFiscaliaSegunda}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<s:fragment rendered="#{item.competencia != null}">
+
+			            #{item.competencia.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn" rendered="#{empty sessionState.globalObjects.camara}" >
+						<s:fragment rendered="#{item.camara != null}">
+
+			            #{item.camara.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+
+				</rich:dataTable>
+		    </div>
+		</h:form>    
+		
+	    <ui:define name="paginator">
+			<s:decorate template="/layout/listPaginator.xhtml">
+	  			<ui:param name="paginator" value="#{turnoFiscaliaSalaList.getPaginator(turnoFiscaliaSalaList)}"/>
+	  			<ui:param name="componentName" value="turnoFiscaliaSala"/>
+	  		</s:decorate>
+		</ui:define>
+	
+   		<ui:define name="lowButtons">
+ 	    	<s:fragment rendered="#{!turnoFiscaliaSalaSearch.inSelectionMultiple}">
+	        <s:div styleClass="lowButtons">
+        		<s:button rendered="#{!turnoFiscaliaSalaSearch.hasReturnPage()}" 
+        					  view="/web/turnoFiscaliaSala/turnoFiscaliaSalaEdit.xhtml"
+        				styleClass="button main-button"
+    	            		action="#{turnoFiscaliaSalaList.onAdd()}"
+	                 		 value="#{messages['turnoFiscaliaSala.button.new']}">
+        	    	<f:param name="turnoFiscaliaSalaIdTurnoFiscaliaSala"/>
+    	    	</s:button>
+
+   	    	
+	    	</s:div>
+	    	</s:fragment>
+
+ 	    	<s:fragment rendered="#{turnoFiscaliaSalaSearch.inSelectionMultiple}">
+		    <s:div styleClass="lowButtons">
+		    <h:form>
+        		<h:commandButton 
+		        			actionListener="#{turnoFiscaliaSalaList.doMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_check_all']}"/>
+        		<h:commandButton 
+		        			actionListener="#{turnoFiscaliaSalaList.doUnMarkAll()}"
+		        			immediate="true"
+						styleClass="button"
+							 value="#{messages['button_uncheck_all']}"/>
+    	    	<rich:spacer width="20px"/>
+        		<h:commandButton rendered="#{turnoFiscaliaSalaSearch.hasReturnPage()}"
+		        			action="#{turnoFiscaliaSalaList.doMultipleSelection('')}"
+						styleClass="button"
+							 value="#{messages['button_accept']}"/>
+        		<s:button rendered="#{turnoFiscaliaSalaSearch.hasReturnPage()}" 
+		        			  view="#{turnoFiscaliaSalaSearch.getReturnPage('')}"
+						styleClass="button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button> 
+    	    </h:form>    	    	    	    	
+	    	</s:div>
+	    	</s:fragment>	    	
+	    	
+	    	
+	    	
+		</ui:define>    	  
+	
+ 	    <ui:define name="buttons">
+		    <s:div styleClass="actionButtons">
+        		<s:button rendered="#{turnoFiscaliaSalaSearch.hasReturnPage()}" 
+		        			  view="#{turnoFiscaliaSalaSearch.getReturnPage('')}"
+						styleClass="button main-button"
+							 value="#{messages['button_cancel']}">
+    	    	</s:button>
+	    	</s:div>
+		</ui:define>
+	</s:decorate> 
+	<ui:include src="/layout/include/exportReport.xhtml" >
+		<ui:param name="reportTitle" value="#{messages['turnoFiscaliaSala.list']}" />
+		<ui:param name="reportPath" value="/com/base100/lex100/controller/entity/turnoFiscaliaSala/turnoFiscaliaSalaList.jrxml" />
+		<ui:param name="reportList" value="#{turnoFiscaliaSalaList}" />
+	</ui:include>	
+</ui:define>
+
+</ui:composition>
+

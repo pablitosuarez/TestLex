@@ -1,0 +1,920 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="objetoJuicio" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{objetoJuicioHome.managed ? messages['objetoJuicio.edit'] : messages['objetoJuicio.add']}" />    
+		<ui:param name="description" value="#{messages['objetoJuicio.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="codigoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.codigo']}</ui:define>
+	                <h:inputText id="codigo" 
+	                       required="true"
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                           size="3"
+	                      maxlength="3"
+	                      converter="#{upperCaseConverter}"
+	                          value="#{objetoJuicioHome.instance.codigo}">
+	                    <a4j:support event="onblur" reRender="codigoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="descripcionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.descripcion']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputText id="descripcion"
+	                               size="98"
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                       required="true"
+	                              value="#{objetoJuicioHome.instance.descripcion}">
+	                    <a4j:support event="onblur" reRender="descripcionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+	                </div>
+                              
+            </s:decorate>
+            <table style="width:100%" cellpadding="0" cellspacing="0"> <tr>
+            <td>
+            <s:decorate id="rubroLetterDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.rubroLetter']}</ui:define>
+	                <h:inputText id="rubroLetter" 
+	                       required="true"
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                           size="10"
+	                      maxlength="10"
+	                          value="#{objetoJuicioHome.instance.rubroLetter}">
+	                    <a4j:support event="onblur" reRender="rubroLetterDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            </td><td>
+				#{messages['objetoJuicio.rubroEstadistico']}
+			</td><td>
+	                <h:inputText id="rubroEstadistico" 
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                           size="10"
+	                      maxlength="10"
+	                          value="#{objetoJuicioHome.instance.rubroEstadistico}">
+	                    <a4j:support event="onblur" reRender="rubroEstadisticoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </td><td>
+                	#{messages['objetoJuicio.rubroLetter2']}
+            </td><td>
+	                <h:inputText id="rubroLetter2" 
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                           size="10"
+	                      maxlength="10"
+	                          value="#{objetoJuicioHome.instance.rubroLetter2}">
+	                    <a4j:support event="onblur" reRender="rubroLetter2Decoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </td></tr></table>
+            
+            <s:decorate id="mesesParalizacionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.mesesParalizacion']}</ui:define>
+	                <h:inputText id="mesesParalizacion"
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                          value="#{objetoJuicioHome.instance.mesesParalizacion}">
+	                    <a4j:support event="onblur" reRender="mesesParalizacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="porcentajeTasaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.porcentajeTasa']}</ui:define>
+					<h:selectOneMenu id="porcentajeTasa"
+	                       required="true"
+					disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+						      value="#{objetoJuicioHome.instance.porcentajeTasa}">
+						<f:selectItem itemLabel="#{messages['lookup_select']}" itemValue="#{null}"/>
+						<f:selectItem itemLabel="#{messages['porcentajeTasa.exento']}" itemValue="0"/>
+						<f:selectItem itemLabel="#{messages['porcentajeTasa.reducido']}" itemValue="1.5"/>
+						<f:selectItem itemLabel="#{messages['porcentajeTasa.ordinario']}" itemValue="3"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="pesoDecoration" template="/layout/edit.xhtml"  rendered = "false">
+                	<ui:define name="label">#{messages['objetoJuicio.peso']}</ui:define>
+	                <h:inputText id="peso" 
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                          value="#{objetoJuicioHome.instance.peso}"
+	                           size="12">
+	                    <a4j:support event="onblur" reRender="pesoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            
+            <s:decorate id="factorMedidasCautelaresDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.factorMedidasCautelares']}</ui:define>
+	                <h:inputText id="factorMedidasCautelares" 
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                          value="#{objetoJuicioHome.instance.factorMedidasCautelares}"
+	                           size="12">
+	                    <a4j:support event="onblur" reRender="factorMedidasCautelaresDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            
+            <s:decorate id="voluntarioDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.voluntario']}</ui:define>
+	                <h:selectBooleanCheckbox id="voluntario"
+	     			                  required="true"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.voluntario}"/>
+            </s:decorate>
+            <s:decorate id="restringidoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.restringido']}</ui:define>
+	                <h:selectBooleanCheckbox id="restringido"
+	     			                  required="true"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.restringido}"/>
+            </s:decorate>
+		<s:decorate id="tipoInstanciaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['objetoJuicio.tipoInstancia']}</ui:define>
+					<h:selectOneMenu id="tipoInstancia"
+							  rendered="#{objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+								 value="#{objetoJuicioHome.instance.tipoInstancia}">
+						<s:selectItems var="lookupItem"
+									 label="#{tipoInstanciaEnumeration.labelFor(lookupItem)}"
+									 value="#{tipoInstanciaEnumeration.items}"
+							noSelectionLabel="#{messages['objetoJuicio.tipoInstancia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="tipoInstanciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{tipoInstanciaEnumeration.labelFor(objetoJuicioHome.instance.tipoInstancia)}"
+						   rendered="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}" />
+ 
+			</s:decorate>
+			
+			<s:decorate id="materiaDecoration" template="/layout/edit.xhtml">
+					<ui:define name="label">#{messages['objetoJuicio.materia']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="materia"
+							  rendered="#{objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+							  required="true"
+								 value="#{objetoJuicioHome.instance.materia}">
+						<s:selectItems var="lookupItem"
+									 label="#{materiaEnumeration.labelFor(lookupItem)}"
+									 value="#{materiaEnumeration.globalMateriaList}"
+							noSelectionLabel="#{messages['objetoJuicio.materia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="materiaDecoration, temaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{materiaEnumeration.labelFor(objetoJuicioHome.instance.materia)}"
+							   rendered="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}" />
+ 
+			</s:decorate>
+
+			<s:decorate id="competenciaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['objetoJuicio.competencia']}</ui:define>
+					<h:selectOneMenu id="competencia"
+							  rendered="#{objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+								 value="#{objetoJuicioHome.instance.competencia}">
+						<s:selectItems var="lookupItem"
+									 label="#{competenciaEnumeration.labelFor(lookupItem)}"
+									 value="#{competenciaEnumeration.items}"
+							noSelectionLabel="#{messages['objetoJuicio.competencia.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="competenciaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{competenciaEnumeration.labelFor(objetoJuicioHome.instance.competencia)}"
+						   rendered="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}" />
+ 
+			</s:decorate>
+
+			<s:decorate id="temaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['objetoJuicio.tema']}</ui:define>
+					<h:selectOneMenu id="tema"
+							  rendered="#{objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+								 value="#{objetoJuicioHome.instance.tema}">
+						<s:selectItems var="lookupItem"
+									 label="#{temaEnumeration.labelFor(lookupItem)}"
+									 value="#{temaEnumeration.getItemsByMateria(objetoJuicioHome.instance.materia)}"
+							noSelectionLabel="#{messages['objetoJuicio.tema.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="temaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{temaEnumeration.labelFor(objetoJuicioHome.instance.tema)}"
+						   rendered="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}" />
+ 
+			</s:decorate>
+
+            <s:decorate id="codigoTipoRecursoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.codigoTipoRecurso']}</ui:define>
+	                <h:inputText id="codigoTipoRecurso" 
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                           size="10"
+	                      maxlength="10"
+	                          value="#{objetoJuicioHome.instance.codigoTipoRecurso}">
+	                    <a4j:support event="onblur" reRender="codigoTipoRecursoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+
+			<s:decorate id="tipoProcesoDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['objetoJuicio.tipoProceso']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:selectOneMenu id="tipoProceso"
+							  required="true"
+							  rendered="#{objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+								 value="#{objetoJuicioHome.instance.tipoProceso}">
+						<s:selectItems var="lookupItem"
+									 label="#{tipoProcesoEnumeration.labelFor(lookupItem)}"
+									 value="#{tipoProcesoEnumeration.getItemsByMateria(objetoJuicioHome.instance.materia)}"
+							noSelectionLabel="#{messages['objetoJuicio.tipoProceso.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="tipoProcesoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{tipoProcesoEnumeration.labelFor(objetoJuicioHome.instance.tipoProceso)}"
+						   rendered="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}" />
+ 
+			</s:decorate>
+
+			<s:decorate id="tipoRemesaDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['objetoJuicio.tipoRemesa']}</ui:define>
+					<h:selectOneMenu id="tipoRemesa"
+							  rendered="#{objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+								 value="#{objetoJuicioHome.instance.tipoRemesa}">
+						<s:selectItems var="lookupItem"
+									 label="#{tipoRemesaEnumeration.labelFor(lookupItem)}"
+									 value="#{tipoRemesaEnumeration.items}"
+							noSelectionLabel="#{messages['objetoJuicio.tipoRemesa.lookup_select']}">
+						</s:selectItems>
+						<s:convertEntity/>
+						<a4j:support event="onchange" reRender="tipoRemesaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+					<h:outputText value="#{tipoRemesaEnumeration.labelFor(objetoJuicioHome.instance.tipoRemesa)}"
+						   rendered="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}" />
+ 
+			</s:decorate>
+			
+		<!-- group conexidad Group -->
+	<ui:decorate template="/layout/group/editGroupFrame.xhtml" >
+       	<ui:param name="label" value="#{messages['objetoJuicio.conexidadGroup']}"/>
+		<ui:param name="id" value="conexidadGroup"/>
+            
+            <s:decorate id="buscaConexidadDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.buscaConexidad']}</ui:define>
+	                <h:selectBooleanCheckbox id="buscaConexidad"
+	     			                  required="true"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.buscaConexidad}"/>
+            </s:decorate>
+            <s:decorate id="buscaConexidadDesdeDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.buscaConexidadDesde']}</ui:define>
+                	<ui:define name="comment">#{messages['objetoJuicio.buscaConexidadRangoComment']}</ui:define>
+	                <h:inputText id="buscaConexidadDesde" 
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                           size="20"
+	                      maxlength="20"
+	                          value="#{objetoJuicioHome.instance.buscaConexidadDesde}">
+	                    <a4j:support event="onblur" reRender="buscaConexidadDesdeDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="buscaConexidadHastaDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.buscaConexidadHasta']}</ui:define>
+                	<ui:define name="comment">#{messages['objetoJuicio.buscaConexidadRangoComment']}</ui:define>
+	                <h:inputText id="buscaConexidadHasta" 
+					       disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                           size="20"
+	                      maxlength="20"
+	                          value="#{objetoJuicioHome.instance.buscaConexidadHasta}">
+	                    <a4j:support event="onblur" reRender="buscaConexidadHastaDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="prioridadDenunciadaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.prioridadDenunciada']}</ui:define>
+	                <h:selectBooleanCheckbox id="prioridadDenunciada"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.prioridadDenunciada}"/>
+            </s:decorate>
+
+            <s:decorate id="asignaConexidadDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.asignaConexidad']}</ui:define>
+					<h:selectOneMenu id="asignaConexidad"
+					disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+						      value="#{objetoJuicioHome.instance.asignaConexidad}">
+						<f:selectItems value="#{asignaConexidadEnumeration.getItems(messages['lookup_select'])}" />
+						<a4j:support event="onchange" reRender="asignaConexidadDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="seleccionaConexidadDecoration" template="/layout/editComment.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.seleccionaConexidad']}</ui:define>
+                	<ui:define name="comment">#{messages['objetoJuicio.seleccionaConexidad.comment']}</ui:define>
+	                <h:selectBooleanCheckbox id="seleccionaConexidad"
+	     			                  required="true"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.seleccionaConexidad}"/>
+            </s:decorate>
+            <s:decorate id="noConexidadCaratulaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.noConexidadCaratula']}</ui:define>
+	                <h:selectBooleanCheckbox id="noConexidadCaratula"
+	     			                  required="true"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.noConexidadCaratula}"/>
+            </s:decorate>
+            <s:decorate id="conexidadSolicitadaMesaDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.conexidadSolicitadaMesa']}</ui:define>
+	                <h:selectBooleanCheckbox id="conexidadSolicitadaMesa"
+	     			                  required="true"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.conexidadSolicitadaMesa}"/>
+            </s:decorate>
+
+	</ui:decorate>
+	
+	<br/>
+			<s:decorate id="excluirObjetosJuicioDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.excluirObjetosJuicio']}</ui:define>
+	                <h:selectBooleanCheckbox id="excluirObjetosJuicio"
+	     			                  required="true"
+					       	           disabled="#{!objetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}"
+	                                      value="#{objetoJuicioHome.instance.excluirObjetosJuicio}"/>
+            </s:decorate>
+			
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+<!-- 
+		<s:decorate id="atributoObjetoJuicioListList" template="/layout/lines/collection.xhtml">
+			<ui:param name="label" value="#{messages['objetoJuicio.atributoObjetoJuicioList']}" />    
+			<ui:param name="icon" value="atributoObjetoJuicio" />
+			<ui:param name="initialState" value="#{empty objetoJuicioHome.instance.atributoObjetoJuicioList? 'closed':'open'}" />    
+	        <div class="association" id="atributoObjetoJuicioListChildren">
+        
+			<ui:define name="emptyMessage">        
+	            <h:outputText value="#{messages['objetoJuicio.atributoObjetoJuicioList.list_none']}" styleClass="emptyMessage" 
+	                       rendered="#{empty objetoJuicioHome.instance.atributoObjetoJuicioList}"/>
+	        </ui:define>
+
+            <rich:dataTable value="#{objetoJuicioHome.instance.atributoObjetoJuicioList}" 
+							  var="atributoObjetoJuicio" 
+						 rendered="#{not empty objetoJuicioHome.instance.atributoObjetoJuicioList}" 
+					   rowClasses="rvgRowOne,rvgRowTwo"
+							   id="atributoObjetoJuicioListTable">
+
+
+
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Codigo Atributo Objeto J
+						</f:facet>
+
+			            #{atributoObjetoJuicio.codigoAtributoObjetoJ}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Descripcion
+						</f:facet>
+
+			            #{atributoObjetoJuicio.descripcion}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Materia
+						</f:facet>
+						<s:fragment rendered="#{atributoObjetoJuicio.materia != null}">
+
+			            #{atributoObjetoJuicio.materia.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{objetoJuicioHome.removeFromAtributoObjetoJuicioList(atributoObjetoJuicio)}"
+										title="#{messages['list_remove']}">
+							<h:graphicImage value="/img/icon/clear.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{atributoObjetoJuicioList.doLineSelection(atributoObjetoJuicio, '/web/atributoObjetoJuicio/atributoObjetoJuicioEdit.xhtml', '/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+										title="#{messages['list_select']}">
+							<h:graphicImage value="/img/icon/select_right.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+	            </rich:dataTable>
+	        
+	        </div>
+
+    		<ui:define name="lowButtons">
+		        <s:div styleClass="lowButtons">
+		        
+		            <s:button view="/web/atributoObjetoJuicio/atributoObjetoJuicioList.xhtml"
+		              		action="#{objetoJuicioHome.lookupAddToAtributoObjetoJuicioList('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+			            		id="addAtributoObjetoJuicioList" styleClass="button"
+							 value="#{messages['button_add']} #{messages['atributoObjetoJuicio']}">
+		            </s:button>
+		            <s:button view="/web/atributoObjetoJuicio/atributoObjetoJuicioList.xhtml"
+		              		action="#{objetoJuicioHome.lookupAddToAtributoObjetoJuicioListMultiple('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+			            		id="addAtributoObjetoJuicioListMultiple" styleClass="button"
+							 value="#{messages['button_add']} #{messages['atributoObjetoJuicio']} Multiple">
+		            </s:button>		            		            		            
+		            
+		        </s:div>
+		    </ui:define>
+		</s:decorate>
+ -->
+ 
+		<s:decorate id="objetoJuicioListList" template="/layout/lines/collection.xhtml">
+			<ui:param name="label" value="#{messages['objetoJuicio.objetoJuicioList']}" />    
+			<ui:param name="icon" value="objetoJuicio" />
+			<ui:param name="initialState" value="#{empty objetoJuicioHome.instance.objetoJuicioList? 'closed':'open'}" />    
+	        <div class="association" id="objetoJuicioListChildren">
+        
+			<ui:define name="emptyMessage">        
+	            <h:outputText value="#{messages['objetoJuicio.objetoJuicioList.list_none']}" styleClass="emptyMessage" 
+	                       rendered="#{empty objetoJuicioHome.instance.objetoJuicioList}"/>
+	        </ui:define>
+
+            <rich:dataTable value="#{objetoJuicioHome.instance.objetoJuicioList}" 
+							  var="objetoJuicio" 
+						 rendered="#{not empty objetoJuicioHome.instance.objetoJuicioList}" 
+					   rowClasses="rvgRowOne,rvgRowTwo"
+							   id="objetoJuicioListTable">
+
+
+
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Código
+						</f:facet>
+
+			            #{objetoJuicio.codigo}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Descripcion
+						</f:facet>
+
+			            #{objetoJuicio.descripcion}
+						<br/>
+			        </rich:column>
+
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Rubro
+						</f:facet>
+
+			            #{objetoJuicio.rubroLetter}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							#{messages['objetoJuicio.tema.shortLabel']}
+						</f:facet>
+						<s:fragment rendered="#{objetoJuicio.tema != null}">
+
+			            #{objetoJuicio.tema.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{objetoJuicioHome.removeFromObjetoJuicioList(objetoJuicio)}"
+										title="#{messages['list_remove']}">
+							<h:graphicImage value="/img/icon/clear.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column>
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{objetoJuicioList.doLineSelection(objetoJuicio, '/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml', '/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+										title="#{messages['list_select']}">
+							<h:graphicImage value="/img/icon/select_right.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+	            </rich:dataTable>
+	        
+	        </div>
+
+    		<ui:define name="lowButtons">
+		        <s:div styleClass="lowButtons">
+		        
+		            <s:button view="/webCustom/objetoJuicioConexidad/objetoJuicioConexidadSelectionList.xhtml"
+		              		action="#{objetoJuicioHome.lookupAddToObjetoJuicioList('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+			            		id="addObjetoJuicioList" styleClass="button"
+							 value="#{messages['button_add']} #{messages['objetoJuicio']}">
+		            </s:button>
+					<!-- many to many -->
+		            <s:button view="/webCustom/objetoJuicioConexidad/objetoJuicioConexidadSelectionList.xhtml"
+		              		action="#{objetoJuicioHome.lookupAddToObjetoJuicioListMultiple('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+			            		id="addObjetoJuicioListMultiple" styleClass="button"
+							 value="#{messages['button_add']} #{messages['objetoJuicio']} Multiple">
+		            </s:button>		            		            		            
+		            
+		        </s:div>
+		    </ui:define>
+		</s:decorate>
+
+		<!-- parametros de expediente por Objeto de Juicio-->
+		<s:decorate id="parametroListList" template="/layout/lines/collection.xhtml">
+			<ui:param name="label" value="#{messages['objetoJuicio.parametroList']}" />    
+			<ui:param name="icon" value="parametro" />
+			<ui:param name="initialState" value="#{empty objetoJuicioHome.instance.parametroList? 'closed':'open'}" />    
+	        <div class="association" id="parametroListChildren">
+        
+			<ui:define name="emptyMessage">        
+	            <h:outputText value="#{messages['objetoJuicio.parametroList.list_none']}" styleClass="emptyMessage" 
+	                       rendered="#{empty objetoJuicioHome.instance.parametroList}"/>
+	        </ui:define>
+
+            <rich:dataTable value="#{objetoJuicioHome.instance.parametroList}" 
+							  var="parametro" 
+						 rendered="#{not empty objetoJuicioHome.instance.parametroList}" 
+					   rowClasses="rvgRowOne,rvgRowTwo"
+							   id="parametroListTable">
+
+
+
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Codigo Parametro
+						</f:facet>
+
+			            #{parametro.name}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Nombre Parametro
+						</f:facet>
+
+			            #{parametro.label}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+							Tipo dato
+						</f:facet>
+			            <h:outputText value="#{tipoDatoEnumeration.getLabel(parametro.type)}"/>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center"  >
+						<f:facet name="header">
+							Multiple
+						</f:facet>
+			            <h:graphicImage rendered="#{parametro.multiple}" value="/img/icon/checked.gif"/>
+						<br/>
+			        </rich:column>
+			        <rich:column  width="1px">
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{objetoJuicioHome.removeFromParametroList(parametro)}"
+										title="#{messages['list_remove']}">
+							<h:graphicImage value="/img/icon/clear.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column width="1px">
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{parametroList.doLineSelection(parametro, '/web/parametro/parametroEdit.xhtml', '/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+										title="#{messages['list_select']}">
+							<h:graphicImage value="/img/icon/select_right.gif"/>
+			            </h:commandLink>
+			        </rich:column>
+	            </rich:dataTable>
+	        
+	        </div>
+
+    		<ui:define name="lowButtons">
+		        <s:div styleClass="lowButtons">
+		        
+		            <s:button view="/web/parametro/parametroList.xhtml"
+		              		action="#{objetoJuicioHome.lookupAddToParametroList('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+			            		id="addParametroList" styleClass="button"
+							 value="#{messages['button_add']} #{messages['parametro']}">
+		            </s:button>
+					<!-- many to many -->
+		            <s:button view="/web/parametro/parametroList.xhtml"
+		              		action="#{objetoJuicioHome.lookupAddToParametroListMultiple('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+			            		id="addParametroListMultiple" styleClass="button"
+							 value="#{messages['button_add']} #{messages['parametro']} Multiple">
+		            </s:button>		            		            		            
+		            
+		        </s:div>
+		    </ui:define>
+		</s:decorate>
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{objetoJuicioHome.doCancel}"
+						view="#{objetoJuicioSearch.getReturnPage('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadList.xhtml')}"
+						rendered="#{objetoJuicioHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{objetoJuicioHome.doAdd(objetoJuicioSearch.getReturnPage('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadList.xhtml'))}"
+					rendered="#{!objetoJuicioHome.managed and s:hasPermission('ObjetoJuicio','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{objetoJuicioHome.doUpdate(objetoJuicioSearch.getReturnPage('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadList.xhtml'))}"
+						rendered="#{objetoJuicioHome.managed and s:hasPermission('ObjetoJuicio','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{objetoJuicioHome.doCancel}"
+						view="#{objetoJuicioSearch.getReturnPage('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadList.xhtml')}"
+						rendered="#{!objetoJuicioHome.managed}"/>
+					<rich:spacer width="15" rendered="#{objetoJuicioHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{objetoJuicioHome.doDelete(objetoJuicioSearch.getReturnPage('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{objetoJuicioHome.managed and s:hasPermission('ObjetoJuicio','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	<f:subview rendered="#{objetoJuicioHome.managed}">
+	<h:form>
+		<s:decorate id="criterioCnxListLines" template="/layout/lines/lines.xhtml">		
+
+
+			<ui:param name="label" value="#{messages['objetoJuicio.criterioCnxList']}" />    
+			<ui:param name="icon" value="criterio" />
+			<ui:param name="initialState" value="#{empty criterioCnxList.byObjetoJuicioResultList? 'closed':'open'}" />    
+
+	        <div class="association" id="criterioCnxListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['objetoJuicio.criterioCnxList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty criterioCnxList.byObjetoJuicioResultList}"/>
+		        </ui:define>
+				<rich:dataTable value="#{criterioCnxList.byObjetoJuicioResultList}" 
+	                           var="criterioCnx" 
+	                      rendered="#{not empty criterioCnxList.byObjetoJuicioResultList}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="criterioCnxListTable">
+			        <rich:column width="1" styleClass="" rendered="#{s:hasPermission('ObjetoJuicio','update') or criterioCnxSearch.hasSelectionPage()}">
+						<f:facet name="header">
+		            		<span/>
+						</f:facet>
+			            <h:commandLink action="#{criterioCnxList.doLineSelection(criterioCnx, '/web/criterioCnx/criterioCnxEdit.xhtml', '/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}"
+							   styleClass="line_selector"
+							   rendered="#{!objetoJuicioSearch.inSelectionMultiple}"			            		
+							   title="#{messages['list_select']}">
+			            </h:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn"  >
+						<f:facet name="header">
+			                <s:link styleClass="#{criterioCnxList.getOrderStyle('nombre', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['criterioCnx.nombre.shortLabel']}">
+			                    <f:param name="criterioCnxOrder" value="#{criterioCnxList.getOrderParam('nombre')}"/>
+			                </s:link>
+						</f:facet>
+
+			            #{criterioCnx.nombre}
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-center"  >
+						<f:facet name="header">
+			                <s:link styleClass="#{criterioCnxList.getOrderStyle('excluirObjetosJuicio', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['criterioCnx.excluirObjetosJuicio.shortLabel']}">
+			                    <f:param name="criterioCnxOrder" value="#{criterioCnxList.getOrderParam('excluirObjetosJuicio')}"/>
+			                </s:link>
+						</f:facet>
+			            <h:graphicImage rendered="#{criterioCnx.excluirObjetosJuicio}" value="/img/icon/checked.gif"/>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="rowColumn align-right"  >
+						<f:facet name="header">
+			                <s:link styleClass="#{criterioCnxList.getOrderStyle('prioridad', 'arrow-down', 'arrow-up', '')}"
+			                             value="#{messages['criterioCnx.prioridad.shortLabel']}">
+			                    <f:param name="criterioCnxOrder" value="#{criterioCnxList.getOrderParam('prioridad')}"/>
+			                </s:link>
+						</f:facet>
+			            #{criterioCnx.prioridad}
+						<br/>
+			        </rich:column>
+            	</rich:dataTable>
+	        </div>
+
+		    <ui:define name="paginator">
+				<s:decorate template="/layout/listPaginator.xhtml">
+		  			<ui:param name="paginator" value="#{criterioCnxList.getPaginator(criterioCnxList)}"/>
+		  			<ui:param name="componentName" value="criterioCnx"/>
+		  		</s:decorate>
+			</ui:define>
+
+    		<ui:define name="lowButtons">
+		        <div class="lowButtons">
+		            <s:button 	  view="/web/criterioCnx/criterioCnxEdit.xhtml"
+								action="#{criterioCnxList.onAdd('/webCustom/objetoJuicioConexidad/objetoJuicioConexidadEdit.xhtml')}" 
+								styleClass="button main-button"
+								rendered="#{s:hasPermission('CriterioCnx','add')}"								
+								 value="#{messages['criterioCnx.button.add']}">
+		                 <f:param name="objetoJuicioId"
+		                         value="#{objetoJuicioHome.instance.id}"/>
+
+		            </s:button>
+		        </div>
+		    </ui:define>
+		</s:decorate>
+	</h:form>
+	<h:form>
+		<s:decorate id="prioridadObjetoJuicioListLines" template="/layout/lines/lines.xhtml" rendered="false">		
+
+
+			<ui:param name="label" value="#{messages['objetoJuicio.prioridadObjetoJuicioList']}" />    
+			<ui:param name="icon" value="list" />
+			<ui:param name="initialState" value="#{empty prioridadObjetoJuicioList.byObjetoJuicioResultListWithNew? 'closed':'open'}" />    
+
+	        <div class="association" id="prioridadObjetoJuicioListChildren">
+				<ui:define name="emptyMessage">        				
+					<h:outputText value="#{messages['objetoJuicio.prioridadObjetoJuicioList.list_none']}" styleClass="emptyMessage" 
+							   rendered="#{empty prioridadObjetoJuicioList.byObjetoJuicioResultListWithNew}"/>
+		        </ui:define>
+				<a4j:region>
+				<rich:dataTable value="#{prioridadObjetoJuicioList.byObjetoJuicioResultListWithNew}" 
+	                           var="prioridadObjetoJuicio" 
+	                      rendered="#{not empty prioridadObjetoJuicioList.byObjetoJuicioResultListWithNew}" 
+	                    rowClasses="rvgRowOne,rvgRowTwo"
+	                            id="prioridadObjetoJuicioListTable">
+					<f:facet name="header">
+						<rich:columnGroup  rowClasses="rich-table-subheader" style="background-image:none">
+							<rich:column styleClass="toolbaritem" style="padding:0px" width="1">
+								<a4j:status>
+                					<f:facet name="start">
+                    					<h:graphicImage  value="/img/icon16/loading.gif"/>
+                					</f:facet>
+            					</a4j:status>
+							</rich:column>
+							<rich:column styleClass="toolbaritem" >
+								#{messages['prioridadObjetoJuicio.objetoJuicioConPrioridad.shortLabel']}
+							</rich:column>
+			                <rich:column styleClass="toolbaritem">
+				                <s:link styleClass="#{prioridadObjetoJuicioList.getOrderStyle('prioridad', 'arrow-down', 'arrow-up', '')}"
+				                             value="#{messages['prioridadObjetoJuicio.prioridad.shortLabel']}">
+				                    <f:param name="prioridadObjetoJuicioOrder" value="#{prioridadObjetoJuicioList.getOrderParam('prioridad')}"/>
+				                </s:link>
+			                </rich:column>
+							<rich:column styleClass="toolbaritem" width="1">
+			            		<span/>
+							</rich:column>
+						</rich:columnGroup>
+					</f:facet>           
+				<rich:subTable  id="editRow" var="instance" value="#{prioridadObjetoJuicioHome.instance}" rendered="#{prioridadObjetoJuicioHome.instance.equals(prioridadObjetoJuicio)}">
+			        <rich:column width="1" styleClass="#{prioridadObjetoJuicioList.isManaged(instance)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission('ObjetoJuicio','update') or prioridadObjetoJuicioSearch.hasSelectionPage()}">
+			            <a4j:commandLink actionListener="#{prioridadObjetoJuicioList.onAcceptLine}" eventsQueue="editLine"
+							   					  title="#{messages['button_save']}" 
+							   				   reRender="prioridadObjetoJuicioListTable">
+							<span class="line_save"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{prioridadObjetoJuicioHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+
+			<s:decorate id="objetoJuicioConPrioridadDecoration" template="/layout/table/edit.xhtml" >
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" rendered="#{prioridadObjetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}">
+                		<h:inputText id="objetoJuicioConPrioridad"
+                				  value="#{instance.objetoJuicioConPrioridad}" 
+							   required="true"
+							  converter="objetoJuicioEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+                			onclick="#{rich:component('objetoJuicioConPrioridadSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="400" width="400" id="objetoJuicioConPrioridadSuggestion" for="objetoJuicioConPrioridad" suggestionAction="#{objetoJuicioEnumeration.autocomplete}" 
+						var="objetoJuicioConPrioridad">
+						<h:column>
+							<h:outputText value="#{objetoJuicioEnumeration.labelFor(objetoJuicioConPrioridad)}"/>
+						</h:column>
+ 	                    <a4j:support event="onselect" reRender="objetoJuicioConPrioridadDecoration" ajaxSingle="true">
+ 	                    	<f:setPropertyActionListener value="#{objetoJuicioConPrioridad}" target="#{objetoJuicioEnumeration.selected}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    	<f:setPropertyActionListener value="#{objetoJuicioConPrioridad}" target="#{instance.objetoJuicioConPrioridad}" >
+ 	                    		<s:convertEntity/>
+ 	                    	</f:setPropertyActionListener>
+ 	                    </a4j:support>
+					</rich:suggestionbox>
+					<h:outputText value="#{objetoJuicioEnumeration.labelFor(instance.objetoJuicioConPrioridad)}"
+						   rendered="#{!prioridadObjetoJuicioHome.hasEditPermission('ObjetoJuicio','add','update')}" />
+ 
+			</s:decorate>
+			        </rich:column>
+			        <rich:column styleClass="#{prioridadObjetoJuicioHome.isManaged(instance)? 'rowColumn': 'newRowColumn'}"  >
+            <s:decorate id="prioridadDecoration" template="/layout/table/edit.xhtml" >
+                	<ui:define name="label">#{messages['objetoJuicio.prioridad']}</ui:define>
+	                <h:inputText id="prioridad"
+	                       required="true"
+	                          value="#{prioridadObjetoJuicioHome.instance.prioridad}">
+	                    <a4j:support event="onblur" reRender="prioridadDecoration" ajaxSingle="true" eventsQueue="editLine"/>
+	                </h:inputText>
+            </s:decorate>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{prioridadObjetoJuicioList.isManaged(instance)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and s:hasPermission('ObjetoJuicio','update')}">
+			            <a4j:commandLink actionListener="#{prioridadObjetoJuicioList.onCancelLine}" eventsQueue="editLine"
+			            					  immediate="true"
+												  title="#{messages['button_cancel']}"
+							   				   reRender="prioridadObjetoJuicioListTable">							  
+							<span class="line_undo"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+				<rich:subTable  id="row" var="prioridadObjetoJuicio" value="#{prioridadObjetoJuicio}" rendered="#{not prioridadObjetoJuicioHome.instance.equals(prioridadObjetoJuicio)}">
+			        <rich:column width="1" styleClass="#{prioridadObjetoJuicioList.isManaged(prioridadObjetoJuicio)? 'rowColumn': 'newRowColumn'}" rendered="#{s:hasPermission('ObjetoJuicio','update') or prioridadObjetoJuicioSearch.hasSelectionPage()}">
+			            <a4j:commandLink action="#{prioridadObjetoJuicioList.doLineEdit(prioridadObjetoJuicio)}" eventsQueue="editLine"
+										  title="#{messages['list_edit']}" 
+									   rendered="#{prioridadObjetoJuicioList.isManaged(prioridadObjetoJuicio)}"
+									   reRender="prioridadObjetoJuicioListTable">
+							<span class="line_edit"/>									   							  
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			            <a4j:commandLink action="#{prioridadObjetoJuicioList.doLineEdit(prioridadObjetoJuicio)}" eventsQueue="editLine"
+										  title="#{messages['list_new']}"
+									   rendered="#{not prioridadObjetoJuicioList.isManaged(prioridadObjetoJuicio)}"
+									   reRender="prioridadObjetoJuicioListTable">
+							<span class="line_new"/>
+							<s:conversationPropagation type="join"/>
+			            </a4j:commandLink>
+			        </rich:column>
+			        <rich:column styleClass="#{prioridadObjetoJuicioHome.isManaged(prioridadObjetoJuicio)? 'rowColumn': 'newRowColumn'}"  >
+						<s:fragment rendered="#{prioridadObjetoJuicio.objetoJuicioConPrioridad != null}">
+
+			            #{prioridadObjetoJuicio.objetoJuicioConPrioridad.descripcion}
+						</s:fragment>
+						<br/>
+			        </rich:column>
+			        <rich:column styleClass="#{prioridadObjetoJuicioHome.isManaged(prioridadObjetoJuicio)? 'rowColumn': 'newRowColumn'} align-right"  >
+			            #{prioridadObjetoJuicio.prioridad}
+						<br/>
+			        </rich:column>
+			        <rich:column width="1" styleClass="#{prioridadObjetoJuicioList.isManaged(prioridadObjetoJuicio)? 'rowColumn': 'newRowColumn'}"
+						      rendered="#{true and s:hasPermission('ObjetoJuicio','update')}">
+			            <h:commandLink action="#{prioridadObjetoJuicioList.doLineDelete(prioridadObjetoJuicio)}" eventsQueue="editLine"
+										  title="#{messages['list_remove']}" 
+									   rendered="#{prioridadObjetoJuicioList.isManaged(prioridadObjetoJuicio) and s:hasPermission('ObjetoJuicio','update')}"
+									   onclick="return confirm('#{messages['confirm_delete']}');"
+									   immediate="true"	 
+									   reRender="prioridadObjetoJuicioListTable">
+							<span class="line_delete"/>							  
+							<s:conversationPropagation type="join"/>
+			            </h:commandLink>
+			        </rich:column>
+		        </rich:subTable>
+            	</rich:dataTable>
+				</a4j:region>
+	        </div>
+
+		    <ui:define name="paginator">
+				<s:decorate template="/layout/listPaginator.xhtml">
+		  			<ui:param name="paginator" value="#{prioridadObjetoJuicioList.getPaginator(prioridadObjetoJuicioList)}"/>
+		  			<ui:param name="componentName" value="prioridadObjetoJuicio"/>
+		  		</s:decorate>
+			</ui:define>
+
+		</s:decorate>
+	</h:form>
+	</f:subview>
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

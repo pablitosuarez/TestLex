@@ -1,0 +1,73 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{messages['expedienteMeAdd.expedienteDesdeMediacion.title']}" />    
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+
+	
+	<br/>
+		<!-- group mediacionGroup -->
+		<ui:decorate template="/layout/group/editGroupBox.xhtml" >
+		      	<ui:param name="label" value="#{messages['expedienteMe.mediacionGroup']}"/>
+			<ui:param name="id" value="mediacionGroup"/>
+		
+			<ui:include src="#{'/web/origenMediacion/include/origenMediacionEditContent.xhtml'}">
+				<ui:param name="mediacion" value="#{expedienteMeAdd.origenMediacion}"/>
+			</ui:include>
+		
+		</ui:decorate>
+		<!-- end group mediacionGroup -->
+
+
+		
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+		            <h:commandButton id="button-save" styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{expedienteMeAdd.doSaveFromMediacion()}">
+						<s:defaultAction/>
+					</h:commandButton>
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_next']}" 
+						action="#{expedienteMeAdd.doSaveFromMediacion('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}"/>
+						
+
+			</div>
+		</ui:define>						
+
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

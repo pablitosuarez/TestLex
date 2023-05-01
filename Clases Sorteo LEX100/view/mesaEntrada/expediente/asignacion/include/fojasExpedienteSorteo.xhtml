@@ -1,0 +1,47 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui">
+
+  	<s:div id="expedienteFojasAgregadosPaquetesCuerposDiv">	
+		 <s:decorate id="fojasExpedienteDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['expediente.fojas']}</ui:define>
+	                <h:inputText id="fojasExpedienteEdit"
+	                          value="#{expedienteEdit.fojas}">
+	                </h:inputText>
+         </s:decorate>
+         <s:decorate id="paquetesExpedienteDecoration" template="/layout/edit.xhtml">
+             	<ui:define name="label">#{messages['expediente.paquetes']}</ui:define>
+              <h:inputText id="paquetesExpedienteEdit"
+                        value="#{expedienteEdit.paquetes}">
+              </h:inputText>
+         </s:decorate>
+         <s:decorate id="cuerposExpedienteDecoration" template="/layout/edit.xhtml" >
+             	<ui:define name="label">#{messages['expediente.cuerpos']}</ui:define>
+              <h:inputText id="cuerposExpedienteEdit"
+                        value="#{expedienteEdit.cuerpos}">
+              </h:inputText>
+         </s:decorate>
+         <s:decorate id="agregadosExpedienteDecoration" template="/layout/edit.xhtml">
+             	<ui:define name="label">#{messages['expediente.agregados']}</ui:define>
+              <h:inputText id="agregadosExpedienteEdit"
+                        value="#{expedienteEdit.agregados}">
+              </h:inputText>
+         </s:decorate>
+         <s:decorate id="comentariosExpedienteDecoration" template="/layout/edit.xhtml" >
+             	<ui:define name="label">#{messages['expediente.comentarios']}</ui:define>
+               <h:inputTextarea id="comentariosExpedienteEdit"
+                             cols="98"
+                             rows="2"
+                            value="#{expedienteEdit.comentarios}">
+                   <f:validateLength maximum="200" />
+              </h:inputTextarea>
+         </s:decorate>
+	</s:div>
+</ui:composition>

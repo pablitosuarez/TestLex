@@ -1,0 +1,107 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="tipoBolillero" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{tipoBolilleroHome.managed ? messages['tipoBolillero.edit'] : messages['tipoBolillero.add']}" />    
+		<ui:param name="description" value="#{messages['tipoBolillero.comment']}" />
+
+
+	<!-- group default -->
+	<ui:decorate template="/layout/group/editGroupAuto.xhtml" >
+		<ui:param name="id" value="default"/>
+
+            <s:decorate id="codigoDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['tipoBolillero.codigo']}</ui:define>
+	                <h:inputText id="codigo" 
+	                       required="true"
+					       disabled="#{!tipoBolilleroHome.hasEditPermission('TipoBolillero','add','update')}"
+	                           size="10"
+	                      maxlength="10"
+	                          value="#{tipoBolilleroHome.instance.codigo}">
+	                    <a4j:support event="onblur" reRender="codigoDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputText>
+            </s:decorate>
+            <s:decorate id="descripcionDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{messages['tipoBolillero.descripcion']}</ui:define>
+					<div class="inputTextarea_wrap">
+	                <h:inputTextarea id="descripcion"
+	                               cols="98"
+	                               rows="2"
+					       	 disabled="#{!tipoBolilleroHome.hasEditPermission('TipoBolillero','add','update')}"
+	                              value="#{tipoBolilleroHome.instance.descripcion}">
+	                    <a4j:support event="onblur" reRender="descripcionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+	                </h:inputTextarea>
+	                </div>
+                              
+            </s:decorate>
+	</ui:decorate>
+	<!-- end group default -->
+
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+	            <s:button styleClass="button done main-button"
+						value="#{messages['button_done']}"
+						action="#{tipoBolilleroHome.doCancel}"
+						view="#{tipoBolilleroSearch.getReturnPage('/web/tipoBolillero/tipoBolilleroList.xhtml')}"
+						rendered="#{tipoBolilleroHome.managed}"/>
+
+				<rich:spacer width="15"/>	
+	            <h:commandButton styleClass="button main-button"
+					value="#{messages['button_save']}"
+					action="#{tipoBolilleroHome.doAdd(tipoBolilleroSearch.getReturnPage('/web/tipoBolillero/tipoBolilleroList.xhtml'))}"
+					rendered="#{!tipoBolilleroHome.managed and s:hasPermission('TipoBolillero','add')}"/>  
+		                          			  
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{tipoBolilleroHome.doUpdate(tipoBolilleroSearch.getReturnPage('/web/tipoBolillero/tipoBolilleroList.xhtml'))}"
+						rendered="#{tipoBolilleroHome.managed and s:hasPermission('TipoBolillero','update')}"/>
+					<s:button styleClass="button main-button"
+						value="#{messages['button_cancel']}"
+						action="#{tipoBolilleroHome.doCancel}"
+						view="#{tipoBolilleroSearch.getReturnPage('/web/tipoBolillero/tipoBolilleroList.xhtml')}"
+						rendered="#{!tipoBolilleroHome.managed}"/>
+					<rich:spacer width="15" rendered="#{tipoBolilleroHome.managed}"/>	
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_delete']}" 
+						action="#{tipoBolilleroHome.doDelete(tipoBolilleroSearch.getReturnPage('/web/tipoBolillero/tipoBolilleroList.xhtml'))}"
+						onclick="return confirm('#{messages['confirm_delete']}');"
+						rendered="#{tipoBolilleroHome.managed and s:hasPermission('TipoBolillero','delete')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>

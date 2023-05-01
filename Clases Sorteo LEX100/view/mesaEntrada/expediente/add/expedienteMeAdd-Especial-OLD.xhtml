@@ -1,0 +1,183 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+			 	xmlns:p="http://primefaces.prime.com.tr/ui"     
+                template="/layout/template.xhtml">
+                       
+<ui:define name="body">
+	<rich:jQuery timing="onload" selector="input:text:visible:first" query="focus();"/>
+    
+    <h:form id="expedienteMe" enctype="multipart/form-data">
+	<ui:decorate id="form" template="/layout/editForm.xhtml">
+		<ui:param name="icon" value="edit" />    
+		<ui:param name="title" value="#{interpolator.interpolate(expedienteMeAdd.title, expedienteMeAdd.expedienteEspecialEdit.tipoCausa.descripcion)}" />    
+		<ui:param name="description" value="#{messages['expedienteMe.comment']}" />
+
+	
+	<br/>
+	<!-- group origen -->
+	<s:fragment rendered="#{expedienteMeAdd.showOrigen()}">
+		<ui:decorate template="/layout/group/editGroupContainer.xhtml">
+			<s:decorate id="dependenciaOrigenDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.dependenciaOrigen']}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<h:panelGrid columns="2" border="0" cellpadding="0" cellspacing="0" >
+                		<h:inputText id="dependencia" 
+                				  value="#{expedienteMeAdd.expedienteEspecialEdit.dependencia}" 
+                				  size="90"
+							  converter="dependenciaEnumerationConverter">
+                		</h:inputText>
+                		<h:graphicImage value="/img/icon/combo_arrow.png" 
+                			onclick="#{rich:component('dependenciaSuggestion')}.callSuggestion(true)"
+                    		alt="" />
+            		</h:panelGrid>				    
+					<rich:suggestionbox height="400" width="500" id="dependenciaSuggestion" for="dependencia" suggestionAction="#{dependenciaEnumeration.autocomplete}" 
+						var="dependencia">
+						<h:column>
+							<h:outputText value="#{dependenciaEnumeration.labelFor(dependencia)}"/>
+						</h:column>
+					</rich:suggestionbox>
+
+
+			</s:decorate>
+
+			<h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" columnClasses="topAlign, topALign">
+			<s:decorate id="fechaInformacionDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.showFechaInformacion()}">
+                	<ui:define name="label">#{expedienteMeAdd.fechaInformacionLabel}</ui:define>
+				    <ui:param name="required" value="true"/>
+					<rich:calendar id="fechaInformacion" showWeeksBar="false"
+									 enableManualInput="true"
+									  inputClass="#{expedienteMeAdd.expedienteEspecialEdit.isError('fechaInformacion')? 'errorEditField' : ''}"
+								 value="#{expedienteMeAdd.expedienteEspecialEdit.fechaInformacion}" datePattern="dd/MM/yyyy" inputSize="10">
+						<a4j:support event="onchanged" reRender="fechaInformacionDecoration"  ajaxSingle="true" eventsQueue="editProperty"/>
+						<a4j:support event="oninputchange" reRender="fechaInformacionDecoration" ajaxSingle="true" eventsQueue="editProperty"/>
+					</rich:calendar>
+            </s:decorate>
+			<s:decorate id="numeroDecoration" template="/layout/edit.xhtml" >
+                	<ui:define name="label">#{expedienteMeAdd.numeroExpedienteOrigenLabel}</ui:define>
+					<ui:param name="required" value="true"/>
+					<!-- 
+					<h:inputText id="numeroCodigo"	                
+					   		styleClass="#{expedienteMeAdd.expedienteEspecialEdit.isError('numeroCodigo')? 'errorEditField' : ''}"
+	                		size="2" maxlength="2"               		
+	                          value="#{expedienteMeAdd.expedienteEspecialEdit.numeroCodigo}">
+	                </h:inputText>
+					<span display="inline-block" width="10px"></span>
+					-->
+	                <h:inputText id="numero"	                
+									styleClass="#{expedienteMeAdd.expedienteEspecialEdit.isError('numero')? 'errorEditField' : ''}"
+	                		size="25"
+	                          value="#{expedienteMeAdd.expedienteEspecialEdit.numero}">
+	                </h:inputText>
+            </s:decorate>
+            </h:panelGrid>
+			<s:decorate id="juezExhortanteDecoration" template="/layout/edit.xhtml" rendered="#{expedienteMeAdd.showJuezExortante()}">
+                	<ui:define name="label">#{messages['expedienteEspecial.juezExhortante']}</ui:define>
+					<ui:param name="required" value="true"/>
+	                <h:inputText id="juezExhortante"
+							styleClass="#{expedienteMeAdd.expedienteEspecialEdit.isError('juezExhortante')? 'errorEditField' : ''}"
+	                		size="50"
+	                          value="#{expedienteMeAdd.expedienteEspecialEdit.juezExhortante}">
+	                </h:inputText>
+            </s:decorate>
+            
+			<s:decorate id="caratulaOrigenDecoration" rendered="#{expedienteMeAdd.showCaratulaOrigen()}" template="/layout/editBlock.xhtml" >
+                	<ui:define name="label">#{messages['expedienteEspecial.caratulaOrigen']}</ui:define>
+					<ui:param name="required" value="#{expedienteMeAdd.isRequiredCaratulaOrigen()}"/>
+					<h:inputTextarea id="caratulaOrigen"
+                              cols="98"
+							styleClass="#{expedienteMeAdd.expedienteEspecialEdit.isError('caratulaOrigen')? 'errorEditField' : ''}"
+                              rows="2"
+	                          value="#{expedienteMeAdd.expedienteEspecialEdit.caratulaOrigen}">
+	                </h:inputTextarea>
+            </s:decorate>
+            
+			<s:decorate id="descripcionDecoration" template="/layout/editBlock.xhtml" >
+                	<ui:define name="label">#{messages['expedienteEspecial.descripcion']}</ui:define>
+					<h:inputTextarea id="descripcion"
+	                               cols="98"
+	                               rows="3"
+	                              value="#{expedienteMeAdd.expedienteEspecialEdit.descripcion}">
+	                </h:inputTextarea>
+	         </s:decorate>            
+
+		</ui:decorate>
+	</s:fragment>
+	<!-- end group origen -->
+
+
+	<!-- group fojasGroup -->
+	<ui:decorate template="/layout/group/editGroupCollapsible.xhtml" >
+       	<ui:param name="label" value="#{messages['expedienteEspecial.fojasGroup']}"/>
+		<ui:param name="id" value="fojasGroup"/>
+
+			<s:decorate id="fojasDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.fojas']}</ui:define>
+						<h:inputText id="expedienteEspecialFojas"
+								size="4"
+								styleClass="#{expedienteMeAdd.fojasEdit.error ? 'errorEditField' : ''}"
+								  value="#{expedienteMeAdd.fojasEdit.fojas}"/>
+			</s:decorate>
+			<s:decorate id="cuerposDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.cuerpos']}</ui:define>
+						<h:inputText id="expedienteEspecialFojas"
+								size="4"
+								  value="#{expedienteMeAdd.fojasEdit.cuerpos}"/>
+			</s:decorate>
+			<s:decorate id="agregadosDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.agregados']}</ui:define>
+						<h:inputText id="expedienteEspecialFojas"
+								size="4"
+								  value="#{expedienteMeAdd.fojasEdit.agregados}"/>
+			</s:decorate>
+			<s:decorate id="sobresDecoration" template="/layout/edit.xhtml" >
+					<ui:define name="label">#{messages['expedienteEspecial.sobres']}</ui:define>
+						<h:inputText id="expedienteEspeci  alFojas"
+								size="4"
+								  value="#{expedienteMeAdd.fojasEdit.sobres}"/>
+			</s:decorate>
+
+	</ui:decorate>
+
+		
+ 			<div style="clear:both;padding-bottom:15px">
+	            <ui:decorate template="/layout/required_info.xhtml">
+					#{messages['edit_required_fields']} 
+    	        </ui:decorate>
+            </div>            
+            
+   		<ui:define name="collections">
+		</ui:define>
+
+   		<ui:define name="buttons">               
+	        <div class="actionButtons">
+		            <h:commandButton id="button-save" styleClass="button main-button"
+						value="#{messages['button_save']}" 
+						action="#{expedienteMeAdd.doSaveEspecial}">
+						<s:defaultAction/>
+					</h:commandButton>
+		            <h:commandButton styleClass="button main-button"
+						value="#{messages['button_next']}" 
+						action="#{expedienteMeAdd.doSaveEspecial('/webCustom/mesaEntrada/expediente/add/expedienteMeAdd-1.xhtml')}"/>
+						
+
+			</div>
+		</ui:define>
+	</ui:decorate>
+    </h:form>
+
+	<div class="indent_lines">
+	</div>
+
+</ui:define>
+
+
+</ui:composition>
